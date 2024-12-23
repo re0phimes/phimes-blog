@@ -96,6 +96,29 @@
         </div>
         <span class="title">杂项调整</span>
         <div class="set-item">
+          <span class="set-label">主题模式</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: themeType === 'light' }]"
+              @click="themeType = 'light'"
+            >
+              浅色
+            </span>
+            <span
+              :class="['options', { choose: themeType === 'dark' }]"
+              @click="themeType = 'dark'"
+            >
+              深色
+            </span>
+            <span
+              :class="['options', { choose: themeType === 'auto' }]"
+              @click="themeType = 'auto'"
+            >
+              跟随系统
+            </span>
+          </div>
+        </div>
+        <div class="set-item">
           <span class="set-label">额外信息显示位置</span>
           <div class="set-options">
             <span

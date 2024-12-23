@@ -5,9 +5,9 @@ export const mainStore = defineStore("main", {
     return {
       // 主题类别
       themeType: "auto",
-      themeValue: "dark",
+      themeValue: "light",
       // banner
-      bannerType: "full",
+      bannerType: "half",
       // 加载状态
       loadingStatus: true,
       // 滚动高度
@@ -24,7 +24,7 @@ export const mainStore = defineStore("main", {
       // 中控台显示
       controlShow: false,
       // 搜索框显示
-      searchShow: false,
+      searchShow: true,
       // 个性化配置显示
       showSeetings: false,
       // 播放器数据
@@ -40,7 +40,7 @@ export const mainStore = defineStore("main", {
       // 使用自定义右键菜单
       useRightMenu: false, //默认不开启
       // 背景模糊
-      backgroundBlur: false,
+      backgroundUrl: true,
       // 全站字体
       fontFamily: "hmos",
       // 全站字体大小
@@ -50,9 +50,9 @@ export const mainStore = defineStore("main", {
       // 上次滚动位置
       lastScrollY: 0,
       // 站点背景
-      backgroundType: "patterns",
+      backgroundType: "none", //patterns
       // backgroundUrl: "https://tuapi.eees.cc/api.php?category={dongman,fengjing}&type=302",
-      backgroundBlur: "/images/百万.jpg"
+      backgroundUrl: "/images/百万.jpg"
     };
   },
   getters: {},
