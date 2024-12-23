@@ -23,7 +23,7 @@
   </main>
   <!-- 页脚 -->
   <FooterLink v-show="!loadingStatus" :showBar="isPostPage && !page.isNotFound" />
-  <Footer v-show="!loadingStatus" />
+  <!-- <Footer v-show="!loadingStatus" /> -->
   <!-- 悬浮菜单 -->
   <Teleport to="body">
     <!-- 左侧菜单 -->
@@ -163,16 +163,20 @@ onBeforeUnmount(() => {
   animation: show 0.5s forwards;
   animation-duration: 0.5s;
   display: block;
+
   &.loading {
     display: none;
   }
+
   @media (max-width: 768px) {
     padding: 1rem 1.5rem;
+
     &.is-post {
       padding: 0;
     }
   }
 }
+
 .left-menu {
   position: fixed;
   left: 20px;
@@ -181,6 +185,7 @@ onBeforeUnmount(() => {
   transition:
     opacity 0.3s,
     transform 0.3s;
+
   &.hidden {
     opacity: 0;
     transform: translateY(100px);
