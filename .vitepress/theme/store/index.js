@@ -5,9 +5,9 @@ export const mainStore = defineStore("main", {
     return {
       // 主题类别
       themeType: "auto",
-      themeValue: "light",
+      themeValue: "dark",
       // banner
-      bannerType: "half",
+      bannerType: "full",
       // 加载状态
       loadingStatus: true,
       // 滚动高度
@@ -38,7 +38,7 @@ export const mainStore = defineStore("main", {
       // 移动端菜单显示
       mobileMenuShow: false,
       // 使用自定义右键菜单
-      useRightMenu: true,
+      useRightMenu: false, //默认不开启
       // 背景模糊
       backgroundBlur: false,
       // 全站字体
@@ -51,7 +51,8 @@ export const mainStore = defineStore("main", {
       lastScrollY: 0,
       // 站点背景
       backgroundType: "patterns",
-      backgroundUrl: "https://tuapi.eees.cc/api.php?category={dongman,fengjing}&type=302",
+      // backgroundUrl: "https://tuapi.eees.cc/api.php?category={dongman,fengjing}&type=302",
+      backgroundBlur: "images/百万.jpg"
     };
   },
   getters: {},

@@ -10,11 +10,7 @@
           <i class="iconfont icon-safe" />
           {{ theme.icp }}
         </a>
-        <a
-          class="upyun link"
-          href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral"
-          target="_blank"
-        >
+        <a class="upyun link" href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral" target="_blank">
           <i class="iconfont icon-upyun" />
           又拍云
         </a>
@@ -31,11 +27,7 @@
           <i class="iconfont icon-rss" />
           <span class="name">订阅</span>
         </a>
-        <a
-          class="cc link"
-          href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans"
-          target="_blank"
-        >
+        <a class="cc link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">
           <i class="iconfont icon-line" />
           <i class="iconfont icon-by-line" />
           <i class="iconfont icon-nc-line" />
@@ -96,6 +88,7 @@ onBeforeUnmount(() => {
     color 0.3s,
     border 0.3s,
     background-color 0.3s;
+
   .footer-content {
     display: flex;
     flex-wrap: wrap;
@@ -108,6 +101,7 @@ onBeforeUnmount(() => {
     color: var(--main-font-color);
     line-height: 1;
     min-height: 32px;
+
     .copyright {
       .icp {
         .iconfont {
@@ -115,6 +109,7 @@ onBeforeUnmount(() => {
           opacity: 0.6;
         }
       }
+
       .upyun {
         .iconfont {
           font-size: 20px;
@@ -122,25 +117,31 @@ onBeforeUnmount(() => {
         }
       }
     }
+
     .meta {
       display: flex;
       flex-direction: row;
       align-items: center;
+
       .power {
         margin-right: 4px;
+
         .by {
           font-weight: normal;
           opacity: 0.8;
           margin-right: 6px;
         }
       }
+
       .rss {
         margin-right: 4px;
+
         .iconfont {
           font-weight: normal;
           margin-right: 6px;
         }
       }
+
       .cc {
         .iconfont {
           margin: 0 2px;
@@ -148,6 +149,7 @@ onBeforeUnmount(() => {
         }
       }
     }
+
     .link {
       display: inline-flex;
       flex-direction: row;
@@ -164,25 +166,31 @@ onBeforeUnmount(() => {
         color 0.3s,
         background-color 0.3s;
       cursor: pointer;
+
       .iconfont {
         font-size: 22px;
         margin-right: 4px;
         transition: color 0.3s;
       }
+
       &:hover {
         color: var(--main-color);
         background-color: var(--main-color-bg);
+
         .iconfont {
           color: var(--main-color);
         }
       }
     }
+
     @media (max-width: 768px) {
       font-size: 14px;
+
       .meta {
         display: none;
       }
     }
+
     @media (max-width: 420px) {
       .copyright {
         .icp {
