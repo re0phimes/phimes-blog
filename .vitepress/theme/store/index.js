@@ -50,8 +50,7 @@ export const mainStore = defineStore("main", {
       // 上次滚动位置
       lastScrollY: 0,
       // 站点背景
-      backgroundType: "none", //patterns
-      // backgroundUrl: "https://tuapi.eees.cc/api.php?category={dongman,fengjing}&type=302",
+      backgroundType: "image",
       backgroundUrl: "/images/百万.jpg"
     };
   },
@@ -84,18 +83,13 @@ export const mainStore = defineStore("main", {
     },
     // 切换明暗模式
     changeThemeType() {
-      // 禁止壁纸模式切换
-      if (this.backgroundType === "image") {
-        $message.warning("无法在壁纸模式下切换明暗模式", {
-          duration: 1500,
-        });
-        return false;
-      }
+      // 更新主题类型
       this.themeType === "auto"
         ? (this.themeType = "dark")
         : this.themeType === "dark"
           ? (this.themeType = "light")
           : (this.themeType = "auto");
+
       // 弹窗提示
       if (typeof $message !== "undefined") {
         const text =
