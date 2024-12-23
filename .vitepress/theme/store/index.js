@@ -52,7 +52,7 @@ export const mainStore = defineStore("main", {
       // 站点背景
       backgroundType: "patterns",
       // backgroundUrl: "https://tuapi.eees.cc/api.php?category={dongman,fengjing}&type=302",
-      backgroundBlur: "images/百万.jpg"
+      backgroundBlur: "/images/百万.jpg"
     };
   },
   getters: {},
