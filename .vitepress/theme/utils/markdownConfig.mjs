@@ -17,9 +17,9 @@ const markdownConfig = (md, themeConfig) => {
 
     // 处理 Obsidian admonition
     if (lang.startsWith('ad-')) {
-      const type = lang.substring(3); // 移除 'ad-' 前缀
+      const type = lang.substring(3); // 取ad-之后的内容，获取类型
       const content = token.content;
-      
+
       const admonitionTypes = {
         'note': { title: 'NOTE', className: 'info' },
         'question': { title: 'QUESTION', className: 'info' },
@@ -34,7 +34,7 @@ const markdownConfig = (md, themeConfig) => {
       };
 
       const config = admonitionTypes[type] || { title: type.toUpperCase(), className: 'info' };
-      
+
       return `<div class="custom-container ${config.className}">
         <p class="custom-container-title">${config.title}</p>
         ${md.render(content)}
