@@ -20,25 +20,26 @@
         </span>
         <span class="num">{{ daysFromNow(theme.since) }} 天</span>
       </div>
-      <div class="data-item">
+      <!-- <div class="data-item">
         <span class="name">
           <i class="iconfont icon-visibility"></i>
           总访问量
         </span>
         <span class="num" id="busuanzi_value_site_pv">0</span>
-      </div>
-      <div class="data-item">
+      </div> -->
+      <!-- <div class="data-item">
         <span class="name">
           <i class="iconfont icon-account"></i>
           总访客数
         </span>
         <span class="num" id="busuanzi_value_site_uv">0</span>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 
 <script setup>
+import { useData } from 'vitepress';
 import { loadScript } from "@/utils/commonTools";
 import { daysFromNow } from "@/utils/helper";
 
