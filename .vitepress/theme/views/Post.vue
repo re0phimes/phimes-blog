@@ -86,7 +86,7 @@
             反馈与投诉
           </a>
         </div>
-        <RewardBtn />
+        <!-- <RewardBtn /> -->
         <!-- 下一篇 -->
         <NextPost />
         <!-- 相关文章 -->
