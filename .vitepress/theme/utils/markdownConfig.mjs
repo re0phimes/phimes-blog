@@ -35,8 +35,8 @@ const markdownConfig = (md, themeConfig) => {
 
       const config = admonitionTypes[type] || { title: type.toUpperCase(), className: 'info' };
 
-      return `<div class="custom-container ${config.className}">
-        <p class="custom-container-title">${config.title}</p>
+      return `<div class="${config.className} custom-block">
+        <p class="custom-block-title">${config.title}</p>
         ${md.render(content)}
       </div>`;
     }
@@ -120,33 +120,33 @@ const markdownConfig = (md, themeConfig) => {
   };
 
   // obsidian admonition containers
-  const admonitionTypes = {
-    'note': { title: 'NOTE', className: 'info' },
-    'question': { title: 'QUESTION', className: 'info' },
-    'warning': { title: 'WARNING', className: 'warning' },
-    'tip': { title: 'TIP', className: 'tip' },
-    'summary': { title: 'SUMMARY', className: 'summary' }
-  };
+  // const admonitionTypes = {
+  //   'note': { title: 'NOTE', className: 'info' },
+  //   'question': { title: 'QUESTION', className: 'info' },
+  //   'warning': { title: 'WARNING', className: 'warning' },
+  //   'tip': { title: 'TIP', className: 'tip' },
+  //   'summary': { title: 'SUMMARY', className: 'summary' }
+  // };
 
-  Object.entries(admonitionTypes).forEach(([type, config]) => {
-    md.use(container, `ad-${type}`, {
-      validate: (params) => params.trim().match(new RegExp(`^ad-${type}`)),
-      render: (tokens, idx, options, env) => {
-        if (tokens[idx].nesting === 1) {
-          // 开始标签
-          return `<div class="custom-container ${config.className}">\n<p class="custom-container-title">${config.title}</p>\n`;
-        } else if (tokens[idx].nesting === 0) {
-          // 处理容器内容
-          const content = tokens[idx].content;
-          return md.render(content);
-        } else {
-          // 结束标签
-          return '</div>\n';
-        }
-      },
-      marker: '`'
-    });
-  });
+  // Object.entries(admonitionTypes).forEach(([type, config]) => {
+  //   md.use(container, `ad-${type}`, {
+  //     validate: (params) => params.trim().match(new RegExp(`^ad-${type}`)),
+  //     render: (tokens, idx, options, env) => {
+  //       if (tokens[idx].nesting === 1) {
+  //         // 开始标签
+  //         return `<div class="custom-container ${config.className}">\n<p class="custom-container-title">${config.title}</p>\n`;
+  //       } else if (tokens[idx].nesting === 0) {
+  //         // 处理容器内容
+  //         const content = tokens[idx].content;
+  //         return md.render(content);
+  //       } else {
+  //         // 结束标签
+  //         return '</div>\n';
+  //       }
+  //     },
+  //     marker: '`'
+  //   });
+  // });
 };
 
 export default markdownConfig;
