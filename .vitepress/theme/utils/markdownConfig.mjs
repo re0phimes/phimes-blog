@@ -7,6 +7,44 @@ const markdownConfig = (md, themeConfig) => {
   // 插件
   md.use(markdownItAttrs);
   md.use(tabsMarkdownPlugin);
+
+  // 修改默认的代码块渲染器来支持 Obsidian admonition
+  const fence = md.renderer.rules.fence;
+  md.renderer.rules.fence = (...args) => {
+    const [tokens, idx] = args;
+    const token = tokens[idx];
+    const lang = token.info.trim();
+
+    // 处理 Obsidian admonition
+    if (lang.startsWith('ad-')) {
+      const type = lang.substring(3); // 移除 'ad-' 前缀
+      const content = token.content;
+      
+      const admonitionTypes = {
+        'note': { title: 'NOTE', className: 'info' },
+        'question': { title: 'QUESTION', className: 'info' },
+        'warning': { title: 'WARNING', className: 'warning' },
+        'tip': { title: 'TIP', className: 'tip' },
+        'summary': { title: 'SUMMARY', className: 'summary' },
+        'hint': { title: 'HINT', className: 'tip' },
+        'important': { title: 'IMPORTANT', className: 'warning' },
+        'caution': { title: 'CAUTION', className: 'warning' },
+        'error': { title: 'ERROR', className: 'danger' },
+        'danger': { title: 'DANGER', className: 'danger' }
+      };
+
+      const config = admonitionTypes[type] || { title: type.toUpperCase(), className: 'info' };
+      
+      return `<div class="custom-container ${config.className}">
+        <p class="custom-container-title">${config.title}</p>
+        ${md.render(content)}
+      </div>`;
+    }
+
+    // 对于非 admonition 的代码块，使用原始的渲染器
+    return fence(...args);
+  };
+
   // timeline
   md.use(container, "timeline", {
     validate: (params) => params.trim().match(/^timeline\s+(.*)$/),
@@ -80,6 +118,35 @@ const markdownConfig = (md, themeConfig) => {
                 <span class="post-img-tip">${alt}</span>
               </a>`;
   };
+
+  // obsidian admonition containers
+  const admonitionTypes = {
+    'note': { title: 'NOTE', className: 'info' },
+    'question': { title: 'QUESTION', className: 'info' },
+    'warning': { title: 'WARNING', className: 'warning' },
+    'tip': { title: 'TIP', className: 'tip' },
+    'summary': { title: 'SUMMARY', className: 'summary' }
+  };
+
+  Object.entries(admonitionTypes).forEach(([type, config]) => {
+    md.use(container, `ad-${type}`, {
+      validate: (params) => params.trim().match(new RegExp(`^ad-${type}`)),
+      render: (tokens, idx, options, env) => {
+        if (tokens[idx].nesting === 1) {
+          // 开始标签
+          return `<div class="custom-container ${config.className}">\n<p class="custom-container-title">${config.title}</p>\n`;
+        } else if (tokens[idx].nesting === 0) {
+          // 处理容器内容
+          const content = tokens[idx].content;
+          return md.render(content);
+        } else {
+          // 结束标签
+          return '</div>\n';
+        }
+      },
+      marker: '`'
+    });
+  });
 };
 
 export default markdownConfig;
