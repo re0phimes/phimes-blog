@@ -58,7 +58,7 @@
             </span>
             <span
               :class="['options', { choose: backgroundType === 'image' }]"
-              @click="(backgroundType = 'image'), (themeType = 'dark')"
+              @click="backgroundType = 'image'"
             >
               图片
             </span>

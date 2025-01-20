@@ -21,9 +21,9 @@ export const themeConfig = {
     },
   },
   // 备案信息
-  icp: "萌ICP备114514号",
+  icp: "没有",
   // 建站日期
-  since: "2020-07-28",
+  since: "2024-12-01",
   // 每页文章数据
   postSize: 8,
   // inject
@@ -148,15 +148,15 @@ export const themeConfig = {
       name: "博客",
       list: [
         {
-          icon: "/images/logo/logo.webp",
+          icon: "/images/logo/logo.ico",
           name: "主站",
           url: "/",
         },
-        {
-          icon: "/images/logo/logo.webp",
-          name: "博客镜像站",
-          url: "https://blog-backup.imsyy.top/",
-        },
+        // {
+        //   icon: "/images/logo/logo.ico",
+        //   name: "博客镜像站",
+        //   url: "https://blog-backup.imsyy.top/",
+        // },
       ],
     },
     {

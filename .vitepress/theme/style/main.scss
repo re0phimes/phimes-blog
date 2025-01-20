@@ -1,5 +1,5 @@
-@import "./font.scss";
-@import "./animation.scss";
+@use "./font";
+@use "./animation";
 
 // 全局颜色变量
 :root {
