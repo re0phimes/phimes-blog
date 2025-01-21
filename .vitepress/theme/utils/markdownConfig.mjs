@@ -36,9 +36,9 @@ const markdownConfig = (md, themeConfig) => {
       const config = admonitionTypes[type] || { title: type.toUpperCase(), className: 'info' };
 
       return `<div class="${config.className} custom-block">
-        <p class="custom-block-title">${config.title}</p>
-        ${md.render(content)}
-      </div>`;
+            <p class="custom-block-title" style="color: #fff; color: inherit;">${config.title}</p>
+            ${md.render(content)}
+    </div>`;
     }
 
     // 对于非 admonition 的代码块，使用原始的渲染器
