@@ -29,7 +29,7 @@
     <!-- 左侧菜单 -->
     <div :class="['left-menu', { hidden: footerIsShow }]">
       <!-- 全局设置 -->
-      <Settings />
+      <!-- <Settings /> -->
       <!-- 全局播放器 -->
       <Player />
     </div>

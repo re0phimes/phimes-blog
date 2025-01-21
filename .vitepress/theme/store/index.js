@@ -4,8 +4,8 @@ export const mainStore = defineStore("main", {
   state: () => {
     return {
       // 主题类别
-      themeType: "auto",
-      themeValue: "light",
+      themeType: "dark",
+      themeValue: "dark",
       // banner
       bannerType: "half",
       // 加载状态
@@ -51,7 +51,7 @@ export const mainStore = defineStore("main", {
       lastScrollY: 0,
       // 站点背景
       backgroundType: "image",
-      backgroundUrl: "/images/百万.jpg"
+      backgroundUrl: "/images/百万2.jpg"
     };
   },
   getters: {},
@@ -89,6 +89,20 @@ export const mainStore = defineStore("main", {
         : this.themeType === "dark"
           ? (this.themeType = "light")
           : (this.themeType = "auto");
+
+      // 根据主题类型设置背景
+      if (this.themeType === "light") {
+        this.backgroundType = "patterns";
+        this.themeValue = "light";
+      } else if (this.themeType === "dark") {
+        this.backgroundType = "image";
+        this.themeValue = "dark";
+      } else {
+        // auto 模式下，根据系统主题设置
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        this.backgroundType = prefersDark ? "image" : "patterns";
+        this.themeValue = prefersDark ? "dark" : "light";
+      }
 
       // 弹窗提示
       if (typeof $message !== "undefined") {
