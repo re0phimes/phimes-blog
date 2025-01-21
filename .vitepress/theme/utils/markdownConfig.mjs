@@ -36,8 +36,10 @@ const markdownConfig = (md, themeConfig) => {
       const config = admonitionTypes[type] || { title: type.toUpperCase(), className: 'info' };
 
       return `<div class="${config.className} custom-block">
-            <p class="custom-block-title" style="color: #fff; color: inherit;">${config.title}</p>
-            ${md.render(content)}
+            <p class="custom-block-title">${config.title}</p>
+            <div class="custom-block-content">
+              ${md.render(content)}
+            </div>
     </div>`;
     }
 
