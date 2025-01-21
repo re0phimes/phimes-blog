@@ -33,6 +33,7 @@
   --main-color-red: #ff3842;
   --main-font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen-Sans, Ubuntu,
     Cantarell, "Helvetica Neue", sans-serif;
+  --vp-c-bg-rgb: 255, 255, 255;
 }
 
 html.dark {
@@ -50,6 +51,7 @@ html.dark {
   --main-mask-Inverse-background: rgba(255, 255, 255, 0.08);
   --main-mask-second-background: rgba(0, 0, 0, 0.45);
   --main-color-opacity: rgba(0, 0, 0, 0.15);
+  --vp-c-bg-rgb: 18, 18, 18;
 }
 
 // 字体
@@ -74,11 +76,6 @@ html {
 // 壁纸背景
 html {
   &.image {
-    --main-card-border: #3d3d3f63;
-    --main-font-second-color: #c6c6c6;
-    --main-card-background: #1b1c20de;
-    --main-card-second-background: #21232ab5;
-
     .main-nav {
       backdrop-filter: blur(20px);
 
