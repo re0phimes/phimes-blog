@@ -4,7 +4,7 @@ tags:
   - LLM, train
 categories:
   - 技术总结
-date: 2025-3-7
+date: 2025-03-07
 ---
 
 ## 1 引言
