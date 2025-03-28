@@ -1,10 +1,8 @@
 ---
 title: 工程实现系列：从什么都不会到QLoRA分布式DPO（一）
 tags:
-  - LLM
-  - 工程实现
-  - DPO
-date: 2025-03-27
+  - LLM, DPO
+date: 2025-3-28
 ---
 
 ## 1 引言
