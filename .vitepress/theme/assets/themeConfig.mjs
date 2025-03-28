@@ -354,7 +354,7 @@ export const themeConfig = {
     },
     // 倒计时
     countDown: {
-      enable: true,
+      enable: false,
       // 倒计时日期
       data: {
         name: "春节",
