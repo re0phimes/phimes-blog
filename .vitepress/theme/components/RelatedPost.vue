@@ -29,6 +29,11 @@ const getRelatedData = () => {
   const catName = frontmatter.value.categories?.[0];
   // 指定分类数据
   const postData = theme.value.categoriesData?.[catName]?.articles;
+  // 检查数据是否存在
+  if (!postData || !Array.isArray(postData)) {
+    relatedData.value = null;
+    return;
+  }
   // 本篇索引
   const postId = generateId(page.value?.filePath);
   // 过滤掉当前文章

@@ -48,14 +48,14 @@ WTF！果然人和代码必须跑一个！
 ```
 
 **第一件事**：用`nvidia-smi`确认你driver版本
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250221231539.png)
+![image.png](https://image.phimes.top/img/20250221231539.png)
 
 
 **第二件事**：用nvcc --version确认你的cuda版本
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250221231626.png)
+![image.png](https://image.phimes.top/img/20250221231626.png)
 
 **第三件事**：确认你的pytorch版本
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250221231722.png)
+![image.png](https://image.phimes.top/img/20250221231722.png)
 
 **最后，我们确认其他环境**
 
@@ -157,7 +157,7 @@ model = get_peft_model(model, LoraConfig)
 - **r：** LoRA的秩，常见是4、8、16、32。r决定了低秩矩阵的维度上限。**那么维度越高，意味着可训练的参数就越多，但是并不适宜设置过高，一方面是可能会增加计算成本，另一个重要的因为是会增加过拟合的风险**， 所以实际任务，还要根据你的资源，和任务类型去尝试不同的r。
 - **lora_alpha：** 缩放参数，是用来控制LoRA更新。较大的lora_alpha可以有更大幅度的更新任务。但是也可能过拟合。
 - **target_modules：** LoRA的模块名称。想要知道每个模型有什么，也很简单。直接打印模型就能看到。也许你看不懂模型结构，不知道怎么选择。那我们至少先放上`q_proj`和`v_proj`，这是注意力层中的Q和V矩阵的投影。
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202502181127120.png)
+![image.png](https://image.phimes.top/img/202502181127120.png)
 
 - **lora_dropout：** 作用于 LoRA 分支的中间激活值，通过随机丢弃部分输出来防止过拟合。按照不同规模的数据集和任务来设置。一般来说小的数据集为0.1，高秩㐉（r>=16)或者一些复杂任务的情况，可以设置为0.2-0.3
 - **task_type：**
@@ -179,7 +179,7 @@ test_dataset = dataset["test"]
 
 加载的时候你会看到它从huggingface上下载数据集
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202502181356026.png)
+![image.png](https://image.phimes.top/img/202502181356026.png)
 
 #### 4.4.2 代码解释
 
@@ -334,11 +334,11 @@ if __name__ == "__main__":
 ```
 
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202502181355805.png)
+![image.png](https://image.phimes.top/img/202502181355805.png)
 
 我们之前设置的输出路径是`./output`，那么到项目根路径下，就能看到这个checkpoint了。
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202502181358357.png)
+![image.png](https://image.phimes.top/img/202502181358357.png)
 
 因为我们用的LoRA，所以现在我们还不能直接使用，现在有两个选择。用transformers加载模型，加载LoRA参数测试一下。或者直接合并。
 
@@ -447,7 +447,7 @@ if __name__ == "__main__":
 ```
 
 运行之后，你就会在命令行里看到：
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250223204936.png)
+![image.png](https://image.phimes.top/img/20250223204936.png)
 
 **很好，很暴躁**
 

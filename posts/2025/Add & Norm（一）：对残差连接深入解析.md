@@ -165,7 +165,7 @@ Add的梯度是这样的，这个梯度提供了两个优势：
 	- 因为纵向的堆叠，会给后续的层，造成错误的理解。他们本来他们是特征，然后因为我们顺着纵向堆叠。在我们刚才的意义上，纵向是S，也就是一个句子，如果堆叠起来，那对于下一个sublayer（无论是attention还是FFN）会错误的理解它为6个特征维度为3的句子。
 	- 但是这种拼接方式**并非无用，它多用于数据处理阶段**。还记得我们的(B,S,D)的结构么，batch_size就是这样沿着`axis=0`拼接而来。**当我们有多个tensor**，形状为\[S, D\]。就有了一个`batch = concat([tensor_1, tensor_2, ..., tensor_N])`这样操作之后，我们就有了N个\[S, D\]堆叠的数据，也就是我们熟悉的`[batch_size, sequence_length, feature_dimension]
 
-![特征操作](https://phimesimage.oss-accelerate.aliyuncs.com/img/20250611214441725.png)
+![特征操作](https://image.phimes.top/img/20250611214441725.png)
 
 那么到这，基本上就事情就明朗起来了。如果不用`add`，我们就只能`concat(axis=1)`，因为`concat(axis=0)`在我们transformer这个部分会完全改变数据结构，让下一个层错误的处理。而`concat(axis=1)`会让我们的特征维度翻倍。当我们原始的shape是\[B,N,D\]，操作之后，就会变成\[B, N, 2\*D\]的情况。而随着我们堆叠层数，最后这个$2^N$会让我们的数据爆炸。
 

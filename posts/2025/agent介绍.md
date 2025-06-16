@@ -19,7 +19,7 @@ Agent本质是一个自主决策的智能体，它通过持续观察环境、制
 > 从最基本的形式来看，智能体可以被定义为一个通过观察世界并使用其可用工具采取行动来实现目标的应用程序。智能体是自主的，可以独立于人类干预而行动，特别是当被赋予适当的目标或要实现的目标时。智能体在实现目标的方法上也可以是主动的。即使在没有来自人类的明确指令集的情况下，代理也可以推理下一步应该做什么来实现其最终目标。为了理解代理的内部运作，智能体的行为、行动和决策的基础组件。这些组件的组合可以被描述为认知架构，通过这些组件的混合和匹配可以实现许多这样的架构。聚焦于核心功能，代理的认知架构中有三个基本组件[^1]
 
 ## Agent、model以及workflow
-![google《agents》 models vs agents](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202501100954832.png)
+![google《agents》 models vs agents](https://image.phimes.top/img/202501100954832.png)
 
 google已经清晰阐述了models和agents的对比：
 - 知识方面，agents可以基于工具对外部知识进行扩展
@@ -42,7 +42,7 @@ workflow其实并不能和models或者agents并列去比较。workflow可以和m
 - 支持工具、models、agents通过指定的程序逻辑进行进行执行和调用
 - 具有一定的条件分支、决策控制、并行处理或者循环迭代的能力
 
-![一种workflow的例子](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202501101128193.png)
+![一种workflow的例子](https://image.phimes.top/img/202501101128193.png)
 
 # agent的组成
 
@@ -55,7 +55,7 @@ workflow其实并不能和models或者agents并列去比较。workflow可以和m
 - orchestration给予了大模型记忆、编排、根据输入进行特定方式思考的能力
 - tools则给予了大模型访问外界知识和工具的能力
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202501101129372.png)
+![image.png](https://image.phimes.top/img/202501101129372.png)
 ## model
 model是模型的基座，离线的如Qwen2.5系列、Llama系列等。这里就不再赘述
 ## 工具
