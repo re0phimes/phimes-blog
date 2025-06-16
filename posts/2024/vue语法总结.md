@@ -6,8 +6,13 @@ date: 2024-10-10
 # description: 欢迎使用 Curve 主题，这是你的第一篇文章
 articleGPT: 这是一篇vue语法总结，记录了vue的一些关键语法和使用方法
 # references:
+#   - icon: <i class="fa-brands fa-github" />
+#     name: Github
 #   - title: vitepress-theme-curve
-#     url: https://github.com/imsyy/vitepress-theme-curve
+#     url: https://github.com/phi/phimes-blog
+# friends:
+#   - Baka-Monogatari
+#   - imsyy
 ---
 
 # 特殊语法
