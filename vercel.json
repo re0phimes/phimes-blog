@@ -1,12 +1,10 @@
 {
-  "cleanUrls": true,
   "framework": "vitepress",
   "outputDirectory": ".vitepress/dist",
+  "cleanUrls": true,
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
     { "source": "/feed.xml", "destination": "/feed.xml" },
     { "source": "/:path*", "destination": "/index.html" }
-  ],
-  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm run build",
-  "installCommand": "pnpm install --no-frozen-lockfile"
+  ]
 }
