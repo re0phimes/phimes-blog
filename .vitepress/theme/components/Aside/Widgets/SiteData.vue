@@ -13,13 +13,13 @@
         </span>
         <span class="num">{{ theme.postData?.length || 0 }} 篇</span>
       </div>
-      <div class="data-item">
+      <!-- <div class="data-item">
         <span class="name">
           <i class="iconfont icon-date"></i>
           建站天数
         </span>
         <span class="num">{{ daysFromNow(theme.since) }} 天</span>
-      </div>
+      </div> -->
       <!-- <div class="data-item">
         <span class="name">
           <i class="iconfont icon-visibility"></i>

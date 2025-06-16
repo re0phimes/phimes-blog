@@ -132,7 +132,7 @@ watch(
 onMounted(() => {
   console.log(frontmatter.value, page.value, theme.value);
   // 全站置灰
-  specialDayGray();
+  // specialDayGray();
   // 更改主题类别
   changeSiteThemeType();
   // 切换系统字体样式

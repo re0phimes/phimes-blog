@@ -14,7 +14,13 @@
             <!-- 菜单 -->
             <div class="menu-list">
               <div v-for="(item, index) in nav" :key="index" class="menu-item">
-                <span class="link-title"> {{ item.text }}</span>
+                <span 
+                  class="link-title" 
+                  @click="item.link && !item.items ? handleNavClick(item.link) : null"
+                  :style="{ cursor: item.link && !item.items ? 'pointer' : 'default' }"
+                > 
+                  {{ item.text }}
+                </span>
                 <div v-if="item.items" class="link-child">
                   <div
                     v-for="(child, childIndex) in item.items"
@@ -65,7 +71,21 @@ const { nav, tagsData } = theme.value;
 const pageJump = (url) => {
   if (!url) return false;
   store.changeShowStatus("mobileMenuShow");
-  router.go(url);
+  
+  // 判断是否为外部链接
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    // 外部链接，在新标签页打开
+    window.open(url, '_blank');
+  } else {
+    // 内部链接，使用路由跳转
+    router.go(url);
+  }
+};
+
+const handleNavClick = (link) => {
+  if (link) {
+    pageJump(link);
+  }
 };
 </script>
 

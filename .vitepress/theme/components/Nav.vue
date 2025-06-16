@@ -32,7 +32,13 @@
         <div class="nav-center">
           <div class="site-menu">
             <div v-for="(item, index) in theme.nav" :key="index" class="menu-item">
-              <span class="link-btn"> {{ item.text }}</span>
+              <span 
+                class="link-btn" 
+                @click="item.link && !item.items ? handleNavClick(item.link) : null"
+                :style="{ cursor: item.link && !item.items ? 'pointer' : 'default' }"
+              > 
+                {{ item.text }}
+              </span>
               <div v-if="item.items" class="link-child">
                 <span
                   v-for="(child, childIndex) in item.items"
@@ -51,15 +57,6 @@
           </span>
         </div>
         <div class="right-nav">
-          <!-- 开往 -->
-          <a
-            class="menu-btn nav-btn travellings"
-            title="开往-友链接力"
-            href="https://www.travellings.cn/go.html"
-            target="_blank"
-          >
-            <i class="iconfont icon-subway"></i>
-          </a>
           <!-- 随机文章 -->
           <div
             class="menu-btn nav-btn"
@@ -134,6 +131,20 @@ const router = useRouter();
 const store = mainStore();
 const { scrollData } = storeToRefs(store);
 const { site, theme, frontmatter, page } = useData();
+
+// 处理导航点击
+const handleNavClick = (link) => {
+  if (!link) return;
+  
+  // 判断是否为外部链接
+  if (link.startsWith('http://') || link.startsWith('https://')) {
+    // 外部链接，在新标签页打开
+    window.open(link, '_blank');
+  } else {
+    // 内部链接，使用路由跳转
+    router.go(link);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
