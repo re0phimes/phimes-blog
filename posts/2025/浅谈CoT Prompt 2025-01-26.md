@@ -20,7 +20,7 @@ articleGPT: 这是一篇关于大模型在CoT方面的介绍
 
 >思维链（CoT）是一种改进的提示策略，用于提高 LLM 在复杂推理任务中的性能，如算术推理、常识推理和符号推理。CoT通过要求模型在输出最终答案之前，显式的输出中间逐步的推理步骤来增强大模型的推理能力。
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250126195911.png)
+![image.png](https://image.phimes.top/img/20250126195911.png)
 
 过去一段时间，"let's solve this step by step"的prompt，可以有效提高大模型的输出效果。如果我们可以给prompt注入更结构化和目标导向的内容，那大模型的输出就会进一步提升。我们需要像教一个学生怎么做一样，每一步的思考逻辑都要给他拆解出来。这就导致了两个问题：
 
@@ -63,11 +63,11 @@ CoT Prompt发展至今，其实没有一个统一的范式，只要能够让大�
 
 也就是说通过生成多个路径的回答，即使其中有错误的，也可以通过投票的方式及时纠正自己。这样就可以避免模型过早的锁定了某一个路径的回答，从而在错误的方向上越走越远。
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250127102019.png)
+![image.png](https://image.phimes.top/img/20250127102019.png)
 
 这里我要求的deepsek-v3用三种思路解决。
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250127102109.png)
+![image.png](https://image.phimes.top/img/20250127102109.png)
 
 而deepseek-v3也趋势给出了三种，第三种实际上就是第一种，但是更为丰富。最终他也验证了结果是否一致。
 
@@ -80,7 +80,7 @@ CoT Prompt发展至今，其实没有一个统一的范式，只要能够让大�
 请将下面的问题分解成3个简单的子步骤，并逐步解决。
 ```
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250127102857.png)
+![image.png](https://image.phimes.top/img/20250127102857.png)
 
 ## 一个例子
 
@@ -174,7 +174,7 @@ CoT Prompt发展至今，其实没有一个统一的范式，只要能够让大�
 
 当我在claude-sonnet里使用这个prompt以后，得到了神奇的效果：
 
-![d9553d347f4706a7fee76e145ef8759.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/d9553d347f4706a7fee76e145ef8759.png)
+![d9553d347f4706a7fee76e145ef8759.png](https://image.phimes.top/img/d9553d347f4706a7fee76e145ef8759.png)
 
 ## 结语
 

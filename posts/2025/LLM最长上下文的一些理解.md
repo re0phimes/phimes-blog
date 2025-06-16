@@ -15,7 +15,7 @@ date: 2025-3-28
 
 huggingface模型`config.json`中的`max_position_embbedings`。从名称上看最长的位置编码嵌入，并不是最长上下文。但是位置编码决定了模型的注意力机制的最大长度，变相限制了模型具备高质量输出的最长上下文。
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202503280958977.png)
+![image.png](https://image.phimes.top/img/202503280958977.png)
 
 ## 为什么要知道最长上下文？
 
@@ -144,11 +144,11 @@ else:
 - `max_model_len`：这个参数定义了模型可以处理的最大序列长度，也就是上下文窗口的大小。它包含了输入提示（prompt）的token数和生成的token数的总和。这个值受模型架构限制，例如对于某些模型可能是4096或8192等。
 	- `vllm serve "Qwen/QwQ-32B-AWQ" --port 9999 --host 0.0.0.0 --max-model-len 4096`
 - `max_new_token` & `generation-config`：可以控制输出的长度。当然，上下文的总长度还是不变的。
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202503281216320.png)
+![image.png](https://image.phimes.top/img/202503281216320.png)
 
 ### llama.cpp
 
-![llama.cpp运行状态截图.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/d914fe215cac42734d8bf545c994e01.png)
+![llama.cpp运行状态截图.png](https://image.phimes.top/img/d914fe215cac42734d8bf545c994e01.png)
 
 #### n_keep
 
@@ -187,7 +187,7 @@ else:
 
 可以类比理解为的`transformers`中的`max_position_embeddings`
 
-![image.png](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/202503281226396.png)
+![image.png](https://image.phimes.top/img/202503281226396.png)
 
 虽然llama.cpp中没有直接名为`n_ctx_slot`的参数，但它确实实现了上下文槽位管理机制：
 

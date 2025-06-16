@@ -59,8 +59,43 @@ export const getAllPosts = async () => {
           // 获取文件创建时间和最后修改时间
           const { birthtimeMs, mtimeMs } = stat;
           // 解析 front matter
-          const { data } = matter(content);
+          const { data, content: markdownContent } = matter(content);
           const { title, date, categories, description, tags, top, cover } = data;
+          
+          // 从文章内容中提取第一张图片作为封面
+          let articleCover = cover; // 优先使用 front matter 中的 cover
+          if (!articleCover && markdownContent) {
+            // 匹配 markdown 图片语法: ![alt](url) 或 ![alt](url "title")
+            const imageRegex = /!\[.*?\]\((.*?)(?:\s+".*?")?\)/;
+            const imageMatch = markdownContent.match(imageRegex);
+            if (imageMatch && imageMatch[1]) {
+              articleCover = imageMatch[1].trim();
+            }
+          }
+          
+          // 如果没有描述，从文章内容中提取摘要
+          let autoDescription = description;
+          if (!autoDescription && markdownContent) {
+            // 移除markdown语法，提取纯文本
+            const plainText = markdownContent
+              .replace(/^#{1,6}\s+/gm, '') // 移除标题
+              .replace(/\*\*(.*?)\*\*/g, '$1') // 移除粗体
+              .replace(/\*(.*?)\*/g, '$1') // 移除斜体
+              .replace(/`(.*?)`/g, '$1') // 移除行内代码
+              .replace(/```[\s\S]*?```/g, '') // 移除代码块
+              .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
+              .replace(/\[.*?\]\(.*?\)/g, '') // 移除链接
+              .replace(/\n+/g, ' ') // 替换换行为空格
+              .trim();
+            
+            // 提取前150个字符作为摘要
+            if (plainText.length > 0) {
+              autoDescription = plainText.length > 150 
+                ? plainText.substring(0, 150) + '...' 
+                : plainText;
+            }
+          }
+          
           // 计算文章的过期天数
           const expired = Math.floor(
             (new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24),
@@ -74,10 +109,10 @@ export const getAllPosts = async () => {
             expired,
             tags,
             categories,
-            description,
+            description: autoDescription,
             regularPath: `/${item.replace(".md", ".html")}`,
             top,
-            cover,
+            cover: articleCover,
           };
         } catch (error) {
           console.error(`处理文章文件 '${item}' 时出错:`, error);

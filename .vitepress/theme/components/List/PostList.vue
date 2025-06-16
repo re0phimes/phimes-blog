@@ -9,7 +9,18 @@
       @click="toPost(item.regularPath)"
     >
       <div v-if="!simple && showCover(item)" class="post-cover">
-        <img :src="getCover(item)" :alt="item.title">
+        <div v-if="imageLoadingStates[item.id]" class="image-loading">
+          <i class="iconfont icon-loading"></i>
+          <span>加载中...</span>
+        </div>
+        <img 
+          :src="getCover(item)" 
+          :alt="item.title"
+          @error="handleImageError($event, item)"
+          @load="handleImageLoad($event, item)"
+          loading="lazy"
+          :style="{ display: imageLoadingStates[item.id] ? 'none' : 'block' }"
+        >
       </div>
       
       <div class="post-content">
@@ -50,6 +61,7 @@
 <script setup>
 import { mainStore } from "@/store";
 import { formatTimestamp } from "@/utils/helper";
+import { onMounted, reactive, watch } from 'vue';
 
 const store = mainStore();
 const router = useRouter();
@@ -107,6 +119,72 @@ const toPost = (path) => {
   // 跳转文章
   router.go(path);
 };
+
+// 图片加载错误处理
+const handleImageError = (event, item) => {
+  console.warn(`图片加载失败: ${item.title}`, event.target.src);
+  
+  // 获取默认封面
+  const { cover } = themeConfig.value ?? {};
+  const defaultCovers = cover?.showCover?.defaultCover;
+  
+  if (Array.isArray(defaultCovers) && defaultCovers.length > 0) {
+    // 如果当前已经是默认封面，则不再重试
+    if (!defaultCovers.includes(event.target.src)) {
+      const randomCover = defaultCovers[Math.floor(Math.random() * defaultCovers.length)];
+      event.target.src = randomCover;
+      console.log(`切换到默认封面: ${randomCover}`);
+    } else {
+      // 如果默认封面也加载失败，隐藏图片
+      event.target.style.display = 'none';
+      console.error('默认封面也加载失败，隐藏图片');
+    }
+  }
+};
+
+// 图片加载成功处理
+const handleImageLoad = (event, item) => {
+  // 图片加载成功，确保显示
+  event.target.style.display = 'block';
+  imageLoadingStates[item.id] = false;
+};
+
+// 预加载图片
+const preloadImages = () => {
+  if (!props.listData || !Array.isArray(props.listData)) return;
+  
+  props.listData.forEach(item => {
+    if (item.cover) {
+      const img = new Image();
+      img.src = item.cover;
+      // 预加载但不处理错误，让实际渲染时处理
+    }
+  });
+};
+
+// 组件挂载时预加载图片
+onMounted(() => {
+  preloadImages();
+});
+
+// 图片加载状态
+const imageLoadingStates = reactive({});
+
+// 初始化加载状态
+const initLoadingStates = () => {
+  if (!props.listData || !Array.isArray(props.listData)) return;
+  
+  props.listData.forEach(item => {
+    if (item.id && showCover(item)) {
+      imageLoadingStates[item.id] = true;
+    }
+  });
+};
+
+// 监听数据变化，重新初始化加载状态
+watch(() => props.listData, () => {
+  initLoadingStates();
+}, { immediate: true });
 </script>
 
 <style lang="scss" scoped>
@@ -124,6 +202,26 @@ const toPost = (path) => {
       flex: 0 0 35%;
       overflow: hidden;
       transform: translateZ(0);
+      position: relative;
+      
+      .image-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--main-font-second-color);
+        font-size: 14px;
+        z-index: 1;
+        
+        .iconfont {
+          font-size: 24px;
+          margin-bottom: 8px;
+          animation: spin 1s linear infinite;
+        }
+      }
       
       img {
         width: 100%;
@@ -330,6 +428,15 @@ const toPost = (path) => {
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
     }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>
