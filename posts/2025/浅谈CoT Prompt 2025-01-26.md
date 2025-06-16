@@ -3,7 +3,7 @@ title: 浅谈CoT 2025-01-26
 tags:
   - LLM
 categories:
-  - 技术总结
+  - LLM原理
 date: 2025-1-26
 articleGPT: 这是一篇关于大模型在CoT方面的介绍
 ---

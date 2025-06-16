@@ -1,5 +1,7 @@
 ---
 title: 前馈神经网络（FFN）详解（二）：从激活函数到MOE
+categories:
+  - LLM原理
 date: 2025-6-2
 ---
 ## 1 前言

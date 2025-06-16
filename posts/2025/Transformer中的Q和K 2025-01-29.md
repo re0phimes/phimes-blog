@@ -2,9 +2,8 @@
 title: Transformer 2025-01-29
 tags:
   - 算法原理
-  - 科研方向
 categories:
-  - 科研
+  - LLM原理
 date: 2025-1-29
 articleGPT: 这是一篇关于Transformer里的Q、K三个矩阵的个人理解
 number headings: first-level 1, max 6, _.1.1

@@ -1,6 +1,8 @@
 ---
 title: 前馈神经网络（FFN）详解（一）
-date: 2025-5-16
+categories:
+  - LLM原理
+date: 2025-5-14
 tags:
   - LLM
   - 算法原理

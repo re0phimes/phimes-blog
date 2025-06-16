@@ -1,7 +1,9 @@
 ---
 title: 注意力机制之多头注意力（Multi-Head Attention）
 tags: [算法原理, LLM]
-date: 2025-05-05
+categories:
+  - LLM原理
+date: 2025-5-6
 ---
 ## 写在前面
 
