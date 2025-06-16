@@ -4,7 +4,7 @@ tags:
   - LLM
   - Agent
 categories:
-  - 技术总结
+  - agents
 date: 2025-1-10
 ---
 
