@@ -1,3 +1,13 @@
+---
+title: Add & Norm（二）：从传统CV到Transformer里的Normalizaiton详解
+date: 2025-7-28
+categories:
+  - LLM原理
+tags:
+  - LLM
+  - 算法原理
+---
+
 ## 1 写在前面
 
 这一篇会稍微有点偏，我们要说明白Transformer中的LayerNorm和RMSNorm，需要把不同领域的Normalizaiton都过一遍。所以整个文章会从传统的CV领域的CNN开始说明，涉及不同数据样式、作用域和任务目标，最终说明Transformer中的LayerNorm和RMSNorm。
