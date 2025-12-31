@@ -174,13 +174,16 @@ watch(
     width: 100%;
     display: flex;
     flex-direction: row;
+    gap: 1rem;
     .posts-content {
-      width: calc(100% - 300px);
+      flex: 1;
+      min-width: 0;
       transition: width 0.3s;
     }
     .main-aside {
+      flex: 0 0 300px;
       width: 300px;
-      padding-left: 1rem;
+      padding-left: 0;
     }
     @media (max-width: 1200px) {
       .posts-content {
