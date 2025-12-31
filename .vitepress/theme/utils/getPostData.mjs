@@ -61,6 +61,15 @@ export const getAllPosts = async () => {
           // 解析 front matter
           const { data, content: markdownContent } = matter(content);
           const { title, date, categories, description, tags, top, cover } = data;
+
+          // Most Popular（策展/排序字段，MVP 预留）
+          // - popular: boolean
+          // - popular_rank / popularRank: number（越大越靠前，具体策略在首页 selector 中定义）
+          const rawPopularRank = data?.popular_rank ?? data?.popularRank;
+          const popularRankNumber =
+            rawPopularRank === undefined || rawPopularRank === null ? undefined : Number(rawPopularRank);
+          const popularRank = Number.isFinite(popularRankNumber) ? popularRankNumber : undefined;
+          const popular = Boolean(data?.popular) || popularRank !== undefined;
           
           // 从文章内容中提取第一张图片作为封面
           let articleCover = cover; // 优先使用 front matter 中的 cover
@@ -113,6 +122,8 @@ export const getAllPosts = async () => {
             regularPath: `/${item.replace(".md", ".html")}`,
             top,
             cover: articleCover,
+            popular,
+            popularRank,
           };
         } catch (error) {
           console.error(`处理文章文件 '${item}' 时出错:`, error);
