@@ -41,6 +41,14 @@ export const themeConfig = {
         limit: 6,
         // 策展式列表：按文章 regularPath 指定，顺序固定
         curated: [],
+        // 可选：构建期读取外部统计缓存（例如从 PV/热度服务导出的 popular.json）
+        // - 启用后会在构建期把 rank/score 合并进 postData.popularRank
+        // - 文件不存在/解析失败时自动降级，不会阻塞 build
+        externalCache: {
+          enable: false,
+          // 相对项目根目录的路径
+          file: "data/popular.json",
+        },
         // 查看全部
         moreLink: "/pages/archives",
       },

@@ -12,6 +12,7 @@ import { getThemeConfig } from "./init.mjs";
 import markdownConfig from "./theme/utils/markdownConfig.mjs";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
+import fs from "fs-extra";
 import path from "path";
 
 // 获取全局数据
@@ -19,6 +20,83 @@ const postData = await getAllPosts();
 
 // 获取主题配置
 const themeConfig = await getThemeConfig();
+
+/**
+ * Optional: merge Most Popular ranking cache into postData at build-time.
+ *
+ * Supported JSON shapes (examples):
+ * - [\"/posts/a.html\", \"/posts/b.html\"]                      // order list
+ * - [{\"regularPath\":\"/posts/a.html\",\"score\":123}, ...]   // score list
+ * - {\"/posts/a.html\": 123, \"/posts/b.html\": 80}            // score map
+ *
+ * This is best-effort: missing file / parse errors will NOT fail the build.
+ */
+const mergeMostPopularExternalCache = async (posts, config) => {
+    const cacheConfig = config?.home?.highlights?.mostPopular?.externalCache;
+    if (!cacheConfig?.enable) return;
+
+    const rawFile = cacheConfig.file || "data/popular.json";
+    const filePath = path.resolve(__dirname, "..", rawFile);
+
+    const exists = await fs.pathExists(filePath);
+    if (!exists) {
+        console.warn(`[popular-cache] file not found, fallback to curated: ${rawFile}`);
+        return;
+    }
+
+    let raw;
+    try {
+        raw = await fs.readJSON(filePath);
+    } catch (error) {
+        console.warn(`[popular-cache] failed to read/parse ${rawFile}, fallback to curated`, error);
+        return;
+    }
+
+    const scoreByPath = new Map();
+
+    // 1) order list
+    if (Array.isArray(raw) && raw.every((item) => typeof item === "string")) {
+        raw.forEach((regularPath, index) => {
+            // Higher score ranks higher
+            scoreByPath.set(regularPath, raw.length - index);
+        });
+    }
+    // 2) score list
+    else if (Array.isArray(raw) && raw.every((item) => item && typeof item === "object")) {
+        raw.forEach((item) => {
+            const regularPath = item.regularPath || item.path;
+            const score = item.score ?? item.rank ?? item.pv ?? item.views;
+            const scoreNumber = Number(score);
+            if (typeof regularPath !== "string" || !regularPath) return;
+            if (!Number.isFinite(scoreNumber)) return;
+            scoreByPath.set(regularPath, scoreNumber);
+        });
+    }
+    // 3) score map
+    else if (raw && typeof raw === "object") {
+        Object.entries(raw).forEach(([regularPath, score]) => {
+            const scoreNumber = Number(score);
+            if (typeof regularPath !== "string" || !regularPath) return;
+            if (!Number.isFinite(scoreNumber)) return;
+            scoreByPath.set(regularPath, scoreNumber);
+        });
+    }
+
+    if (scoreByPath.size === 0) {
+        console.warn(`[popular-cache] empty/invalid cache: ${rawFile}`);
+        return;
+    }
+
+    posts.forEach((post) => {
+        if (!post || typeof post.regularPath !== "string") return;
+        const score = scoreByPath.get(post.regularPath);
+        if (!Number.isFinite(score)) return;
+        post.popularRank = score;
+        post.popular = true;
+    });
+};
+
+await mergeMostPopularExternalCache(postData, themeConfig);
 
 // https://vitepress.dev/reference/site-config
 export default withPwa(
