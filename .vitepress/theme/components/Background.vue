@@ -88,9 +88,6 @@ const coverLoaded = () => {
   coverHasError.value = false;
 };
 
-// 添加调试信息
-console.log('Background type:', backgroundType.value)
-console.log('Background URL:', backgroundUrl.value)
 </script>
 
 <style lang="scss" scoped>
