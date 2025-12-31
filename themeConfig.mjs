@@ -26,6 +26,34 @@ export const themeConfig = {
   since: "2020-07-28",
   // 每页文章数据
   postSize: 8,
+  // 首页（Home）
+  home: {
+    // 首页开头 Highlights 模块
+    highlights: {
+      // 总开关
+      enable: true,
+      // 仅首页第一页展示（/，不含 /page/2+；不含分类/标签页）
+      onlyFirstPage: true,
+      // Most Popular（MVP：策展式，非真实 PV 排行）
+      mostPopular: {
+        title: "Most Popular",
+        // 展示条数
+        limit: 6,
+        // 策展式列表：按文章 regularPath 指定，顺序固定
+        curated: [],
+        // 查看全部
+        moreLink: "/pages/archives",
+      },
+      // Recent Posts
+      recentPosts: {
+        title: "Recent Posts",
+        // 展示条数
+        limit: 6,
+        // 查看全部
+        moreLink: "/pages/archives",
+      },
+    },
+  },
   // inject
   inject: {
     // 头部
