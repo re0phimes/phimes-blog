@@ -33,6 +33,7 @@
 
 <script setup>
 import { mainStore } from "@/store";
+import { selectHomeHighlights } from "@/utils/homeSections.mjs";
 
 const { theme } = useData();
 const store = mainStore();
@@ -62,6 +63,30 @@ const props = defineProps({
 // 每页文章数
 const postSize = theme.value.postSize;
 
+// 首页 Highlights 数据（用于：去重/分页/展示条件）
+const homeHighlightsData = computed(() => selectHomeHighlights(theme.value?.postData, theme.value));
+const homeHighlightsExcludedIds = computed(() => {
+  const idSet = new Set();
+  const { mostPopularPosts = [], recentPosts = [] } = homeHighlightsData.value ?? {};
+  [...mostPopularPosts, ...recentPosts].forEach((post) => {
+    if (!post || post.id === undefined || post.id === null) return;
+    idSet.add(String(post.id));
+  });
+  return idSet;
+});
+
+// 首页文章流（去除 Highlights 已展示的文章，避免重复）
+const homeFeedPostData = computed(() => {
+  const data = theme.value?.postData;
+  if (!Array.isArray(data)) return [];
+
+  const highlightsConfig = theme.value?.home?.highlights;
+  if (!highlightsConfig?.enable) return data;
+
+  const excludedIds = homeHighlightsExcludedIds.value;
+  return data.filter((post) => !post || post.id === undefined || post.id === null || !excludedIds.has(String(post.id)));
+});
+
 // 首页 Highlights 显示条件（仅首页第一页，且不在分类/标签页）
 const shouldShowHighlights = computed(() => {
   const highlightsConfig = theme.value?.home?.highlights;
@@ -81,7 +106,7 @@ const allListTotal = computed(() => {
     ? theme.value.categoriesData[props.showCategories]?.articles
     : props.showTags
       ? theme.value.tagsData[props.showTags]?.articles
-      : theme.value.postData;
+      : homeFeedPostData.value;
   // 返回数量
   return data ? data.length : 0;
 });
@@ -114,7 +139,7 @@ const postData = computed(() => {
   }
   // 文章数据
   else {
-    data = theme.value.postData;
+    data = homeFeedPostData.value;
   }
   // 返回列表
   return data ? data.slice(page * postSize, page * postSize + postSize) : [];
