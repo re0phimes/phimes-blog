@@ -91,3 +91,71 @@ export const selectMostPopularPosts = (postData, mostPopularConfig = {}, options
 
   return selected.slice(0, limit);
 };
+
+/**
+ * Select Recent Posts (date desc; stable tie-breakers; supports excludeIds).
+ *
+ * @param {Array<object>} postData - theme.postData
+ * @param {object} recentConfig - theme.home.highlights.recentPosts
+ * @param {object} [options]
+ * @param {Array<string|number>} [options.excludeIds]
+ * @returns {Array<object>}
+ */
+export const selectRecentPosts = (postData, recentConfig = {}, options = {}) => {
+  if (!Array.isArray(postData) || postData.length === 0) return [];
+
+  const rawLimit = Number(recentConfig?.limit);
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 6;
+
+  const excludeIds = new Set(
+    (Array.isArray(options.excludeIds) ? options.excludeIds : []).map((id) => String(id)),
+  );
+
+  const candidates = postData.filter((post) => post && post.id !== undefined && post.id !== null);
+  candidates.sort((a, b) => {
+    const aDate = Number(a.date) || 0;
+    const bDate = Number(b.date) || 0;
+    if (aDate !== bDate) return bDate - aDate;
+
+    const aModified = Number(a.lastModified) || 0;
+    const bModified = Number(b.lastModified) || 0;
+    if (aModified !== bModified) return bModified - aModified;
+
+    const aPath = typeof a.regularPath === "string" ? a.regularPath : "";
+    const bPath = typeof b.regularPath === "string" ? b.regularPath : "";
+    return aPath.localeCompare(bPath);
+  });
+
+  const selected = [];
+  const selectedIds = new Set();
+  for (const post of candidates) {
+    if (selected.length >= limit) break;
+    const idKey = String(post.id);
+    if (excludeIds.has(idKey) || selectedIds.has(idKey)) continue;
+    selected.push(post);
+    selectedIds.add(idKey);
+  }
+
+  return selected.slice(0, limit);
+};
+
+/**
+ * Select homepage Highlights sections.
+ *
+ * @param {Array<object>} postData - theme.postData
+ * @param {object} themeConfig - theme config (expects themeConfig.home.highlights.*)
+ * @returns {{ mostPopularPosts: Array<object>, recentPosts: Array<object> }}
+ */
+export const selectHomeHighlights = (postData, themeConfig = {}) => {
+  const highlights = themeConfig?.home?.highlights;
+  if (!highlights?.enable) {
+    return { mostPopularPosts: [], recentPosts: [] };
+  }
+
+  const mostPopularPosts = selectMostPopularPosts(postData, highlights.mostPopular);
+  const recentPosts = selectRecentPosts(postData, highlights.recentPosts, {
+    excludeIds: mostPopularPosts.map((post) => post.id),
+  });
+
+  return { mostPopularPosts, recentPosts };
+};
