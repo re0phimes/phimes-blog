@@ -4,6 +4,8 @@
     <Banner v-if="showHeader" :height="store.bannerType" />
     <div class="home-content">
       <div class="posts-content">
+        <!-- 首页 Highlights：Most Popular / Recent Posts -->
+        <HomeHighlights v-if="shouldShowHighlights" />
         <!-- 分类总览 -->
         <TypeBar :type="showTags ? 'tags' : 'categories'" />
         <!-- 文章列表 -->
@@ -59,6 +61,19 @@ const props = defineProps({
 
 // 每页文章数
 const postSize = theme.value.postSize;
+
+// 首页 Highlights 显示条件（仅首页第一页，且不在分类/标签页）
+const shouldShowHighlights = computed(() => {
+  const highlightsConfig = theme.value?.home?.highlights;
+  if (!highlightsConfig?.enable) return false;
+  if (props.showCategories || props.showTags) return false;
+
+  // 默认仅首页第一页展示
+  if (highlightsConfig.onlyFirstPage !== false) {
+    return getCurrentPage() === 0;
+  }
+  return true;
+});
 
 // 列表总数量
 const allListTotal = computed(() => {
