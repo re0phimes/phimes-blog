@@ -1,12 +1,16 @@
 <template>
   <Teleport to="body">
     <!-- 站点背景 -->
-    <div v-if="backgroundType !== 'close'" :class="['background', backgroundType, themeValue]">
+    <div
+      v-if="effectiveBackgroundType !== 'close'"
+      :class="['background', effectiveBackgroundType, themeValue]"
+    >
       <img
-        v-if="backgroundType === 'image'"
-        :src="backgroundUrl"
+        v-if="effectiveBackgroundType === 'image'"
+        ref="coverRef"
+        :src="resolvedBackgroundUrl"
         id="background-cover"
-        class="cover"
+        :class="['cover', { loaded: coverIsLoaded }]"
         alt="background"
         @error="coverError"
         @load="coverLoaded"
@@ -17,26 +21,71 @@
 
 <script setup>
 import { storeToRefs } from "pinia";
+import { withBase } from "vitepress";
 import { mainStore } from "@/store";
 
 const store = mainStore();
 const { backgroundType, backgroundUrl, themeValue } = storeToRefs(store);
 
+const DEFAULT_BACKGROUND_URL = "/images/百万2.jpg";
+
+const coverRef = ref(null);
+const coverIsLoaded = ref(false);
+const coverHasError = ref(false);
+
+const isExternalUrl = (url) =>
+  url.startsWith("http://") ||
+  url.startsWith("https://") ||
+  url.startsWith("//") ||
+  url.startsWith("data:") ||
+  url.startsWith("blob:");
+
+const resolveBackgroundUrl = (rawUrl) => {
+  const trimmed = typeof rawUrl === "string" ? rawUrl.trim() : "";
+  const url = trimmed || DEFAULT_BACKGROUND_URL;
+  if (isExternalUrl(url)) return url;
+  const sitePath = url.startsWith("/") ? url : `/${url}`;
+  return encodeURI(withBase(sitePath));
+};
+
+const resolvedBackgroundUrl = computed(() => resolveBackgroundUrl(backgroundUrl.value));
+
+const effectiveBackgroundType = computed(() => {
+  if (backgroundType.value === "image" && coverHasError.value) return "patterns";
+  return backgroundType.value;
+});
+
+const resetCoverState = async () => {
+  coverIsLoaded.value = false;
+  coverHasError.value = false;
+
+  if (backgroundType.value !== "image") return;
+
+  await nextTick();
+
+  const img = coverRef.value;
+  if (img?.complete && img?.naturalWidth > 0) {
+    coverIsLoaded.value = true;
+  }
+};
+
+watch([backgroundType, resolvedBackgroundUrl], () => {
+  void resetCoverState();
+}, { immediate: true });
+
 // 加载失败
-const coverError = (e) => {
-  // 替换为透明图片
-  e.target.src =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' version='1.1' width='100%25' height='100%25'%3E%3C/svg%3E";
+const coverError = () => {
+  coverHasError.value = true;
+  coverIsLoaded.value = false;
   if (typeof $message !== "undefined") {
     $message.error("背景图片加载失败，请重新设置");
   }
 };
 
 // 加载完成
-const coverLoaded = (e) => {
-  const imgElement = e.target;
-  // 加载完成
-  imgElement.classList.add("loaded");
+const coverLoaded = () => {
+  coverIsLoaded.value = true;
+  coverHasError.value = false;
 };
 
 // 添加调试信息
