@@ -58,7 +58,7 @@ const socialLinkData = computed(() => {
 <style lang="scss" scoped>
 .footer-link {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1600px;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;

@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .mian-layout {
   width: 100%;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 1rem 2rem;
   // 手动实现加载动画
