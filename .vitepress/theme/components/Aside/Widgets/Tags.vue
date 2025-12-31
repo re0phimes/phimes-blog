@@ -34,11 +34,22 @@ const { theme } = useData();
     max-height: 500px;
     overflow: hidden;
     .tags {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
       padding: 4px 8px;
       margin: 2px;
       border-radius: 8px;
+      .name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .num {
+        flex: 0 0 auto;
         margin-left: 2px;
         opacity: 0.6;
       }
