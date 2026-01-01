@@ -2,6 +2,20 @@ import { generateId } from "./commonTools.mjs";
 import { globby } from "globby";
 import matter from "gray-matter";
 import fs from "fs-extra";
+import path from "node:path";
+
+// 读取页面浏览量数据
+const loadPopularData = () => {
+  try {
+    const popularPath = path.resolve(process.cwd(), "data/popular.json");
+    if (fs.existsSync(popularPath)) {
+      return fs.readJSONSync(popularPath);
+    }
+  } catch (e) {
+    console.warn("[getPostData] Failed to load popular.json:", e.message);
+  }
+  return {};
+};
 
 /**
  * 获取 posts 目录下所有 Markdown 文件的路径
@@ -46,6 +60,9 @@ const comparePostPriority = (a, b) => {
  */
 export const getAllPosts = async () => {
   try {
+    // 加载页面浏览量数据
+    const popularData = loadPopularData();
+
     // 获取所有 Markdown 文件的路径
     let paths = await getPostMDFilePaths();
     // 读取和处理每个 Markdown 文件的内容
@@ -68,7 +85,12 @@ export const getAllPosts = async () => {
           const rawPopularRank = data?.popular_rank ?? data?.popularRank;
           const popularRankNumber =
             rawPopularRank === undefined || rawPopularRank === null ? undefined : Number(rawPopularRank);
-          const popularRank = Number.isFinite(popularRankNumber) ? popularRankNumber : undefined;
+
+          // 从 popular.json 获取页面浏览量作为 popularRank
+          const regularPath = `/${item.replace(".md", ".html")}`;
+          const viewCount = popularData[regularPath] || 0;
+          // 优先使用 frontmatter 中的 popularRank，否则使用浏览量
+          const popularRank = Number.isFinite(popularRankNumber) ? popularRankNumber : (viewCount > 0 ? viewCount : undefined);
           const popular = Boolean(data?.popular) || popularRank !== undefined;
           
           // 从文章内容中提取第一张图片作为封面
