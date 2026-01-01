@@ -3,6 +3,47 @@ import { globby } from "globby";
 import matter from "gray-matter";
 import fs from "fs-extra";
 import path from "node:path";
+import crypto from "node:crypto";
+
+// 封面图片缓存目录
+const COVERS_DIR = path.resolve(process.cwd(), "public/covers");
+
+/**
+ * 下载外部图片到本地
+ * @param {string} url - 图片 URL
+ * @returns {Promise<string|null>} - 本地路径或 null
+ */
+const downloadCover = async (url) => {
+  if (!url || !url.startsWith("http")) return url;
+
+  try {
+    // 用 URL hash 作为文件名
+    const hash = crypto.createHash("md5").update(url).digest("hex").slice(0, 12);
+    const ext = path.extname(new URL(url).pathname) || ".png";
+    const filename = `${hash}${ext}`;
+    const localPath = path.join(COVERS_DIR, filename);
+
+    // 已存在则跳过
+    if (fs.existsSync(localPath)) {
+      return `/covers/${filename}`;
+    }
+
+    // 确保目录存在
+    await fs.ensureDir(COVERS_DIR);
+
+    // 下载图片
+    const res = await fetch(url, { timeout: 10000 });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const buffer = Buffer.from(await res.arrayBuffer());
+    await fs.writeFile(localPath, buffer);
+    console.log(`[cover] Downloaded: ${filename}`);
+    return `/covers/${filename}`;
+  } catch (e) {
+    console.warn(`[cover] Failed to download ${url}:`, e.message);
+    return null; // 下载失败返回 null
+  }
+};
 
 // 读取页面浏览量数据
 const loadPopularData = () => {
@@ -102,6 +143,11 @@ export const getAllPosts = async () => {
             if (imageMatch && imageMatch[1]) {
               articleCover = imageMatch[1].trim();
             }
+          }
+
+          // 下载外部封面图片到本地
+          if (articleCover) {
+            articleCover = await downloadCover(articleCover);
           }
           
           // 如果没有描述，从文章内容中提取摘要
