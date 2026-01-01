@@ -34,8 +34,9 @@ try {
   }
   data = await res.json();
 } catch (error) {
-  console.error(`[popular-cache] fetch failed: ${url}`, error);
-  process.exit(1);
+  console.warn(`[popular-cache] fetch failed (non-blocking): ${url}`, error.message);
+  // 不退出，继续使用空数据或现有缓存
+  data = {};
 } finally {
   clearTimeout(timer);
 }

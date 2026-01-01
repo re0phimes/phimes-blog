@@ -41,7 +41,7 @@
         <!-- 热度 -->
         <span class="hot meta">
           <i class="iconfont icon-fire" />
-          <span id="twikoo_visitors" class="artalk-pv-count">0</span>
+          <span>{{ pageViews }}</span>
         </span>
         <!-- 评论数 -->
         <span class="chat meta hover" @click="commentRef?.scrollToComments">
@@ -103,8 +103,10 @@
 import { formatTimestamp } from "@/utils/helper";
 import { generateId } from "@/utils/commonTools";
 import initFancybox from "@/utils/initFancybox";
+import { usePageViews } from "@/composables/usePageViews";
 
 const { page, theme, frontmatter } = useData();
+const route = useRoute();
 
 // 评论元素
 const commentRef = ref(null);
@@ -114,6 +116,9 @@ const postMetaData = computed(() => {
   const postId = generateId(page.value.relativePath);
   return theme.value.postData.find((item) => item.id === postId);
 });
+
+// 页面浏览计数
+const { count: pageViews } = usePageViews(route.path);
 
 onMounted(() => {
   initFancybox(theme.value);

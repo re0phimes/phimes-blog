@@ -51,7 +51,9 @@ export const mainStore = defineStore("main", {
       lastScrollY: 0,
       // 站点背景
       backgroundType: "image",
-      backgroundUrl: "/images/百万2.jpg"
+      backgroundUrl: "/images/百万2.jpg",
+      // 背景动画
+      bgAnimationEnabled: true
     };
   },
   getters: {},
@@ -134,6 +136,7 @@ export const mainStore = defineStore("main", {
         "fontSize",
         "infoPosition",
         "backgroundUrl",
+        "bgAnimationEnabled",
       ],
     },
   ],

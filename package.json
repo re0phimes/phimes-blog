@@ -19,7 +19,8 @@
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
     "dev": "vitepress dev --host",
-    "build": "vitepress build",
+    "fetch-popular": "node scripts/fetch-popular-cache.mjs https://blog-page-views.re0phimes.workers.dev/all data/popular.json",
+    "build": "npm run fetch-popular && vitepress build",
     "preview": "vitepress preview",
     "deploy:vercel": "vercel deploy"
   },

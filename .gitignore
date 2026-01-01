@@ -37,3 +37,7 @@ test.html
 *.sw?
 
 .vercel
+
+# Local docs and plans
+plan/
+docs/

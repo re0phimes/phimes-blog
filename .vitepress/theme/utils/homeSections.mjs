@@ -50,9 +50,39 @@ export const selectMostPopularPosts = (postData, mostPopularConfig = {}, options
     tryAdd(byPath.get(path));
   }
 
-  // 2) fallback (optional): popularRank / popular / top / date
+  // 2) fallback: only select posts with popularRank (actual view counts)
   if (selected.length < limit) {
     const candidates = postData.filter(
+      (post) =>
+        post &&
+        post.id !== undefined &&
+        post.id !== null &&
+        Number.isFinite(post.popularRank) && // 只选有浏览量的文章
+        !excludeIds.has(String(post.id)) &&
+        !selectedIds.has(String(post.id)),
+    );
+
+    candidates.sort((a, b) => {
+      // 按 popularRank 降序（浏览量越高越靠前）
+      const aRank = a.popularRank;
+      const bRank = b.popularRank;
+      if (aRank !== bRank) return bRank - aRank;
+
+      // 浏览量相同时按日期降序
+      const aDate = Number(a.date) || 0;
+      const bDate = Number(b.date) || 0;
+      return bDate - aDate;
+    });
+
+    for (const post of candidates) {
+      if (selected.length >= limit) break;
+      tryAdd(post);
+    }
+  }
+
+  // 3) 如果还不够，随机选择文章填充
+  if (selected.length < limit) {
+    const remaining = postData.filter(
       (post) =>
         post &&
         post.id !== undefined &&
@@ -61,29 +91,15 @@ export const selectMostPopularPosts = (postData, mostPopularConfig = {}, options
         !selectedIds.has(String(post.id)),
     );
 
-    candidates.sort((a, b) => {
-      const aRank = Number.isFinite(a.popularRank) ? a.popularRank : -Infinity;
-      const bRank = Number.isFinite(b.popularRank) ? b.popularRank : -Infinity;
-      if (aRank !== bRank) return bRank - aRank;
-
-      const aPopular = a.popular ? 1 : 0;
-      const bPopular = b.popular ? 1 : 0;
-      if (aPopular !== bPopular) return bPopular - aPopular;
-
-      const aTop = a.top ? 1 : 0;
-      const bTop = b.top ? 1 : 0;
-      if (aTop !== bTop) return bTop - aTop;
-
-      const aDate = Number(a.date) || 0;
-      const bDate = Number(b.date) || 0;
-      if (aDate !== bDate) return bDate - aDate;
-
-      const aPath = typeof a.regularPath === "string" ? a.regularPath : "";
-      const bPath = typeof b.regularPath === "string" ? b.regularPath : "";
-      return aPath.localeCompare(bPath);
+    // 简单随机打乱（使用日期作为伪随机种子，保证 SSR 一致性）
+    const seed = new Date().getDate();
+    remaining.sort((a, b) => {
+      const aHash = (a.id * seed) % 100;
+      const bHash = (b.id * seed) % 100;
+      return aHash - bHash;
     });
 
-    for (const post of candidates) {
+    for (const post of remaining) {
       if (selected.length >= limit) break;
       tryAdd(post);
     }
