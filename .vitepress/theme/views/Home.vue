@@ -75,16 +75,19 @@ const homeHighlightsExcludedIds = computed(() => {
   return idSet;
 });
 
-// 首页文章流（去除 Highlights 已展示的文章，避免重复）
+// 首页文章流（按日期降序排序）
 const homeFeedPostData = computed(() => {
   const data = theme.value?.postData;
   if (!Array.isArray(data)) return [];
 
-  const highlightsConfig = theme.value?.home?.highlights;
-  if (!highlightsConfig?.enable) return data;
+  const filtered = data.filter(post => post && post.id !== undefined && post.id !== null);
 
-  const excludedIds = homeHighlightsExcludedIds.value;
-  return data.filter((post) => !post || post.id === undefined || post.id === null || !excludedIds.has(String(post.id)));
+  // 按日期降序排序（最新优先）
+  return [...filtered].sort((a, b) => {
+    const aDate = Number(a?.date) || 0;
+    const bDate = Number(b?.date) || 0;
+    return bDate - aDate;
+  });
 });
 
 // 首页 Highlights 显示条件（仅首页第一页，且不在分类/标签页）

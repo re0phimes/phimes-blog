@@ -17,7 +17,7 @@ export const selectMostPopularPosts = (postData, mostPopularConfig = {}, options
   if (!Array.isArray(postData) || postData.length === 0) return [];
 
   const rawLimit = Number(mostPopularConfig?.limit);
-  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 6;
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 12;
 
   const curated = Array.isArray(mostPopularConfig?.curated) ? mostPopularConfig.curated : [];
   const excludeIds = new Set(
