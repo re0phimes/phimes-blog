@@ -2,12 +2,6 @@
 <template>
   <div class="hello s-card" @mouseleave="resetHello">
     <span class="tip" @click="changeHello">{{ helloText }}</span>
-    <div class="content">
-      <div class="site-logo">
-        <Clock />
-      </div>
-      <span class="site-desc" v-html="theme.aside.hello.text" />
-    </div>
     <div class="info">
       <div class="name">
         <span class="author">{{ theme.siteMeta.author.name }}</span>
@@ -90,23 +84,21 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 8px 12px;
   background-color: var(--main-color);
   color: var(--main-card-background);
   border: none;
   .tip {
     display: inline-block;
-    min-width: 140px;
+    min-width: 120px;
     text-align: center;
-    padding: 6px 12px;
+    padding: 2px 8px;
     border-radius: 25px;
     font-size: 14px;
     font-weight: bold;
     background-color: var(--main-color-opacity);
-    margin-bottom: 12px;
-    transition:
-      color 0.3s,
-      transform 0.3s,
-      background-color 0.3s;
+    margin-bottom: 4px;
+    transition: color 0.3s, transform 0.3s, background-color 0.3s;
     &:hover {
       transform: scale(1.1);
       color: var(--main-font-color);
@@ -116,44 +108,19 @@ onBeforeUnmount(() => {
       transform: scale(1);
     }
   }
-  .content {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 180px;
-    .site-logo {
-      position: absolute;
-      width: 160px;
-      height: 160px;
-      transition:
-        transform cubic-bezier(0.69, 0.39, 0, 1.21) 0.3s,
-        opacity cubic-bezier(0.69, 0.39, 0, 1.21) 0.3s;
-      transform-origin: bottom;
-    }
-    .site-desc {
-      display: block;
-      height: 100%;
-      margin-top: 20px;
-      font-size: 1.1rem;
-      line-height: 1.5;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-  }
   .info {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    margin-top: 20px;
     .name {
       display: flex;
       flex-direction: column;
       .author {
         font-weight: bold;
         font-size: 20px;
+        line-height: 1.2;
       }
       .desc {
         font-size: 12px;
@@ -164,18 +131,18 @@ onBeforeUnmount(() => {
       display: flex;
       flex-direction: row;
       align-items: center;
-      margin-left: 20px;
+      margin-left: 8px;
       .social-link {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        margin-left: 12px;
+        width: 32px;
+        height: 32px;
+        margin-left: 4px;
         background-color: var(--main-color-opacity);
         border-radius: 50%;
         .iconfont {
-          font-size: 22px;
+          font-size: 20px;
           color: var(--main-card-background);
         }
         &:first-child {
@@ -188,17 +155,6 @@ onBeforeUnmount(() => {
             color: var(--main-font-color);
           }
         }
-      }
-    }
-  }
-  &:hover {
-    .content {
-      .site-logo {
-        opacity: 0;
-        transform: scale(0);
-      }
-      .site-desc {
-        opacity: 1;
       }
     }
   }

@@ -1,9 +1,8 @@
 <template>
   <div class="copyright s-card">
     <div class="title">
-      <span class="post-name">{{ postData?.title || "未命名文章" }}</span>
-      <a :href="theme.siteMeta.site + route.path" class="post-link" target="_blank">
-        {{ theme.siteMeta.site + route.path }}
+      <a :href="theme.siteMeta.site + route.path" class="post-name" target="_blank">
+        {{ postData?.title || "未命名文章" }}
       </a>
     </div>
     <div class="post-meta">
@@ -56,14 +55,10 @@ const route = useRoute();
   margin-top: 2rem;
   overflow: hidden;
   .title {
-    display: flex;
-    flex-direction: column;
-    .post-link {
-      margin-top: 2px;
-      font-size: 14px;
-      opacity: 0.6;
+    .post-name {
+      font-weight: bold;
       &:hover {
-        opacity: 1;
+        color: var(--main-color);
       }
     }
   }

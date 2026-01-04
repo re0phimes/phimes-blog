@@ -9,15 +9,15 @@ export const themeConfig = {
     // 站点logo
     logo: "/images/logo/logo.webp",
     // 站点地址
-    site: "https://blog.imsyy.top",
+    site: "https://blog.phimes.top",
     // 语言
     lang: "zh-CN",
     // 作者
     author: {
-      name: "Admin",
+      name: "phimes",
       cover: "/images/logo/logo.webp",
-      email: "114514@gmail.com",
-      link: "https://www.imsyy.top",
+      email: "re0phimes@outlook.com",
+      link: "https://blog.phimes.top",
     },
   },
   // 备案信息
@@ -76,7 +76,7 @@ export const themeConfig = {
           rel: "alternate",
           type: "application/rss+xml",
           title: "RSS",
-          href: "https://blog.imsyy.top/rss.xml",
+          href: "https://blog.phimes.top/rss.xml",
         },
       ],
       // 预载 CDN
@@ -196,7 +196,7 @@ export const themeConfig = {
         // {
         //   icon: "/images/logo/logo.webp",
         //   name: "博客镜像站",
-        //   url: "https://blog-backup.imsyy.top/",
+        //   url: "https://blog-backup.phimes.top/",
         // },
       ],
     },
@@ -206,17 +206,17 @@ export const themeConfig = {
     //     {
     //       icon: "https://pic.efefee.cn/uploads/2024/04/08/6613465358077.png",
     //       name: "起始页",
-    //       url: "https://nav.imsyy.top/",
+    //       url: "https://nav.phimes.top/",
     //     },
     //     {
     //       icon: "https://pic.efefee.cn/uploads/2024/04/08/661346d418ad7.png",
     //       name: "今日热榜",
-    //       url: "https://hot.imsyy.top/",
+    //       url: "https://hot.phimes.top/",
     //     },
     //     // {
     //     //   icon: "https://pic.efefee.cn/uploads/2024/04/08/66134722586fa.png",
     //     //   name: "站点监测",
-    //     //   url: "https://status.imsyy.top/",
+    //     //   url: "https://status.phimes.top/",
     //     // },
     //   ],
     // },
@@ -345,9 +345,9 @@ export const themeConfig = {
     //   {
     //     text: "服务",
     //     items: [
-    //       { text: "站点状态", link: "https://status.imsyy.top/", newTab: true },
-    //       { text: "一个导航", link: "https://nav.imsyy.top/", newTab: true },
-    //       { text: "站点订阅", link: "https://blog.imsyy.top/rss.xml", newTab: true },
+    //       { text: "站点状态", link: "https://status.phimes.top/", newTab: true },
+    //       { text: "一个导航", link: "https://nav.phimes.top/", newTab: true },
+    //       { text: "站点订阅", link: "https://blog.phimes.top/rss.xml", newTab: true },
     //       {
     //         text: "反馈投诉",
     //         link: "https://eqnxweimkr5.feishu.cn/share/base/form/shrcnCXCPmxCKKJYI3RKUfefJre",

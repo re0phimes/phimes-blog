@@ -37,3 +37,10 @@ test.html
 *.sw?
 
 .vercel
+
+# Local docs and plans
+plan/
+docs/
+
+# Downloaded covers (regenerated on build)
+public/covers/
