@@ -42,6 +42,24 @@
         </div>
         <span class="title">壁纸个性化</span>
         <div class="set-item">
+          <span class="set-label">背景动画</span>
+          <div class="set-options">
+            <span
+              :class="['options', { choose: bgAnimationEnabled }]"
+              @click="bgAnimationEnabled = true"
+            >
+              播放
+            </span>
+            <span
+              :class="['options', { choose: !bgAnimationEnabled }]"
+              @click="bgAnimationEnabled = false"
+            >
+              停止
+            </span>
+          </div>
+        </div>
+        <!-- 全站背景（关闭/纹理/图片）- 当前使用网格背景，暂时禁用
+        <div class="set-item">
           <span class="set-label">全站背景</span>
           <div class="set-options">
             <span
@@ -76,6 +94,8 @@
             />
           </div>
         </div>
+        -->
+        <!-- 首页样式 - 暂时禁用
         <span class="title">首页样式</span>
         <div class="set-item">
           <span class="set-label">Banner 高度</span>
@@ -94,6 +114,7 @@
             </span>
           </div>
         </div>
+        -->
         <span class="title">杂项调整</span>
         <div class="set-item">
           <span class="set-label">主题模式</span>
@@ -118,6 +139,7 @@
             </span>
           </div>
         </div>
+        <!-- 额外信息显示位置 - 暂时禁用
         <div class="set-item">
           <span class="set-label">额外信息显示位置</span>
           <div class="set-options">
@@ -135,6 +157,7 @@
             </span>
           </div>
         </div>
+        -->
       </div>
     </Modal>
   </div>
@@ -145,7 +168,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, fontFamily, fontSize, infoPosition, backgroundType, backgroundUrl, bannerType } =
+const { themeType, fontFamily, fontSize, bgAnimationEnabled } =
   storeToRefs(store);
 </script>
 

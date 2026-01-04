@@ -29,7 +29,7 @@
     <!-- 左侧菜单 -->
     <div :class="['left-menu', { hidden: footerIsShow }]">
       <!-- 全局设置 -->
-      <!-- <Settings /> -->
+      <Settings />
       <!-- 全局播放器 -->
       <Player />
     </div>
@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .mian-layout {
   width: 100%;
-  max-width: 1600px;
+  max-width: 1920px;
   margin: 0 auto;
   padding: 1rem 2rem;
   // 手动实现加载动画
