@@ -1,5 +1,5 @@
 ---
-title: KV Cache（二）：从 MQA/GQA 到 MLA 的量化推导
+title: KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解
 tags:
   - 大模型
   - KV-Cache
