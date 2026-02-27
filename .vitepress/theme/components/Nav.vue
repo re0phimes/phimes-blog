@@ -24,7 +24,7 @@
               </div>
             </div>
           </div>
-          <div class="site-name" @click="router.go('/')">
+          <div class="site-name" @click="window.open('https://phimes.top', '_blank')">
             {{ site.title }}
           </div>
         </div>

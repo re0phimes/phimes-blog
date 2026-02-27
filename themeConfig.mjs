@@ -159,6 +159,11 @@ export const themeConfig = {
       link: "https://demo.phimes.top",
       icon: "code"
     },
+    {
+      text: "AI FAQ",
+      link: "https://aifaq.phimes.top",
+      icon: "chat"
+    },
     // {
     //   text: "专栏",
     //   items: [
@@ -191,7 +196,7 @@ export const themeConfig = {
         {
           icon: "/images/logo/logo.webp",
           name: "主站",
-          url: "/",
+          url: "https://phimes.top",
         },
         // {
         //   icon: "/images/logo/logo.webp",
