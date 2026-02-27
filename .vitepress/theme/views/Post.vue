@@ -34,6 +34,9 @@
           <i class="iconfont icon-date" />
           {{ formatTimestamp(postMetaData.date) }}
         </span>
+        <span class="version-tag meta" v-if="frontmatter.version > 1">
+          v{{ frontmatter.version }}
+        </span>
         <span class="update meta" v-if="frontmatter.lastUpdated">
           <i class="iconfont icon-time" />
           {{ formatTimestamp(new Date(frontmatter.lastUpdated).getTime()) }}
@@ -216,6 +219,14 @@ onMounted(() => {
         }
         &.date {
           padding-left: 0;
+        }
+        &.version-tag {
+          font-size: 12px;
+          font-weight: 600;
+          padding: 2px 8px;
+          background: var(--main-color);
+          color: #fff;
+          border-radius: 4px;
         }
         &.hot {
           .iconfont {
