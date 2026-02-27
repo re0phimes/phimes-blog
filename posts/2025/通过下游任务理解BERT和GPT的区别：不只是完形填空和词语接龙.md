@@ -1,16 +1,22 @@
 ---
 title: 通过下游任务理解BERT和GPT的区别：不只是完形填空和词语接龙
-date: 2025.11.17
+date: 2025.12.19
 tags:
   - LLM
   - 算法原理
+  - BERT
+cover: https://image.phimes.top/img/20251117111602.png
+status: published
+lastUpdated: 2026-02-27
+topic: [bert, gpt, deep-learning]
+type: article
+created: 2025-11-17
 ---
-
 ## 1 写在前面
 
-好久没更新，非常对不住打赏的佬们。本来想写一个大一点的内容，不过还是低估了内容的丰富和复杂度，一直在修修改改。先开个小坑过度一下吧。
+好久没更新，非常对不住打赏的佬们。本来想写一个大一点的内容，不过还是低估了内容的丰富和复杂度，一直在修修改改。先开个小坑过渡一下吧。
 
-## 2 TL;DL
+## 2 TL;DR
 
 很多人接触AI，都是直接从GPT开始的。对于一些传统的模型任务和理解不够深入，所以这次要从从**最初要解决的任务**出发，经过**下游任务设计**、**预训练任务**，最终落实到**核心架构选择**上，来完整的说明一下BERT和GPT的区别。
 ## 3 BERT和GPT的区别？
@@ -23,7 +29,7 @@ tags:
 
 **BERT理解一个词的左右两侧内容，是双向注意力，而GPT只能看到当前词去预测下一个词，看不到后面的内容，是自回归注意力。**
 
-这肯定是对的，而且高度凝练的。所以关键的“为什么”。为什么它们会选择不同的路径？所以**我认为想要了解二者的区别，应该从它设计的动机开始**。而论文原文中，~~先diss了一下GPT，尽管GPT现在已经成为了主流。~~BERT在设计之出，就是一个**任务驱动设计决策**的成果。
+这肯定是对的，而且高度凝练的。所以关键的“为什么”。为什么它们会选择不同的路径？所以**我认为想要了解二者的区别，应该从它设计的动机开始**。而论文原文中，~~先diss了一下GPT，尽管GPT现在已经成为了主流。~~BERT在设计之初，就是一个**任务驱动设计决策**的成果。
 
 > We argue that current techniques restrict the power of the pre-trained representations, especially for the fine-tuning approaches. The major limitation is that standard language models are unidirectional, and this limits the choice of architectures that can be used during pre-training. 
 > For example, in OpenAI GPT, the authors use a left-to-right architecture, where every token can only attend to previous tokens in the self-attention layers of the Transformer (Vaswani et al., 2017). Such restrictions are sub-optimal for sentence-level tasks, and could be very harmful when applying finetuning based approaches to token-level tasks such as question answering, where it is crucial to incorporate context from both directions. (Devlin et al., 2018)
@@ -93,7 +99,7 @@ tags:
 BERT的不同任务实现要搭配不同的任务头，我们直接看一下代码，大家应该都很熟悉了。
 
 ```python
-from transformers import BertSequenceClassifier, BertForTokenClassification
+from transformers import BertForSequenceClassification, BertForTokenClassification
 ```
 
 而如果我们直接去看transformers库的实现，bert里拉倒最后，可以看到已经实现的常见任务头。有些为了预训练任务比如`BertForMaskedLM`，而我们之前提到的四类下游任务，常用的就是：
@@ -119,7 +125,7 @@ from transformers import BertSequenceClassifier, BertForTokenClassification
 
 ### 5.1 BERT
 
-BERT（我是说标准的BERT，尽管后续RoBERTa等有一些其他的思考，这就就只谈BERT）有两个预训练任务。
+BERT（我是说标准的BERT，尽管后续RoBERTa等有一些其他的思考，这里就只谈BERT）有两个预训练任务。
 #### 5.1.1 掩码语言模型（Masked Language Model)
 
 这就是我们前面说的“完形填空”。在训练时，BERT会随机将输入句子中15%的词用一个特殊的 `[MASK]` 标记替换掉，然后模型的任务就是**根据这个词左右的全部上下文，来预测被遮盖掉的原始词汇**。
@@ -170,7 +176,14 @@ Mask的位置： 随机选择15%的词进行遮盖。这个任务强迫模型学
 ![模型和架构选择](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251115181934089.png)
 
 
-不论是GPT还是BERT，对原始方案都是有一点点改动的。先说GPT
+不论是GPT还是BERT，对原始方案都是有一点点改动的。我们先看一下原始的架构，左边是encoder，右边是decoder。decoder需要注意的是，它是先接入一个masked multi-head attention（这里的mask是我们后面GPT用的因果注意力，通过mask遮盖当前token之后的所有token），后面还有个multi-head attention是编码器-解码器交叉注意力（cross-attention），它的Q来自decoder，K和V来自encoder的输出。
+
+**这是因为transformers架构的设计动机是翻译任务，它的原始的decoder部分是需要对需要输入进行翻译，这是一个seq2seq的任务**。在这里其实它是有两个输入点的，一个是我们翻译一开始用masked-multi-head attention的结构进行生成。比如“I love"但是为了知道我们翻译什么，所以它要和encoder部分的内容进行attention计算，也就是我们说的交叉注意力，把I love的状态和encoder的”我爱学习“拼接，然后可以从attention得到love后面不是跟”飞机“也不是”苹果“而是”机器学习“所以最后出来的是”machine learning“。
+
+知道了原生结构，现在开始我们的GPT和BERT的结构对比。
+
+![image.png](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251219233011391.png)
+
 ### 6.1 GPT
 
 #### 6.1.1 原始Transformer Decoder：
@@ -183,17 +196,23 @@ Mask的位置： 随机选择15%的词进行遮盖。这个任务强迫模型学
 
 #### 6.1.2 GPT的变体：
 
-GPT的最主要修改是**移除了编码器解码器注意力部分**。因为GPT是一个纯粹的生成模型，它只需要根据前文预测下一个词，所有的注意力都会经过多次的堆叠，在当前最后一个token下。所以，它不需要编码器-解码器部分的双向注意力了。
+GPT的最主要修改是**移除了编码器解码器注意力部分**。上文我们知道了，encoder部分会在中间输入和生成的部分做一个拼接计算，来完成我们的Seq2Seq的任务，保证原始语言和输出语言的注意力对齐（知道要翻译什么）。但是又因为GPT是一个纯粹的生成模型，它只需要根据前文预测下一个词，不再需要对齐了，所有的注意力都会经过多次的堆叠，在当前最后一个token下。所以，它不需要编码器-解码器部分的双向注意力了。
 
 所以GPT的架构中transformer blocks只有两个部分：
 - 前瞻掩码自注意力机制
-- 全链接前馈神经网络
+- 全连接前馈神经网络
+
+![GPT的decoder only](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251219232913711.png)
+
 
 **当然这里GPT对decoder部分的改造并不是本次的重点。**
 ### 6.2 BERT
 
+![BERT架构](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251219232824382.png)
 
-BERT其实是直接直接使用encoder部分，在这个部分，和图里的是一致，包含两个部分：
+
+
+BERT其实是直接使用encoder部分，在这个部分，和图里的是一致，包含两个部分：
 - 多头自注意力机制： 无掩码，允许每个位置关注序列中的所有其他位置（包括自身），实现双向上下文编码。
 - **全连接前馈网络（Position-wise Feed-Forward Network）：** 对每个位置独立应用全连接层进行非线性变换。
 
@@ -271,7 +290,7 @@ Model:积极
 > [!Question]
 > 那BERT为什么不能跟GPT一样做生成任务？
 
-从架构角度来说，BERT在预训练时，接触到的`[MASK]`标记有大约80%的概率是随机出现在句子**中间**的。之前说过，BERT是**在拥有充分的、双向的上下文（左边和右边都有词）的情况下，去推断一个被遮盖的词。** 它的整个“世界观”都是建立在“信息完整的前提上。
+从架构角度来说，BERT在预训练时，被选中的15%的token中有80%会被替换为`[MASK]`标记，而这些位置是在整个序列上随机分布的，大多数情况下出现在句子**中间**。之前说过，BERT是**在拥有充分的、双向的上下文（左边和右边都有词）的情况下，去推断一个被遮盖的词。** 它的整个“世界观”都是建立在“信息完整的前提上。
 
 如果我们不管它的这个前置的预训练流程，直接让它做生成任务。用一个直观的比喻就是：老师一直教的加法，比如100+23，然后突然，考试考你200 * 66。
 
@@ -311,7 +330,7 @@ Model:积极
 
 `[CLS] 我喜欢飞机坦克 [MASK]. [SEP]`
 
-从BERT的角度看，这是一个**全新的、与上一步毫无关联的输入序列**。为了预测新的 `[MASK]`，模型必须**从零开始**，再次对这个更长的序列进**行完整的双向注意力计算。**
+从BERT的角度看，这是一个**全新的、与上一步毫无关联的输入序列**。为了预测新的 `[MASK]`，模型必须**从零开始**，再次对这个更长的序列**进行完整的双向注意力计算**。
 
 **BERT的编码器架构没有任何机制来“记忆”或“复用”上一步的计算结果**。每增加一个词，都相当于要求你为了写下一个词的摘要，而把整本书从第一页重新读一遍。关键你（BERT）确实就是，读完了就忘了。
 
@@ -325,14 +344,14 @@ Model:积极
 
 所以叫它什么都行，总而言之，这个token原本是空白的。所以在预训练和下游任务（比如单句分类，因为单句分类我们拿得CLS的hidden state）的时候，可以被反向传播的计算梯度损失来迫使模型的参数优化，让CLS必须有足够丰富的全局语义信息来完成分类。
 
-问题5:
+### 7.5 问题5:
 
 > [!Question]
 > 那必须要用`[CLS]`吗？
 
 这还真不是，`[CLS]`虽然是被当做一种标准做法，但是一些场景下我们可以有一些别的选择。
 
-在BERT出现之前，处理句子级别的任务（如情感分类、句子对相似度判断）通常有两种主流方法，RNN/LSTM或者CNN/Polling。
+在BERT出现之前，处理句子级别的任务（如情感分类、句子对相似度判断）通常有两种主流方法，RNN/LSTM或者CNN/Pooling。
 
 本质上两套假设
 

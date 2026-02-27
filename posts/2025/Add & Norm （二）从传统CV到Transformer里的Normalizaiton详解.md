@@ -1,16 +1,20 @@
 ---
-title: Add & Norm（二）：从传统CV到Transformer里的Normalizaiton详解
+title: Add & Norm（二）从传统CV到Transformer里的Normalization详解
 date: 2025-7-28
-categories:
-  - LLM原理
 tags:
   - LLM
   - 算法原理
+cover: https://image.phimes.top/img/BatchNorm%20in%20CV.excalidraw.png
+status: published
+lastUpdated: 2026-02-27
+topic: [transformer, normalization]
+type: article
+created: 2025-06-15
 ---
 
 ## 1 写在前面
 
-这一篇会稍微有点偏，我们要说明白Transformer中的LayerNorm和RMSNorm，需要把不同领域的Normalizaiton都过一遍。所以整个文章会从传统的CV领域的CNN开始说明，涉及不同数据样式、作用域和任务目标，最终说明Transformer中的LayerNorm和RMSNorm。
+这一篇会稍微有点偏，我们要说明白Transformer中的LayerNorm和RMSNorm，需要把不同领域的Normalization都过一遍。所以整个文章会从传统的CV领域的CNN开始说明，涉及不同数据样式、作用域和任务目标，最终说明Transformer中的LayerNorm和RMSNorm。
 
 ### 1.1 TL;DR
 
@@ -41,7 +45,7 @@ y_i &= \gamma \hat{x}_i + \beta\\[1em]
 \end{align}
 $$
 
-Normalization的公式，除了最后的RMSNorm，我们接下来要说的BatchNorm、LayerNorm、IntanceNorm和GroupNrom都可以按照这个公式分为4步：
+Normalization的公式，除了最后的RMSNorm，我们接下来要说的BatchNorm、LayerNorm、InstanceNorm和GroupNorm都可以按照这个公式分为4步：
 - 计算均值
 - 计算方差
 - 中心化
@@ -49,7 +53,7 @@ Normalization的公式，除了最后的RMSNorm，我们接下来要说的BatchN
 
 ## 3 Norm的动机
 
-深度神经网络训练过程中，**中心协变量偏移（Internal Covariate Shift, ICS）曾被认为是阻碍收敛的关键因素**。早期理论假设，通过Batch Normalization归一化各层输入的均值和方差，可消除ICS以加速优化。然而，目前学术界普遍接受的观点的是“**损失平滑性是BN改善训练的主要原因**”，BN提升训练效率的根本机制在于其对优化过程的重参数化（reparameterization），这种重构显著改善了损失函数的几何特性，平滑了损失曲面。
+深度神经网络训练过程中，**中心协变量偏移（Internal Covariate Shift, ICS）曾被认为是阻碍收敛的关键因素**。早期理论假设，通过Batch Normalization归一化各层输入的均值和方差，可消除ICS以加速优化。然而，目前学术界普遍接受的观点是”**损失平滑性是BN改善训练的主要原因**”，BN提升训练效率的根本机制在于其对优化过程的重参数化（reparameterization），这种重构显著改善了损失函数的几何特性，平滑了损失曲面。
 
 ### 3.1 中心协变量偏移
 
@@ -96,7 +100,7 @@ $$
 - **加速收敛：** 更高的学习率和更稳定的梯度方向自然导致训练速度更快。
 - **更稳定的训练过程：** 避免了梯度爆炸或消失的问题，使训练过程对初始化和超参数选择不那么敏感。
 
-因此目前来说，更为被普遍接受的的理论是BN**将一个原本崎岖、险峻的优化景观，“重塑”成一个更加平滑、易于探索的地形**。
+因此目前来说，更为被普遍接受的理论是BN**将一个原本崎岖、险峻的优化景观，“重塑”成一个更加平滑、易于探索的地形**。
 
 ## 4 不同的领域的数据
 
@@ -166,7 +170,7 @@ NLP 数据的特点是**序列长度可变（Variable-Length Sequences）**。�
 
 展平操作的核心问题在于它粗暴地破坏了图像固有的**二维空间局部性**。在原始的图像网格中，**一个像素与其上下左右的邻近像素在语义上具有强相关性**，这种空间邻接关系是图像理解，比如边缘检测、纹理识别的基础。然而，在展平后的线性序列中，原本垂直相邻的两个像素，比如坐标(x, y)与(x, y+1)的像素，可能会在序列中相距甚远，其空间关联性被完全消除。这种信息损失是巨大的，它使得模型无法有效学习到基于空间位置的视觉模式，从而严重制约了模型性能的上限，尤其是在需要精细空间推理的复杂视觉任务中。
 
-于是我们有了**ViT（Vision in Transformer**）。ViT是现代的CV架构，其逻辑是不在将单个像素视为序列单元，而是将图像分割成一系列不重叠的、固定大小的图像块（Patches）。例如，一张224x224的图像可以被分割成196个16x16的图像块。每一个图像块作为一个整体，保留了其内部的局部二维结构。这一“分块化”（Patching）策略。**它在宏观上将图像问题转化为序列问题，同时在微观上维持了关键的局部空间信息**。
+于是我们有了**ViT（Vision Transformer）**。ViT是现代的CV架构，其逻辑是不在将单个像素视为序列单元，而是将图像分割成一系列不重叠的、固定大小的图像块（Patches）。例如，一张224x224的图像可以被分割成196个16x16的图像块。每一个图像块作为一个整体，保留了其内部的局部二维结构。这一“分块化”（Patching）策略。**它在宏观上将图像问题转化为序列问题，同时在微观上维持了关键的局部空间信息**。
 
 > [!Note]  
 > 这里不深入展开ViT，主要是为了理解传统CV和NLP的数据形态对应关系。尽管这种转换方式存在一定问题，最终引导到ViT这一适合视觉和自然语言的模型。
@@ -518,9 +522,9 @@ $$
 \mu_{n,g} &= \frac{1}{(C/G) \cdot H \cdot W} \sum_{c=g \cdot C/G}^{(g+1) \cdot C/G - 1} \sum_{h=1}^{H} \sum_{w=1}^{W} x_{n,c,h,w} \\  
 \sigma_{n,g}^2 &= \frac{1}{(C/G) \cdot H \cdot W} \sum_{c=g \cdot C/G}^{(g+1) \cdot C/G - 1} \sum_{h=1}^{H} \sum_{w=1}^{W} (x_{n,c,h,w} - \mu_{n,g})^2 \\  
 \hat{x}_{n,c,h,w} &= \frac{x_{n,c,h,w} - \mu_{n,g}}{\sqrt{\sigma_{n,g}^2 + \epsilon}} \\  
-y_{n,c,h,w} &= \gamma_g \hat{x}_{n,c,h,w} + \beta_g
+y_{n,c,h,w} &= \gamma_c \hat{x}_{n,c,h,w} + \beta_c
 
-\text{其中：} \\quad &N: \text{Batch size（批次大小）} \\
+\text{其中：} \quad &N: \text{Batch size（批次大小）} \\
 &C: \text{Channels（通道数）} \\ 
 &H: \text{Height（特征图高度）} \\  
 &W: \text{Width（特征图宽度）} \\  
@@ -530,8 +534,8 @@ y_{n,c,h,w} &= \gamma_g \hat{x}_{n,c,h,w} + \beta_g
 &\mu_{n,g}: \text{第n个样本第g组的均值} \\  
 &\sigma_{n,g}^2: \text{第n个样本第g组的方差} \\  
 &\hat{x}_{n,c,h,w}: \text{归一化后的值} \\  
-&\gamma_g: \text{第g组的可学习缩放参数} \\  
-&\beta_g: \text{第g组的可学习偏移参数} \\  
+&\gamma_c: \text{第c个通道的可学习缩放参数} \\
+&\beta_c: \text{第c个通道的可学习偏移参数} \\
 &y_{n,c,h,w}: \text{仿射变换后的最终输出} \\  
 &\epsilon: \text{数值稳定性常数}  
 \end{align}
@@ -568,7 +572,7 @@ GN的“分割”操作，就是基于一个非常合理的工程假设：**在C
 
 是的，作用域就是这么重要。
 
-对比多个Norm，他们本质方法并没有改动。不同Norm的根源在于它们各自的**作用域（normalization scope）** 赋予了其独特的**归纳偏置**（inductive bias）** 或者说**隐式表达**。在我们上面看的CNN领域下：
+对比多个Norm，他们本质方法并没有改动。不同Norm的根源在于它们各自的**作用域（normalization scope）** 赋予了其独特的**归纳偏置（inductive bias）**或者说**隐式表达**。在我们上面看的CNN领域下：
 
 - **Batch Normalization (BN)** 表示的是：在**一个批次内**，对**每个特征通道独立地**计算均值和方差。这意味着，对单个样本的归一化，其统计量来自于**同一批次内的所有其他样本**。这种跨样本的统计依赖，使得模型隐式地利用了批次内的信息分布，起到了正则化效果，但也导致了其性能严重依赖批次大小。
 - **Layer Normalization (LN)** 表示的是：在**单个样本内部**，对**所有通道/特征维度**进行归一化。这确保了每个样本的计算完全独立于批次中的其他样本。但LN假设了所有通道都服从同一分布，而这一假设在CNN中并不符合逻辑导致其效果在CNN中并不好。
@@ -598,7 +602,7 @@ $$
 > [!Question]
 > 为什么LayerNorm在NLP里和传统CV里是不一样的？这里怎么是一个“条”，而CNN里是一个“面”
 > 
-> 这LayerNorm既然是个“条”不就是IntanceNorm？
+> 这LayerNorm既然是个“条”不就是InstanceNorm？
 
 #### 7.1.2 “层”概念的不同
 
@@ -642,7 +646,7 @@ Transformer下的LayerNorm的意思是就是将单个样本里的单个sequence�
 理论说完，我们看一下`PyTorch`[InstanceNorm2d — PyTorch 2.7 documentation](https://docs.pytorch.org/docs/stable/generated/torch.nn.InstanceNorm2d.html) 
 中怎么说的。
 
-![PyTorch中IntanceNorm2d的解释](https://phimesimage.oss-accelerate.aliyuncs.com/img/20250629004201998.png)  
+![PyTorch中InstanceNorm2d的解释](https://phimesimage.oss-accelerate.aliyuncs.com/img/20250629004201998.png)  
 
 这里需要注意的是，PyTorch 将 IN的`affine` 默认为 `False` 是一个工程上的设计选择，可能基于在某些非风格迁移的生成任务（如某些GANs）中，禁用仿射变换能获得更稳定或更好的结果的考虑。而不是说理论领域的IN就没有仿射变换。
 
@@ -745,24 +749,24 @@ $$
 3. **应用增益 `γ` (重新缩放)**
 4. **应用偏置 `β` (重新平移)**
 
-之前我们说过，在猜测BatchNorm等一系列Normalization为什么可以成功的时候，现在最主流的一个假设是“平滑损失曲面”，而这四个操作里，计算平均值用的第一个目的中心化明显不是，而方差是缩放的坟墓，分母和仿射变化的$\gamma$，共同组成了重新缩放。而β是重新平移，FFN中也有这种偏置项，所以大概也不是重点。
+之前我们说过，在猜测BatchNorm等一系列Normalization为什么可以成功的时候，现在最主流的一个假设是“平滑损失曲面”，而这四个操作里，计算平均值用的第一个目的中心化明显不是，而方差是缩放的分母，分母和仿射变化的$\gamma$，共同组成了重新缩放。而β是重新平移，FFN中也有这种偏置项，所以大概也不是重点。
 
 那么重点就在“重新缩放”上了。分解一下：
 - RMSNorm没有$\mu$，也就是没有均值计算这一步。
 - 因为没有均值，所以我们也没有办法计算方差。
-- 原本的$\sqrt{\sigma^2 - \epsilon}$则就替换为均方根，也就是$\sqrt{\frac{1}{n} \sum_{i=1}^{n} x_i^2 + \epsilon}$。
+- 原本的$\sqrt{\sigma^2 + \epsilon}$则就替换为均方根，也就是$\sqrt{\frac{1}{n} \sum_{i=1}^{n} x_i^2 + \epsilon}$。
 - 最后，在仿射变换方面，还没有$\beta$。
 
 > [!question]  
 > 但是还是不对啊，原始的transformer不是LayerNorm+ReLU么，ReLU这种非零均值的激活函数不是搭配LayerNorm这样包含中心化操作的才是比较稳定么？
 
-在[[从激活函数到MOE]]中，曾经说过，部分场景下，激活函数的选择的一个动机是零均值，因为零均值的激活函数可以帮助我们加速梯度下降的收敛并稳定训练过程。传统的Transformer，ReLU不是零均值的，在工程上，LayerNorm的中心化操作在工程上帮助我们稳定了训练。
+在[[为什么前馈神经网络（FFN）对Transformer这么重要（二）：从激活函数到MOE]]中，曾经说过，部分场景下，激活函数的选择的一个动机是零均值，因为零均值的激活函数可以帮助我们加速梯度下降的收敛并稳定训练过程。传统的Transformer，ReLU不是零均值的，在工程上，LayerNorm的中心化操作在工程上帮助我们稳定了训练。
 
 在RMSNorm中，去掉了中心化，这一操作理论上是反直觉的。因为其核心假设是LayerNorm的有效性主要来自重缩放不变性，而非中心化。为了证明这一点，RMSNorm+ReLU的组合也进行训练，实际结果证明，训练效率反而提升了。
 
 这并不是说中心化不重要了，只是没我们原本想的那么重要。Transformer架构下，除了Norm我们还有残差连接稳定通路；训练过程中有Adam优化器；最关键的是，现代的Transformer架构的激活函数普遍选择GLU变体，这类函数因其门控结构，在处理来自前序归一化层的近零均值输入时，其输出本身即为“准零均值”。
 
-简而言之吗，Norm中的中心化有用，但没有那么有用。从工程上看，去掉它的收益更大。
+简而言之，Norm中的中心化有用，但没有那么有用。从工程上看，去掉它的收益更大。
 
 #### 7.2.2 RMSNorm的代码实现
 
@@ -830,9 +834,9 @@ else:
 
 ![RMSNorm输出结果对比](https://image.phimes.top/img/202507291313177.png)
 
-#### 7.2.3 LayerNorm/RMSNorm在Transfomer中的代码
+#### 7.2.3 LayerNorm/RMSNorm在Transformer中的代码
 
-这里我们假设其Transfomer的其他模块都已经实现了，比如Attention和FFN
+这里我们假设其Transformer的其他模块都已经实现了，比如Attention和FFN
 ```python
 class TransformerEncoderBlock(nn.Module):
     def __init__(self, d_model: int, num_heads: int, d_ff: int, dropout: float = 0.1):

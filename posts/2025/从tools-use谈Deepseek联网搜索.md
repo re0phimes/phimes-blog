@@ -1,11 +1,16 @@
 ---
-title: 从tools use谈谈Deepseek的“联网搜索”怎么实现 2025-02-01
+title: 从tools use谈谈Deepseek的”联网搜索”怎么实现 2025-02-01
 tags:
   - LLM
   - Tools
 categories:
   - 技术总结
 date: 2025-2-1
+status: published
+topic: [llm, tools, deepseek]
+type: article
+created: 2025-02-01
+cover: https://image.phimes.top/img/202501101129372.png
 ---
 
 

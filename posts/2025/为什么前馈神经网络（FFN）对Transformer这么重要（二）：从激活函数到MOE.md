@@ -1,8 +1,15 @@
 ---
-title: 前馈神经网络（FFN）详解（二）：从激活函数到MOE
-categories:
-  - LLM原理
+title: 为什么前馈神经网络（FFN）对Transformer这么重要（二）：从激活函数到MOE
 date: 2025-6-2
+tags:
+  - LLM
+  - 算法原理
+cover: https://image.phimes.top/img/202505271446227.png
+status: published
+lastUpdated: 2026-02-27
+topic: [transformer, ffn, activation-function, moe]
+type: article
+created: 2025-07-01
 ---
 ## 1 前言
 
@@ -108,11 +115,11 @@ ReLU的优点可以体现在以下三个方面：
 case1：**$x_{1} = 2$和$x_{2} = 1$，均为正数**
 
 $$z = (-0.3 * 2) + (-0.2 * 1) + (-0.4) = -1.2$$
-case2：**$x_{1} = -1$和$x_{2} = 3$均为负数**
+case2：**$x_{1} = -1$和$x_{2} = 3$，一负一正**
 
 $$z = (-0.3 * -1) + (-0.2 * 3) + (-0.4) = -0.7$$
 
-case3：**$x_{1} = 5$和$x_{2} = 5$一正一负**
+case3：**$x_{1} = 5$和$x_{2} = 5$，均为较大正数**
 
 $$ z = (-0.3 * 5) + (-0.2 * 5) + (-0.4) = -2.9$$
 那么以上三种情况，在$ReLU$作为激活函数时，就会导致$$ReLU(z) = 0$$
@@ -282,7 +289,7 @@ class GELUFFN(nn.Module):
         
     def forward(self, x):
         x = self.linear1(x)
-        x = nn.GELU()
+        x = F.gelu(x)
         x = self.dropout(x)
         x = self.linear2(x)
         return x
@@ -330,7 +337,7 @@ $$
 > [!question]
 > 所以为什么GELU是transformer中一度推荐的激活函数而Swish不是
 
-- GELU论文发表于2016年 ([1606.08415])，而Swish的自动化搜索研究发表于2017年末 ([1710.05941])。当Transformer架构在2017年提出时 ([1706.03762])，GELU已经是当时研究社区探索过并在一些实验中显示出潜力的候选者之一。Transformer的原始论文在比较ReLU和GELU后，选择了GELU作为其默认激活函数。这种“先发优势”使得GELU在Transformer生态建立的早期就被广泛采用。
+- GELU论文发表于2016年 ([1606.08415])，而Swish的自动化搜索研究发表于2017年末 ([1710.05941])。当Transformer架构在2017年提出时 ([1706.03762])，其原始论文使用的是ReLU作为FFN的激活函数。随后，GELU在BERT（2018）和GPT-2（2019）等后续模型中被采用为默认激活函数，逐渐成为Transformer生态中的主流选择。这种在Transformer生态中的广泛采用使得GELU建立了”先发优势”。
 - **GELU的理论动机**，GELU的设计灵感来源于随机正则化思想，其形式 可以被理解为输入 根据其自身大小被随机“保留”的期望值，其中“保留”的概率由标准正态分布的累积分布函数 决定。这种将输入值与一个依赖于该输入值的概率因子相乘的机制，与Dropout等随机正则化手段有相似的哲学内核，即根据输入信号的强度进行自适应的非线性变换和信息门控。
 - **近似计算**，虽然精确计算GELU涉及误差函数（erf），计算成本高于Swish中的Sigmoid，但GELU论文中同时提出了高效的近似算法，例如使用Sigmoid函数或Tanh函数进行逼近。这些近似算法大大降低了GELU的实际计算开销，使其在实践中与Swish的计算成本差距缩小。
 
@@ -342,7 +349,7 @@ $$
 
 激活函数优化的同时，研究者们也在尝试对FFN结构进行优化。除了现在大家熟知的MOE以外，第一个比较成功结构变化应该是GLU提出的门控结构。
 
-2017年，GLU改变了传统的FFN的`升维-非线性-降维`的结构。降**第一个升维的线性变换和非线性变换**整体代替维门控机制。GLU将输入 `X` 通过两个独立的线性变换成两部分。一部分 `(XW + b)` 作为主要的待处理信息，另一部分 `σ(XV + c)` 经过Sigmoid函数后作为门控信号。这个门控信号决定了第一部分信息中哪些元素应该被保留或抑制。如果门控值接近1，则对应的信息通过；如果接近0，则信息被抑制。从下面这张图来看可以看出标准的FFN和门控结构的FFN的区别：
+2017年，GLU改变了传统的FFN的`升维-非线性-降维`的结构，将**第一个升维的线性变换和非线性变换**整体替换为门控机制。GLU将输入 `X` 通过两个独立的线性变换成两部分。一部分 `(XW + b)` 作为主要的待处理信息，另一部分 `σ(XV + c)` 经过Sigmoid函数后作为门控信号。这个门控信号决定了第一部分信息中哪些元素应该被保留或抑制。如果门控值接近1，则对应的信息通过；如果接近0，则信息被抑制。从下面这张图来看可以看出标准的FFN和门控结构的FFN的区别：
 
 ![标准FFN和门控结构对比](https://image.phimes.top/img/FFN%E7%BB%93%E6%9E%84%E5%AF%B9%E6%AF%94.excalidraw.png)
 
@@ -353,7 +360,7 @@ GLU（Gated Linear Units）的核心思想在于将输入特征线性变换后�
 #### 4.1.1 公式
 
 $$
-\text{GLU}(x) = \underbrace{(W X + b)}_{\text{主路径}} \odot \underbrace{\sigma(VX + c)}_{\text{门控路径}}
+\text{GLU}(x) = \underbrace{(XW + b)}_{\text{主路径}} \odot \underbrace{\sigma(XV + c)}_{\text{门控路径}}
 $$
 
 - `X` 是输入张量。
@@ -366,7 +373,7 @@ $$
 所以进一步来说我们可以称为这个结构叫做`GLU-Variant(x)·
 
 $$
-\text{GLU}(x) = \underbrace{(W X + b)}_{\text{主路径}} \odot \underbrace{\text{Activation}(VX + c)}_{\text{门控路径}}
+\text{GLU}(x) = \underbrace{(XW + b)}_{\text{主路径}} \odot \underbrace{\text{Activation}(XV + c)}_{\text{门控路径}}
 $$
 而其中的差异在于$Activation$
 $$\text{Activation} \in \{ \sigma, \text{GELU}, \text{Swish}, \text{ReLU}\cdots \}$$
