@@ -118,7 +118,7 @@ export const getAllPosts = async () => {
           const { birthtimeMs, mtimeMs } = stat;
           // 解析 front matter
           const { data, content: markdownContent } = matter(content);
-          const { title, date, categories, description, tags, top, cover } = data;
+          const { title, date, categories, description, tags, tag, top, cover, version, lastUpdated } = data;
 
           // Most Popular（策展/排序字段，MVP 预留）
           // - popular: boolean
@@ -178,13 +178,18 @@ export const getAllPosts = async () => {
             (new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24),
           );
           // 返回文章对象
+          // 兼容 tag（单数）和 tags（复数）
+          const resolvedTags = tags || tag || undefined;
+
           return {
             id: generateId(item),
             title: title || "未命名文章",
             date: date ? new Date(date).getTime() : birthtimeMs,
             lastModified: mtimeMs,
+            lastUpdated: lastUpdated ? new Date(lastUpdated).getTime() : undefined,
+            version: version || undefined,
             expired,
-            tags,
+            tags: resolvedTags,
             categories,
             description: autoDescription,
             regularPath: `/${item.replace(".md", ".html")}`,
@@ -221,8 +226,8 @@ export const getAllType = (postData) => {
     if (!item.tags || item.tags.length === 0) return;
     // 处理标签
     if (typeof item.tags === "string") {
-      // 以逗号分隔
-      item.tags = item.tags.split(",");
+      // 支持逗号或空格分隔
+      item.tags = item.tags.split(/[,\s]+/).filter(Boolean);
     }
     // 遍历文章的每个标签
     item.tags.forEach((tag) => {
