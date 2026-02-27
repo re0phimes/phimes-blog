@@ -9,7 +9,12 @@ tags:
   - 推理优化
   - Attention
 date: 2026-01-16
-status: pending
+status: published
+lastUpdated: 2026-02-27
+topic: [transformer, kv-cache, attention, roofline]
+type: article
+created: 2026-01-15
+cover: https://image.phimes.top/img/202601040941582.png
 ---
 ## 1 前言
 
@@ -53,7 +58,7 @@ status: pending
 
 ![MHA、GQA、MQA对比](https://image.phimes.top/img/202601040941582.png)
 
-MHA、MQA、GQA 三者其实改动很小，思想上就是从KV完全一一对应到份组对应。所以代码结构几乎完全相同。我们可以用一份代码去看出改动区别。
+MHA、MQA、GQA 三者其实改动很小，思想上就是从KV完全一一对应到分组对应。所以代码结构几乎完全相同。我们可以用一份代码去看出改动区别。
 
 ```python
 import torch
@@ -263,7 +268,7 @@ $$
 2 \times 32 \text{层} \times 32 \text{头} \times 128 \text{维} \times 2 \text{ bytes} = 0.5 \text{ MB}
 $$
 
-算上content length为4096时，KV Cache = $0.5 \text{ MB} \times 4096 \approx 2 \text{ GB}$。
+算上context length为4096时，KV Cache = $0.5 \text{ MB} \times 4096 \approx 2 \text{ GB}$。
 
 每次decoding要搬运的数据：
 - Weights: ~13.5 GB
@@ -853,13 +858,13 @@ DeepSeek-V2（$n_h=128$）中则是：
 
 
 > [!Note]
-> 其实到这里，这种**压缩再解压**的思路**很多人都能想到**。甚至于想到矩阵吸收已经非常惊艳了。然而这里的推导会遇到一个关键问题：RoPE怎么办？。
+> 其实到这里，这种**压缩再解压**的思路**很多人都能想到**。甚至于想到矩阵吸收已经非常惊艳了。然而这里的推导会遇到一个关键问题：RoPE怎么办？
 > 包括Deepseek和苏神都在这里进行过深入思考。
 
 引用苏神原文：
 
 ![Su博客)](https://image.phimes.top/img/20260220133456.png)
-### 6.6 RoPE 的挑战与 Decoupled RoPE
+### 6.7 RoPE 的挑战与 Decoupled RoPE
 
 MLA 的数学逻辑看似完美闭环。但在工程落地时，遇到了一个棘手的问题：**旋转位置编码（RoPE）**。
 
