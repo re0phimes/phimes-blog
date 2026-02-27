@@ -34,9 +34,9 @@
           <i class="iconfont icon-date" />
           {{ formatTimestamp(postMetaData.date) }}
         </span>
-        <span class="update meta">
+        <span class="update meta" v-if="frontmatter.lastUpdated">
           <i class="iconfont icon-time" />
-          {{ formatTimestamp(page?.lastUpdated || postMetaData.lastModified) }}
+          {{ formatTimestamp(new Date(frontmatter.lastUpdated).getTime()) }}
         </span>
         <!-- 热度 -->
         <span class="hot meta">
