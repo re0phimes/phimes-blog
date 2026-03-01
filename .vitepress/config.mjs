@@ -138,7 +138,7 @@ export default withPwa(
                 const now = new Date();
                 const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-                return items.map(item => {
+                const result = items.map(item => {
                     // 1. 首页
                     if (item.url === '/' || item.url === '') {
                         return { ...item, priority: 1.0, changefreq: 'weekly' };
@@ -204,6 +204,9 @@ export default withPwa(
 
                             // 旧文章
                             return { ...item, priority: 0.6, changefreq: 'yearly' };
+                        } else {
+                            // Fallback: 无法找到文章数据时的默认值
+                            return { ...item, priority: 0.5, changefreq: 'yearly' };
                         }
                     }
 
@@ -224,13 +227,11 @@ export default withPwa(
 
                     // 6. 其他页面
                     return { ...item, priority: 0.5, changefreq: 'yearly' };
-                }).filter(item => {
-                    // 打印转换统计
-                    if (items.indexOf(item) === items.length - 1) {
-                        console.log(`[Sitemap] Transformed ${transformedCount} post URLs to SEO-friendly format`);
-                    }
-                    return true;
                 });
+
+                // 打印转换统计
+                console.log(`[Sitemap] Transformed ${transformedCount} post URLs to SEO-friendly format`);
+                return result;
             }
         },
         // 主题配置
