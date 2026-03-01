@@ -133,11 +133,18 @@ export default withPwa(
         sitemap: {
             hostname: themeConfig.siteMeta.site,
             transformItems: (items) => {
-                // 为每个 post 生成 SEO 友好的 URL
+                // 为每个 post 生成 SEO 友好的 URL 并添加 SEO 字段
                 let transformedCount = 0;
+                const now = new Date();
+                const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-                const result = items.map(item => {
-                    // 只处理 posts 目录下的文章
+                return items.map(item => {
+                    // 1. 首页
+                    if (item.url === '/' || item.url === '') {
+                        return { ...item, priority: 1.0, changefreq: 'weekly' };
+                    }
+
+                    // 2. 文章页
                     if (item.url && item.url.startsWith('posts/')) {
                         // 尝试从 postData 中找到对应的文章数据
                         const post = postData.find(p => {
@@ -182,12 +189,48 @@ export default withPwa(
                                 item.url = `posts/${year}/${month}/${day}/${slug}`;
                                 transformedCount++;
                             }
+
+                            // 添加 SEO 字段
+                            // 热门文章
+                            if (post.popular || post.popularRank) {
+                                return { ...item, priority: 0.8, changefreq: 'monthly' };
+                            }
+
+                            // 最近 3 个月的文章
+                            const postDate = new Date(post.date);
+                            if (postDate > threeMonthsAgo) {
+                                return { ...item, priority: 0.7, changefreq: 'monthly' };
+                            }
+
+                            // 旧文章
+                            return { ...item, priority: 0.6, changefreq: 'yearly' };
                         }
                     }
-                    return item;
+
+                    // 3. 分类页
+                    if (item.url.startsWith('pages/categories/')) {
+                        return { ...item, priority: 0.5, changefreq: 'weekly' };
+                    }
+
+                    // 4. 标签页
+                    if (item.url.startsWith('pages/tags/')) {
+                        return { ...item, priority: 0.5, changefreq: 'weekly' };
+                    }
+
+                    // 5. 归档页
+                    if (item.url.includes('/archives')) {
+                        return { ...item, priority: 0.4, changefreq: 'monthly' };
+                    }
+
+                    // 6. 其他页面
+                    return { ...item, priority: 0.5, changefreq: 'yearly' };
+                }).filter(item => {
+                    // 打印转换统计
+                    if (items.indexOf(item) === items.length - 1) {
+                        console.log(`[Sitemap] Transformed ${transformedCount} post URLs to SEO-friendly format`);
+                    }
+                    return true;
                 });
-                console.log(`[Sitemap] Transformed ${transformedCount} post URLs to SEO-friendly format`);
-                return result;
             }
         },
         // 主题配置
