@@ -118,7 +118,7 @@ export const getAllPosts = async () => {
           const { birthtimeMs, mtimeMs } = stat;
           // 解析 front matter
           const { data, content: markdownContent } = matter(content);
-          const { title, date, categories, description, tags, tag, top, cover, version, lastUpdated } = data;
+          const { title, date, categories, description, tags, tag, top, cover, version, lastUpdated, topic } = data;
 
           // Most Popular（策展/排序字段，MVP 预留）
           // - popular: boolean
@@ -190,6 +190,7 @@ export const getAllPosts = async () => {
             version: version || undefined,
             expired,
             tags: resolvedTags,
+            topic: topic || undefined,
             categories,
             description: autoDescription,
             regularPath: `/${item.replace(".md", ".html")}`,
