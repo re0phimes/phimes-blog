@@ -1,7 +1,8 @@
 ---
 title: 工程实现系列：从什么都不会到QLoRA分布式DPO（一）
 tags:
-  - LLM, DPO
+  - llm
+  - dpo
 date: 2025-3-28
 topic: [qlora, dpo, training, llm]
 ---
