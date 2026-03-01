@@ -14,7 +14,7 @@ cover: https://image.phimes.top/img/20260101232311654.png
 ---
 ## 1 TL;DR
 
-本文的目标在于理清楚一个核心问题：**为什么主流大模型纷纷从传统的多头注意力转向了MQA、GQA、MLA等变体？** 关键在于解码阶段的 **KV Cache** 及其引发的 **“内存墙”** 问题。内容如下：
+本文的目标在于理清楚一个核心问题：**为什么主流llm纷纷从传统的多头注意力转向了MQA、GQA、MLA等变体？** 关键在于解码阶段的 **KV Cache** 及其引发的 **“内存墙”** 问题。内容如下：
 
 1. **Prefill** 与 **Decoding** 两阶段的本质区别。
 2. **KV Cache** 如何以空间换时间，解决重复计算。
@@ -29,7 +29,7 @@ cover: https://image.phimes.top/img/20260101232311654.png
 
 ## 2 优化的目标：从Attention的选择困难开始
 
-对于现代大模型架构，各个transformer的组件已经逐渐被更新的模块替换。以attention为例，可以看到千奇百怪的attention，有从硬件和框架上优化的，也有结构上优化的。不同模型选择各不相同，比如Llama、[Qwen3-Next](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct/blob/main/config.json)都采用了GQA，Deepseek的MLA。抛开[oLMO 2](https://huggingface.co/allenai/OLMo-2-1124-7B/blob/main/config.json) 这种研究性质模型，minimax的[M2](https://www.minimaxi.com/news/why-did-m2-end-up-as-a-full-attention-model)这样的商业落地的模型，反而采用了MHA这样的传统的结构。
+对于现代llm架构，各个transformer的组件已经逐渐被更新的模块替换。以attention为例，可以看到千奇百怪的attention，有从硬件和框架上优化的，也有结构上优化的。不同模型选择各不相同，比如Llama、[Qwen3-Next](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct/blob/main/config.json)都采用了GQA，Deepseek的MLA。抛开[oLMO 2](https://huggingface.co/allenai/OLMo-2-1124-7B/blob/main/config.json) 这种研究性质模型，minimax的[M2](https://www.minimaxi.com/news/why-did-m2-end-up-as-a-full-attention-model)这样的商业落地的模型，反而采用了MHA这样的传统的结构。
 
 也就是说研究者对不同的模块选择依然有各自的见解和选择。这里先按下对不同Attention直接介绍，我们先放出一个问题：**我们对Attention的优化，到底在优化什么？**
 
@@ -37,7 +37,7 @@ cover: https://image.phimes.top/img/20260101232311654.png
 
 ## 3 推理的两个阶段
 
-在大模型的推理阶段，分为两个步骤：
+在llm的推理阶段，分为两个步骤：
 
 **Prefill 阶段**：当模型接收到用户的初始提示（Prompt）时，它处于**预填充（Prefill）阶段**。此刻，模型拥有完整的输入序列，其任务是并行计算所有输入词元的中间表示，并生成第一个输出词元。
 
@@ -188,7 +188,7 @@ $$
 * `n_heads x d_head`：其实就是 $d_{model}$（模型的维度）。
 * `P_precision`：精度（FP16 为 2 bytes）。
 
-拿经典的MHA结构大模型算一下，这里用**Llama-2-7B**（新模型都大多已经换了GQA或者MLA了）为例，其config.json如下：
+拿经典的MHA结构llm算一下，这里用**Llama-2-7B**（新模型都大多已经换了GQA或者MLA了）为例，其config.json如下：
 
 ```json
 {

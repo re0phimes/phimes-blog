@@ -1,12 +1,12 @@
 ---
 title: KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解
 tags:
-  - 大模型
+  - llm
   - KV-Cache
   - MQA
   - GQA
   - MLA
-  - 推理优化
+  - inference-optimization
   - Attention
 date: 2026-01-16
 status: published

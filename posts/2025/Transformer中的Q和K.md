@@ -1,9 +1,9 @@
 ---
 title: Transformer中的Q和K
 tags:
-  - 算法原理
+  - algorithm-principles
 categories:
-  - LLM原理
+  - llm-principles
 date: 2025-1-29
 articleGPT: 这是一篇关于Transformer里的Q、K、V三个矩阵的个人理解
 number headings: first-level 1, max 6, _.1.1
@@ -17,7 +17,7 @@ cover: https://image.phimes.top/img/20250129225821.png
 
 ## 1 引言
 
-现有的大模型，大部分都是decode-only结构。`attention is all you need`太过精炼，很多信息都被一笔带过了。所以学习过程中难免会产生一些疑问。比如什么是decode-only，大模型都是基于注意力机制的，什么是注意力机制，其中的QKV又怎么理解？
+现有的llm，大部分都是decode-only结构。`attention is all you need`太过精炼，很多信息都被一笔带过了。所以学习过程中难免会产生一些疑问。比如什么是decode-only，llm都是基于注意力机制的，什么是注意力机制，其中的QKV又怎么理解？
 
 本文旨在通过解决学习过程中的一些疑问，将知识点串起来，从而尽可能用说人话的方式，说明transformer中的Q和K。
 

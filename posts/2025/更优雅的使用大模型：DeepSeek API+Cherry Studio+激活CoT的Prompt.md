@@ -1,16 +1,16 @@
 ---
-title: 更优雅的使用大模型：DeepSeek API+Cherry Studio+激活CoT的Prompt
+title: 更优雅的使用llm：DeepSeek API+Cherry Studio+激活CoT的Prompt
 tags:
   - LLM
 categories:
-  - 技术总结
+  - technical-summary
 date: 2025-1-23
 ---
 
 
 ## 1 引言
 
-大模型越来越多，以前喜欢直接网页开一个窗口，但是现在因为在DeepSeek、Kimi、Claude等多个平台间来回切换，而每次都需要手动输入Prompt来激活CoT（Chain-of-Thought）功能，严重影响了工作效率。这次记录一下API+客户端+长prompt的方式，提升大模型脑子的同时，让我不用再切来切去。这次主要用到三个东西：DeepSeek API: https://platform.deepseek.com/api_keysCherry Studio: https://github.com/CherryHQ/cherry-studio一个名为Thinking Claude的prompt：https://github.com/richards199999/Thinking-Claude/blob/main/model_instructions/v5.1-extensive-20241201.md
+llm越来越多，以前喜欢直接网页开一个窗口，但是现在因为在DeepSeek、Kimi、Claude等多个平台间来回切换，而每次都需要手动输入Prompt来激活CoT（Chain-of-Thought）功能，严重影响了工作效率。这次记录一下API+客户端+长prompt的方式，提升llm脑子的同时，让我不用再切来切去。这次主要用到三个东西：DeepSeek API: https://platform.deepseek.com/api_keysCherry Studio: https://github.com/CherryHQ/cherry-studio一个名为Thinking Claude的prompt：https://github.com/richards199999/Thinking-Claude/blob/main/model_instructions/v5.1-extensive-20241201.md
 
 ## 2 DeepSeek API
 
@@ -57,7 +57,7 @@ date: 2025-1-23
 1. 先点左下角，打开设置。模型选择里选择自己要用的。这里直接`深度索求`
 2. 把右上角勾上
 3. 在官网找到你的API密钥
-4. API地址一般来说cherry studio都给你写好了，除非你是自己运行的本地大模型，一般都是兼容`openai api`风格的 `xxxxx/v1`格式，不需要手动修改。
+4. API地址一般来说cherry studio都给你写好了，除非你是自己运行的本地llm，一般都是兼容`openai api`风格的 `xxxxx/v1`格式，不需要手动修改。
 5. 模型名称和官网一致就行，用你想用的。如果是在不在到，cherry给出了该平台的说明文档地址，查一下。
 
 ![image.png](https://image.phimes.top/img/202501231005637.png)
@@ -78,9 +78,9 @@ date: 2025-1-23
 
 因为我们用的普通的模型，（`deepseek-reasoning`属于后者）所以，一个有效好用的prompt就尤为重要。
 
-### 4.2 用Prompt让大模型”学会“思考
+### 4.2 用Prompt让llm”学会“思考
 
-[Thinking-Claude/model_instructions/v5.1-extensive-20241201.md at main · richards199999/Thinking-Claude](https://github.com/richards199999/Thinking-Claude/blob/main/model_instructions/v5.1-extensive-20241201.md) 是我很喜欢用的一个激活prompt，对大模型的提升十分明显，尤其是显示的体现了思考过程，比起直接输出更有参考价值。
+[Thinking-Claude/model_instructions/v5.1-extensive-20241201.md at main · richards199999/Thinking-Claude](https://github.com/richards199999/Thinking-Claude/blob/main/model_instructions/v5.1-extensive-20241201.md) 是我很喜欢用的一个激活prompt，对llm的提升十分明显，尤其是显示的体现了思考过程，比起直接输出更有参考价值。
 
 内容很多，用openai的GPT-4o的tokenizer去算，它有大约11323个。这也决定了上下文窗口不够的模型是无法使用的。[Tokenizer - OpenAI API](https://platform.openai.com/tokenizer)
 
@@ -119,7 +119,7 @@ date: 2025-1-23
 
 ### 5.2 测试效果
 
-用一个简单的问题来测试。当我们使用prompt让模型强制思考以后，可以发现右边的回答实际上更贴近我们想要的结果。现在我们可以愉快的开始使用大模型了
+用一个简单的问题来测试。当我们使用prompt让模型强制思考以后，可以发现右边的回答实际上更贴近我们想要的结果。现在我们可以愉快的开始使用llm了
 
 ![image.png](https://image.phimes.top/img/20250123195902.png)
 

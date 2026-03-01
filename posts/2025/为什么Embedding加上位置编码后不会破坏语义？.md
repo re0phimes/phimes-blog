@@ -3,7 +3,7 @@ title: 为什么Embedding加上位置编码后不会破坏语义？
 date: 2025-09-28
 tags:
   - LLM
-  - 算法原理
+  - algorithm-principles
   - Embedding
 description: 通过位置编码的加法操作分析正余弦编码的推导逻辑以及高维空间特点
 cover: https://image.phimes.top/img/20250927222247489.png

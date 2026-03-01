@@ -2,10 +2,10 @@
 title: Add & Norm：对残差连接深入解析（一）
 date: 2025-6-12
 categories:
-  - LLM原理
+  - llm-principles
 tags:
   - LLM
-  - 算法原理
+  - algorithm-principles
 status: published
 lastUpdated: 2026-02-27
 topic: [transformer, residual-connection]

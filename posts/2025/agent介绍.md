@@ -16,7 +16,7 @@ cover: https://image.phimes.top/img/202501100954832.png
 
 # 概述
 
-最早学习大模型的时候，被大模型五花八门的概念弄得云里雾里。国内在翻译的时候也存在理解偏差。比如agents被翻译为代理。这篇主要为了简要的区分models、agents、workflows，并初步介绍agents在当前（2025-01-10），具体是什么，有哪些功能，有哪些工具或者框架。
+最早学习llm的时候，被llm五花八门的概念弄得云里雾里。国内在翻译的时候也存在理解偏差。比如agents被翻译为代理。这篇主要为了简要的区分models、agents、workflows，并初步介绍agents在当前（2025-01-10），具体是什么，有哪些功能，有哪些工具或者框架。
 
 # Agent介绍
 
@@ -58,8 +58,8 @@ workflow其实并不能和models或者agents并列去比较。workflow可以和m
 
 根据google的《agents》，google把agents分为三个部分：`model`、 `tools` 、`Orchestration`。三者共同组成了一个agent。
 **可以发现，除了model，它还包含了orchesration和tools两个部分**
-- orchestration给予了大模型记忆、编排、根据输入进行特定方式思考的能力
-- tools则给予了大模型访问外界知识和工具的能力
+- orchestration给予了llm记忆、编排、根据输入进行特定方式思考的能力
+- tools则给予了llm访问外界知识和工具的能力
 
 ![image.png](https://image.phimes.top/img/202501101129372.png)
 ## model
@@ -67,7 +67,7 @@ model是模型的基座，离线的如Qwen2.5系列、Llama系列等。这里就
 ## 工具
 
 ### 概述tools calling（function calling）
-工具调用赋予了大模型访问外界知识的能力。通常来说大模型不具备回答其训练数据以外知识的能力。但是通过在训练数据中包含了工具调用的示例，并在推理时提供模板生成的工具调用指令来执行外部工具。
+工具调用赋予了llm访问外界知识的能力。通常来说llm不具备回答其训练数据以外知识的能力。但是通过在训练数据中包含了工具调用的示例，并在推理时提供模板生成的工具调用指令来执行外部工具。
 
 ### 工具调用的实现逻辑
 
@@ -84,10 +84,10 @@ model是模型的基座，离线的如Qwen2.5系列、Llama系列等。这里就
 	- Qwen自己的函数调用模板
 
 ```ad-question[注意]
-如何在大模型中使用tools？
+如何在llm中使用tools？
 ```
 
-### 大模型中使用工具的两种模式
+### llm中使用工具的两种模式
 
 这里不深入讨论哪种方法更好，现有情况下我们可以根据框架，选择自己喜欢的。
 
