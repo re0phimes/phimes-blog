@@ -4,6 +4,7 @@ date: 2025-08-19
 tags:
   - LLM
   - 算法原理
+topic: [embedding, rag, manifold, bert]
 ---
 ## 1 TL,DR;
 

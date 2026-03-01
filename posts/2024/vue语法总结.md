@@ -1,6 +1,7 @@
 ---
 title: vue语法总结 2024-12-23
 tags: [vue, 前端]
+topic: [vue, syntax, frontend]
 categories: [技术总结]
 date: 2024-10-10
 # description: 欢迎使用 Curve 主题，这是你的第一篇文章

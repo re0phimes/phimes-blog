@@ -1,6 +1,7 @@
 ---
 title: 从vibe到spec：可维护性视角下探讨为什么很多人的AI编程依然是小玩具
 tag: 公众号 经验分享 技术杂谈
+topic: [ai-coding, spec, maintainability, vibe-coding]
 date: 2025-12-26
 ---
 
