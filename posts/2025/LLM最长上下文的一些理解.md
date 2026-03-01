@@ -1,7 +1,7 @@
 ---
 title: LLM最长上下文的一些运用和理解
 tags:
-  - LLM
+  - llm
   - algorithm-principles
   - vLLM
   - llamacpp

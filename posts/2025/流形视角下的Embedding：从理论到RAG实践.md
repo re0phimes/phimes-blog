@@ -2,7 +2,7 @@
 title: 流形视角下的Embedding：从理论到RAG实践
 date: 2025-08-19
 tags:
-  - LLM
+  - llm
   - algorithm-principles
 ---
 ## 1 TL,DR;

@@ -2,7 +2,7 @@
 title: Add & Norm（二）从传统CV到Transformer里的Normalization详解
 date: 2025-7-28
 tags:
-  - LLM
+  - llm
   - algorithm-principles
 cover: https://image.phimes.top/img/BatchNorm%20in%20CV.excalidraw.png
 status: published

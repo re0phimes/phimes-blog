@@ -1,7 +1,7 @@
 ---
 title: 浅谈CoT
 tags:
-  - LLM
+  - llm
 categories:
   - llm-principles
 date: 2025-1-26

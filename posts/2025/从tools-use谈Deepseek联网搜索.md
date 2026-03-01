@@ -1,7 +1,7 @@
 ---
 title: 从tools use谈谈Deepseek的”联网搜索”怎么实现 2025-02-01
 tags:
-  - LLM
+  - llm
   - Tools
 categories:
   - technical-summary

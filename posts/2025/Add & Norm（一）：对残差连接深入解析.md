@@ -4,7 +4,7 @@ date: 2025-6-12
 categories:
   - llm-principles
 tags:
-  - LLM
+  - llm
   - algorithm-principles
 status: published
 lastUpdated: 2026-02-27

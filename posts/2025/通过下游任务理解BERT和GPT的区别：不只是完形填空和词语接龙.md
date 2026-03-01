@@ -2,7 +2,7 @@
 title: 通过下游任务理解BERT和GPT的区别：不只是完形填空和词语接龙
 date: 2025.12.19
 tags:
-  - LLM
+  - llm
   - algorithm-principles
   - BERT
 cover: https://image.phimes.top/img/20251117111602.png
