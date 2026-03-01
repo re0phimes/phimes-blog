@@ -4,7 +4,7 @@ tags:
   - LLM
   - Tools
 categories:
-  - 技术总结
+  - technical-summary
 date: 2025-2-1
 status: published
 topic: [llm, tools, deepseek]
@@ -20,16 +20,16 @@ cover: https://image.phimes.top/img/202501101129372.png
 
 ![claude的agent结构](https://image.phimes.top/img/202501101129372.png)
 
-最近翻阅各大模型的tools use的文档的时候，发现这块的文档的例子都比较简单。这次通过调用本地的`drissionpage`来实现一个deepseek一样的联网搜索。
+最近翻阅各llm的tools use的文档的时候，发现这块的文档的例子都比较简单。这次通过调用本地的`drissionpage`来实现一个deepseek一样的联网搜索。
 
 ![deepseek的联网搜索按钮](https://image.phimes.top/img/20250201104751.png)
 
 
 ## 2 效果展示
 
-我们用一个最近的例子，让大模型获得访问外部信息的能力。以`2025年春晚机器人表演，会导致以后机器人觉醒后认为自己被羞辱么？`为问题。
+我们用一个最近的例子，让llm获得访问外部信息的能力。以`2025年春晚机器人表演，会导致以后机器人觉醒后认为自己被羞辱么？`为问题。
 
-这是第一次，system输入后，大模型知道了自己的执行逻辑。
+这是第一次，system输入后，llm知道了自己的执行逻辑。
 ![image.png](https://image.phimes.top/img/20250202173119.png)
 
 于是当user prompt输入后，它开始发现需要调用工具，于是调用了我本地的方法进行搜索，然后进行了总结。
@@ -55,7 +55,7 @@ Tool use（工具使用）是一种让大语言模型能够通过调用外部工
 
 一般来说可以分为两种，一种是的服务器端已经具备相关`方法`/`工具`。另一种情况是，我们自己本地准备方法工具。从OEPN-AI的流程图上，tools（第三步）也是在客户端侧。因为服务器测的方法其实也是一样的原理的所以我们重点说一下：
 
-**当我自己有一个tool，我要如何让大模型调用它，以便于他可以访问外界的知识**
+**当我自己有一个tool，我要如何让llm调用它，以便于他可以访问外界的知识**
 
 ![OPEN AI的工具调用流程](https://image.phimes.top/img/20250201175201.png)
 
@@ -81,7 +81,7 @@ openai、deepseek、qwen的例子都是都是查询天气，其实我觉得不�
 
 - `web_search_tool`: 这是我们的联网搜索方法，用`DrissionPage`直接自动化实现搜索。
 - `tool use schema`: tool use的参数schema定义，用于api传参，tool
-- `send_message`: 简单封装了一下用`requests`请求api，实际上对于支持OPEN AI格式的大模型，可以用`openai`的库，看个人偏好。
+- `send_message`: 简单封装了一下用`requests`请求api，实际上对于支持OPEN AI格式的llm，可以用`openai`的库，看个人偏好。
 - `handle_tool_call`: 对于任何的本地的tool（如果我定义了多个）被调用后，可以在该方法内做对应的结果解析。
 - `process_conversation`: 对话流程的实现。对于每次的请求，我们需要手动将`message`(不论是用户的request还是服务器返回的response)都添加到`messages`（或者叫history）里。
 
@@ -90,7 +90,7 @@ openai、deepseek、qwen的例子都是都是查询天气，其实我觉得不�
 
 #### 4.1.1 message的结构
 
-message就是我们构造给api发送的`request`或者大模型回复的`response`。
+message就是我们构造给api发送的`request`或者llm回复的`response`。
 
 message可以分成几种类型：
 - system（open-ai的o1会用developer来代替）、user
@@ -111,7 +111,7 @@ message可以分成几种类型：
 
 ##### 4.1.1.2 assistant
 
-assistant是大模型给我们的回复。除了`role`和`content`，多了几个东西。
+assistant是llm给我们的回复。除了`role`和`content`，多了几个东西。
 
 1. `reasoning_content`：现在的reasoning模型的思考内容。如果不是reasoning模型，那就没有，目前我们先不关注。
 2. `tool_calls`：如果没有工具调用那该选项也是空的，但是如果有，这一json对象的则描述了我具体调用的方法和参数。（**很重要，我们后续就是要用它**）
@@ -322,7 +322,7 @@ def web_search_tool(query: str, search_engine: str = "bing") -> Dict:
 
 ##### 4.2.1.2 `tool use schema`
 
-有了方法，我们还要根据大模型调用的规范，在向api请求的时候，带上我们的tools列表。这可以是多个也可以是一个。
+有了方法，我们还要根据llm调用的规范，在向api请求的时候，带上我们的tools列表。这可以是多个也可以是一个。
 
 这里有**三个**地方要注意：
 
@@ -394,7 +394,7 @@ tools = [
 
 ##### 4.2.1.3 `send message`
 
-`send_message`主要是封装了请求。这里要注意的是`data`里的`tool_choice`，一般来说使用"auto"就能让大模型自己决定什么时候用什么tool。
+`send_message`主要是封装了请求。这里要注意的是`data`里的`tool_choice`，一般来说使用"auto"就能让llm自己决定什么时候用什么tool。
 
 ![image.png](https://image.phimes.top/img/20250202184143.png)
 
@@ -533,8 +533,8 @@ default_system_message = {
 流程请求的最后封装，这里要注意的就是，当本地执行完tool调用以后，要将结果封装成tool message再发给服务器。
 
 这里有两个选择：
-1. 我们可以显式的构造一个请求，提供一个新的prompt，强制改变大模型后续的执行逻辑
-2. 我们也可以直接把tool的调用结果以tool message（参照message结构部分）去构造，让大模型完成剩下的逻辑。
+1. 我们可以显式的构造一个请求，提供一个新的prompt，强制改变llm后续的执行逻辑
+2. 我们也可以直接把tool的调用结果以tool message（参照message结构部分）去构造，让llm完成剩下的逻辑。
 
 ```python
 def process_conversation(messages: Optional[List[Dict[str, Any]]] = None):
@@ -619,7 +619,7 @@ def process_conversation(messages: Optional[List[Dict[str, Any]]] = None):
 在调用`tools`时，实际遇到了一些问题，例如无线调用、连续调用以及不触发的情况。目前，`tool use`的功能还不够完善。以下是需要注意的几个关键点：
 1. **System Message的判断**：需要对`system message`进行适当的判断和处理。
 2. **影响调用的因素**：包括`system prompt`、`tools`的`schema`中的`description`、`user prompt`等，这些内容必须清晰明确。此外，请求`tool_choice`时的模式也需要注意。
-3. **利用大模型的能力**：非标要的情况下，尽量依赖大模型自身的能力，而不是通过`user prompt`强行改变其行为。
+3. **利用llm的能力**：非标要的情况下，尽量依赖llm自身的能力，而不是通过`user prompt`强行改变其行为。
 
 ### 5.2 心得体会
 
@@ -642,7 +642,7 @@ def process_conversation(messages: Optional[List[Dict[str, Any]]] = None):
 
 最后再抛出一个例子
 
-### 5.3 一个例子：一句话让大模型为我调用多次方法。
+### 5.3 一个例子：一句话让llm为我调用多次方法。
 
 比如我的prompt是：
 ```

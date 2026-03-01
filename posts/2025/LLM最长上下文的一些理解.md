@@ -2,7 +2,7 @@
 title: LLM最长上下文的一些运用和理解
 tags:
   - LLM
-  - 算法原理
+  - algorithm-principles
   - vLLM
   - llamacpp
 topic: [llm, context-length, vllm, llamacpp]
