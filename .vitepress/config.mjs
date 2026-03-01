@@ -132,6 +132,63 @@ export default withPwa(
         // sitemap
         sitemap: {
             hostname: themeConfig.siteMeta.site,
+            transformItems: (items) => {
+                // 为每个 post 生成 SEO 友好的 URL
+                let transformedCount = 0;
+
+                const result = items.map(item => {
+                    // 只处理 posts 目录下的文章
+                    if (item.url && item.url.startsWith('posts/')) {
+                        // 尝试从 postData 中找到对应的文章数据
+                        const post = postData.find(p => {
+                            // item.url 格式: "posts/2024/vue语法总结"
+                            // p.regularPath 格式: "/posts/2024/vue语法总结.html"
+                            const postPath = p.regularPath.replace(/^\//, '').replace(/\.html$/, '');
+                            return postPath === item.url;
+                        });
+
+                        if (post && post.date) {
+                            const date = new Date(post.date);
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+
+                            // 生成 slug（智能 fallback）
+                            let slug = '';
+
+                            // 优先级 1: topic 字段
+                            if (post.topic && post.topic.length > 0) {
+                                slug = post.topic.join('-');
+                            }
+                            // 优先级 2: tags 字段（过滤中文，保留英文/缩写）
+                            else if (post.tags && post.tags.length > 0) {
+                                slug = post.tags
+                                    .filter(tag => /^[a-zA-Z0-9-]+$/.test(tag))
+                                    .slice(0, 4)
+                                    .join('-')
+                                    .toLowerCase();
+                            }
+                            // 优先级 3: 从文件名提取（fallback）
+                            if (!slug) {
+                                const filename = post.regularPath.split('/').pop().replace('.html', '');
+                                slug = filename
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+                                    .replace(/^-+|-+$/g, '');
+                            }
+
+                            // 生成新的 URL
+                            if (slug) {
+                                item.url = `posts/${year}/${month}/${day}/${slug}`;
+                                transformedCount++;
+                            }
+                        }
+                    }
+                    return item;
+                });
+                console.log(`[Sitemap] Transformed ${transformedCount} post URLs to SEO-friendly format`);
+                return result;
+            }
         },
         // 主题配置
         themeConfig: {
@@ -156,10 +213,60 @@ export default withPwa(
         srcExclude: ["**/README.md", "**/TODO.md"],
         // transformHead
         transformPageData: async (pageData) => {
-            // canonical URL
-            const canonicalUrl = `${themeConfig.siteMeta.site}/${pageData.relativePath}`
-                .replace(/index\.md$/, "")
-                .replace(/\.md$/, "");
+            // 新增：URL 结构优化
+            // 只处理 posts 目录下的文章
+            let customUrl = null;
+            if (pageData.relativePath.startsWith('posts/')) {
+                const frontmatter = pageData.frontmatter;
+
+                // 1. 提取日期（必需）
+                if (frontmatter.date) {
+                    const date = new Date(frontmatter.date);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const dateStr = `${year}${month}${day}`;
+
+                    // 2. 生成 slug（智能 fallback）
+                    let slug = '';
+
+                    // 优先级 1: topic 字段
+                    if (frontmatter.topic && frontmatter.topic.length > 0) {
+                        slug = frontmatter.topic.join('-');
+                    }
+                    // 优先级 2: tags 字段（过滤中文，保留英文/缩写）
+                    else if (frontmatter.tags && frontmatter.tags.length > 0) {
+                        slug = frontmatter.tags
+                            .filter(tag => /^[a-zA-Z0-9-]+$/.test(tag))
+                            .slice(0, 4)
+                            .join('-')
+                            .toLowerCase();
+                    }
+                    // 优先级 3: 从文件名提取（fallback）
+                    else {
+                        const filename = pageData.relativePath.split('/').pop().replace('.md', '');
+                        slug = filename
+                            .toLowerCase()
+                            .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+                            .replace(/^-+|-+$/g, '');
+                    }
+
+                    // 3. 生成唯一 ID
+                    frontmatter.id = `${dateStr}-${slug}`;
+
+                    // 4. 生成 permalink（用于 canonical URL）
+                    customUrl = `/posts/${year}/${month}/${day}/${slug}`;
+                    frontmatter.permalink = customUrl;
+                }
+            }
+
+            // canonical URL（使用自定义 URL 或默认 URL）
+            const canonicalUrl = customUrl
+                ? `${themeConfig.siteMeta.site}${customUrl}`
+                : `${themeConfig.siteMeta.site}/${pageData.relativePath}`
+                    .replace(/index\.md$/, "")
+                    .replace(/\.md$/, "");
+
             pageData.frontmatter.head ??= [];
             pageData.frontmatter.head.push(["link", { rel: "canonical", href: canonicalUrl }]);
         },
