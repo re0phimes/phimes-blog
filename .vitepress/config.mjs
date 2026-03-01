@@ -322,6 +322,60 @@ export default withPwa(
         buildEnd: async (config) => {
             await createRssFile(config, themeConfig);
             await createBlogIndex(config, themeConfig);
+
+            // 移动HTML文件到permalink路径
+            console.log('[URL Optimization] Moving HTML files to permalink paths...');
+            let movedCount = 0;
+
+            // 重新获取文章数据
+            const matter = await import('gray-matter');
+            const postsDir = path.resolve(__dirname, '../posts');
+            const mdFiles = await fs.readdir(postsDir, { recursive: true });
+
+            for (const file of mdFiles) {
+                if (!file.endsWith('.md')) continue;
+
+                const fullPath = path.join(postsDir, file);
+                const content = await fs.readFile(fullPath, 'utf-8');
+                const { data: frontmatter } = matter.default(content);
+
+                // 生成permalink
+                if (frontmatter.date) {
+                    const date = new Date(frontmatter.date);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+
+                    let slug = '';
+                    if (frontmatter.topic && frontmatter.topic.length > 0) {
+                        slug = frontmatter.topic.join('-');
+                    } else if (frontmatter.tags && frontmatter.tags.length > 0) {
+                        slug = frontmatter.tags
+                            .filter(tag => /^[a-zA-Z0-9-]+$/.test(tag))
+                            .slice(0, 4)
+                            .join('-')
+                            .toLowerCase();
+                    } else {
+                        const filename = file.split(/[/\\]/).pop().replace('.md', '');
+                        slug = filename.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '');
+                    }
+
+                    if (slug) {
+                        const permalink = `/posts/${year}/${month}/${day}/${slug}`;
+                        const relativePath = 'posts/' + file.replace(/\\/g, '/');
+                        const oldHtmlPath = path.join(config.outDir, relativePath.replace('.md', '.html'));
+                        const newHtmlPath = path.join(config.outDir, permalink + '.html');
+
+                        if (await fs.pathExists(oldHtmlPath)) {
+                            await fs.ensureDir(path.dirname(newHtmlPath));
+                            await fs.move(oldHtmlPath, newHtmlPath, { overwrite: true });
+                            movedCount++;
+                        }
+                    }
+                }
+            }
+
+            console.log(`[URL Optimization] Moved ${movedCount} HTML files to SEO-friendly paths`);
         },
         // vite
         vite: {
