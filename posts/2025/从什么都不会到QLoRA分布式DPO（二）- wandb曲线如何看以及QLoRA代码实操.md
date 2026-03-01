@@ -2,7 +2,6 @@
 title: 从什么都不会到QLoRA分布式DPO（二）
 tags:
   - LLM, train
-topic: [qlora, dpo, wandb, training]
 categories:
   - technical-summary
 date: 2025-03-07
