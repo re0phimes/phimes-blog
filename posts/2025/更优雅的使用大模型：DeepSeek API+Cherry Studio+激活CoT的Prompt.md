@@ -1,7 +1,7 @@
 ---
 title: 更优雅的使用llm：DeepSeek API+Cherry Studio+激活CoT的Prompt
 tags:
-  - LLM
+  - llm
 topic: [deepseek, api, cherry-studio, cot, prompt]
 categories:
   - technical-summary

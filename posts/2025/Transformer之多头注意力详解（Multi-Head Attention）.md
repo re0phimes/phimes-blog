@@ -1,7 +1,7 @@
 ---
 title: 注意力机制之多头注意力（Multi-Head Attention）
 tags:
-  - LLM
+  - llm
   - Attention
   - Transformers
 date: 2025-05-05

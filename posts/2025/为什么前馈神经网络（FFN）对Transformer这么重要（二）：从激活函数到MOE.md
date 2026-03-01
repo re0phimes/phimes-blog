@@ -2,7 +2,7 @@
 title: 为什么前馈神经网络（FFN）对Transformer这么重要（二）：从激活函数到MOE
 date: 2025-6-2
 tags:
-  - LLM
+  - llm
   - algorithm-principles
 cover: https://image.phimes.top/img/202505271446227.png
 status: published

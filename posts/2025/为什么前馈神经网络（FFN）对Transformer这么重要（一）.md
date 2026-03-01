@@ -2,7 +2,7 @@
 title: 为什么前馈神经网络（FFN）对Transformer这么重要（一）
 date: 2025-5-16
 tags:
-  - LLM
+  - llm
   - algorithm-principles
 cover: https://image.phimes.top/img/20250516232343.png
 status: published
