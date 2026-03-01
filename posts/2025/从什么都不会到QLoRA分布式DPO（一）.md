@@ -3,11 +3,12 @@ title: 工程实现系列：从什么都不会到QLoRA分布式DPO（一）
 tags:
   - LLM, DPO
 date: 2025-3-28
+topic: [qlora, dpo, training, llm]
 ---
 
 ## 1 引言
 
-领导看了几篇营销号推文，突然要求在有限的算力上部署和微调大模型。当你开始研究，却发现眼前摆着一堆框架和工具，你好不容易理清楚了发现无从下手：
+领导看了几篇营销号推文，突然要求在有限的算力上部署和微调llm。当你开始研究，却发现眼前摆着一堆框架和工具，你好不容易理清楚了发现无从下手：
 - 训练框架：accelerate、deepspeed、llamafactory、megatron、unsloth...
 - 部署方案：vllm、ollama、sglang...
 - 官方工具：transformers、trl、peft...
@@ -161,7 +162,7 @@ model = get_peft_model(model, LoraConfig)
 
 - **lora_dropout：** 作用于 LoRA 分支的中间激活值，通过随机丢弃部分输出来防止过拟合。按照不同规模的数据集和任务来设置。一般来说小的数据集为0.1，高秩㐉（r>=16)或者一些复杂任务的情况，可以设置为0.2-0.3
 - **task_type：**
-	- CAUSAL_LM，在一般的大模型训练中我们不会改它，大模型本身是单项注意力机制的预测，所以都使用因果语言模型。
+	- CAUSAL_LM，在一般的llm训练中我们不会改它，llm本身是单项注意力机制的预测，所以都使用因果语言模型。
 	- SEQ_2_SEQ_LM：T5、BART 等编解码结构，适用于需区分输入输出的任务（如翻译）
 	- SEQ_CLS：文本分类等任务。
 
