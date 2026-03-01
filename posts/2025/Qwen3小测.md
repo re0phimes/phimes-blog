@@ -2,6 +2,7 @@
 title: Qwen3-8b的变化和能力初探
 categories:
   - 模型测试
+topic: [qwen3, model-test, llm, moe]
 date: 2025-04-29
 ---
 

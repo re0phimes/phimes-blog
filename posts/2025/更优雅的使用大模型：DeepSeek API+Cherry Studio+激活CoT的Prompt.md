@@ -2,6 +2,7 @@
 title: 更优雅的使用大模型：DeepSeek API+Cherry Studio+激活CoT的Prompt
 tags:
   - LLM
+topic: [deepseek, api, cherry-studio, cot, prompt]
 categories:
   - 技术总结
 date: 2025-1-23
