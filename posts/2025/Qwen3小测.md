@@ -1,9 +1,9 @@
 ---
 title: Qwen3-8b的变化和能力初探
 categories:
-  - 模型测试
-topic: [qwen3, model-test, llm, moe]
+  - model-testing
 date: 2025-04-29
+topic: [qwen3, model-test, llm, moe]
 ---
 
 # Qwen3介绍
@@ -24,7 +24,7 @@ Qwen3系列推出了多种规格的模型：
 
 1. **大型MoE模型**：
 
-   - Qwen3-235B-A22B：拥有2350亿总参数和220亿激活参数的大模型  
+   - Qwen3-235B-A22B：拥有2350亿总参数和220亿激活参数的llm  
    - Qwen3-30B-A3B：拥有300亿总参数和30亿激活参数的小型MoE模型
 
   2. **Dense模型**：
@@ -120,7 +120,7 @@ vllm serve Qwen/Qwen3-8B --enable-reasoning --reasoning-parser deepseek_r1
 
    ```
 
-## 模型测试
+## model-testing
 
 ### 特定任务：
 
