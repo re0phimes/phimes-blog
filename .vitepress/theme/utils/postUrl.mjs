@@ -1,3 +1,5 @@
+import { generateId } from "./commonTools.mjs";
+
 const normalizePath = (input = "") => String(input).replace(/\\/g, "/");
 
 const stripExtension = (input = "") => String(input).replace(/\.[^.]+$/, "");
@@ -120,6 +122,16 @@ export const buildLegacyRedirectHtml = (targetPath = "/") => {
   </body>
 </html>
 `;
+};
+
+export const resolveCurrentPostId = (pageData = {}, frontmatter = {}) => {
+  if (frontmatter?.id !== undefined && frontmatter?.id !== null && frontmatter.id !== "") {
+    return frontmatter.id;
+  }
+
+  const fallbackPath = pageData?.filePath || pageData?.relativePath;
+  if (!fallbackPath) return null;
+  return generateId(fallbackPath);
 };
 
 export const getPostPublicPath = (post) => post?.permalink || post?.regularPath || "/";

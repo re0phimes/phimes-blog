@@ -14,8 +14,8 @@
 </template>
 
 <script setup>
-import { generateId } from "@/utils/commonTools";
 import { shufflePost } from "@/utils/helper";
+import { resolveCurrentPostId } from "@/utils/postUrl.mjs";
 
 const router = useRouter();
 const { theme, page, frontmatter } = useData();
@@ -35,7 +35,11 @@ const getRelatedData = () => {
     return;
   }
   // 本篇索引
-  const postId = generateId(page.value?.filePath);
+  const postId = resolveCurrentPostId(page.value, frontmatter.value);
+  if (postId === null || postId === undefined) {
+    relatedData.value = null;
+    return;
+  }
   // 过滤掉当前文章
   const filteredPosts = postData.filter((post) => post.id !== postId);
   // 取出两篇文章
