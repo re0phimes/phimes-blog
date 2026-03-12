@@ -15,6 +15,8 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import fs from "fs-extra";
 import path from "path";
+import { buildPageViewPathCandidates, buildPostUrlData } from "./theme/utils/postUrl.mjs";
+import { transformSitemapItems } from "./theme/utils/sitemap.mjs";
 
 // 获取全局数据
 const postData = await getAllPosts();
@@ -89,9 +91,12 @@ const mergeMostPopularExternalCache = async (posts, config) => {
     }
 
     posts.forEach((post) => {
-        if (!post || typeof post.regularPath !== "string") return;
-        const score = scoreByPath.get(post.regularPath);
-        if (!Number.isFinite(score)) return;
+        if (!post) return;
+        const score = buildPageViewPathCandidates(post).reduce((sum, currentPath) => {
+            const currentScore = Number(scoreByPath.get(currentPath));
+            return sum + (Number.isFinite(currentScore) ? currentScore : 0);
+        }, 0);
+        if (!Number.isFinite(score) || score <= 0) return;
         post.popularRank = score;
         post.popular = true;
     });
@@ -133,104 +138,10 @@ export default withPwa(
         sitemap: {
             hostname: themeConfig.siteMeta.site,
             transformItems: (items) => {
-                // 为每个 post 生成 SEO 友好的 URL 并添加 SEO 字段
-                let transformedCount = 0;
-                const now = new Date();
-                const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-
-                const result = items.map(item => {
-                    // 1. 首页
-                    if (item.url === '/' || item.url === '') {
-                        return { ...item, priority: 1.0, changefreq: 'weekly' };
-                    }
-
-                    // 2. 文章页
-                    if (item.url && item.url.startsWith('posts/')) {
-                        // 尝试从 postData 中找到对应的文章数据
-                        const post = postData.find(p => {
-                            // item.url 格式: "posts/2024/vue语法总结"
-                            // p.regularPath 格式: "/posts/2024/vue语法总结.html"
-                            const postPath = p.regularPath.replace(/^\//, '').replace(/\.html$/, '');
-                            return postPath === item.url;
-                        });
-
-                        if (post && post.date) {
-                            const date = new Date(post.date);
-                            const year = date.getFullYear();
-                            const month = String(date.getMonth() + 1).padStart(2, '0');
-                            const day = String(date.getDate()).padStart(2, '0');
-
-                            // 生成 slug（智能 fallback）
-                            let slug = '';
-
-                            // 优先级 1: topic 字段
-                            if (post.topic && post.topic.length > 0) {
-                                slug = post.topic.join('-');
-                            }
-                            // 优先级 2: tags 字段（过滤中文，保留英文/缩写）
-                            else if (post.tags && post.tags.length > 0) {
-                                slug = post.tags
-                                    .filter(tag => /^[a-zA-Z0-9-]+$/.test(tag))
-                                    .slice(0, 4)
-                                    .join('-')
-                                    .toLowerCase();
-                            }
-                            // 优先级 3: 从文件名提取（fallback）
-                            if (!slug) {
-                                const filename = post.regularPath.split('/').pop().replace('.html', '');
-                                slug = filename
-                                    .toLowerCase()
-                                    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
-                                    .replace(/^-+|-+$/g, '');
-                            }
-
-                            // 生成新的 URL
-                            if (slug) {
-                                item.url = `posts/${year}/${month}/${day}/${slug}`;
-                                transformedCount++;
-                            }
-
-                            // 添加 SEO 字段
-                            // 热门文章
-                            if (post.popular || post.popularRank) {
-                                return { ...item, priority: 0.8, changefreq: 'monthly' };
-                            }
-
-                            // 最近 3 个月的文章
-                            const postDate = new Date(post.date);
-                            if (postDate > threeMonthsAgo) {
-                                return { ...item, priority: 0.7, changefreq: 'monthly' };
-                            }
-
-                            // 旧文章
-                            return { ...item, priority: 0.6, changefreq: 'yearly' };
-                        } else {
-                            // Fallback: 无法找到文章数据时的默认值
-                            return { ...item, priority: 0.5, changefreq: 'yearly' };
-                        }
-                    }
-
-                    // 3. 分类页
-                    if (item.url.startsWith('pages/categories/')) {
-                        return { ...item, priority: 0.5, changefreq: 'weekly' };
-                    }
-
-                    // 4. 标签页
-                    if (item.url.startsWith('pages/tags/')) {
-                        return { ...item, priority: 0.5, changefreq: 'weekly' };
-                    }
-
-                    // 5. 归档页
-                    if (item.url.includes('/archives')) {
-                        return { ...item, priority: 0.4, changefreq: 'monthly' };
-                    }
-
-                    // 6. 其他页面
-                    return { ...item, priority: 0.5, changefreq: 'yearly' };
-                });
-
-                // 打印转换统计
-                console.log(`[Sitemap] Transformed ${transformedCount} post URLs to SEO-friendly format`);
+                const result = transformSitemapItems(items, postData);
+                const transformedCount = result.filter((item) => item.url.startsWith("posts/") && item.url.includes("/20")).length;
+                console.log(`[Sitemap] Kept ${result.length} items after cleanup`);
+                console.log(`[Sitemap] Normalized ${transformedCount} post URLs to SEO-friendly format`);
                 return result;
             }
         },
@@ -254,7 +165,7 @@ export default withPwa(
             config: (md) => markdownConfig(md, themeConfig),
         },
         // 构建排除
-        srcExclude: ["**/README.md", "**/TODO.md"],
+        srcExclude: ["**/README.md", "**/TODO.md", "**/TEST_REPORT.md", "docs/plans/**", "plan/**"],
         // transformHead
         transformPageData: async (pageData) => {
             // 新增：URL 结构优化
@@ -262,44 +173,16 @@ export default withPwa(
             let customUrl = null;
             if (pageData.relativePath.startsWith('posts/')) {
                 const frontmatter = pageData.frontmatter;
+                const urlData = buildPostUrlData({
+                    relativePath: pageData.relativePath,
+                    date: frontmatter.date,
+                    topic: frontmatter.topic,
+                    tags: frontmatter.tags,
+                });
 
-                // 1. 提取日期（必需）
-                if (frontmatter.date) {
-                    const date = new Date(frontmatter.date);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const dateStr = `${year}${month}${day}`;
-
-                    // 2. 生成 slug（智能 fallback）
-                    let slug = '';
-
-                    // 优先级 1: topic 字段
-                    if (frontmatter.topic && frontmatter.topic.length > 0) {
-                        slug = frontmatter.topic.join('-');
-                    }
-                    // 优先级 2: tags 字段（过滤中文，保留英文/缩写）
-                    else if (frontmatter.tags && frontmatter.tags.length > 0) {
-                        slug = frontmatter.tags
-                            .filter(tag => /^[a-zA-Z0-9-]+$/.test(tag))
-                            .slice(0, 4)
-                            .join('-')
-                            .toLowerCase();
-                    }
-                    // 优先级 3: 从文件名提取（fallback）
-                    else {
-                        const filename = pageData.relativePath.split('/').pop().replace('.md', '');
-                        slug = filename
-                            .toLowerCase()
-                            .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
-                            .replace(/^-+|-+$/g, '');
-                    }
-
-                    // 3. 生成唯一 ID
-                    frontmatter.id = `${dateStr}-${slug}`;
-
-                    // 4. 生成 permalink（用于 canonical URL）
-                    customUrl = `/posts/${year}/${month}/${day}/${slug}`;
+                if (urlData) {
+                    frontmatter.id = urlData.id;
+                    customUrl = urlData.permalink;
                     frontmatter.permalink = customUrl;
                 }
             }
@@ -323,9 +206,9 @@ export default withPwa(
             await createRssFile(config, themeConfig);
             await createBlogIndex(config, themeConfig);
 
-            // 移动HTML文件到permalink路径
-            console.log('[URL Optimization] Moving HTML files to permalink paths...');
-            let movedCount = 0;
+            // 复制HTML文件到permalink路径，保留旧路径兼容历史外链
+            console.log('[URL Optimization] Copying HTML files to permalink paths...');
+            let copiedCount = 0;
 
             // 重新获取文章数据
             const matter = await import('gray-matter');
@@ -339,43 +222,27 @@ export default withPwa(
                 const content = await fs.readFile(fullPath, 'utf-8');
                 const { data: frontmatter } = matter.default(content);
 
-                // 生成permalink
-                if (frontmatter.date) {
-                    const date = new Date(frontmatter.date);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
+                const relativePath = 'posts/' + file.replace(/\\/g, '/');
+                const urlData = buildPostUrlData({
+                    relativePath,
+                    date: frontmatter.date,
+                    topic: frontmatter.topic,
+                    tags: frontmatter.tags,
+                });
 
-                    let slug = '';
-                    if (frontmatter.topic && frontmatter.topic.length > 0) {
-                        slug = frontmatter.topic.join('-');
-                    } else if (frontmatter.tags && frontmatter.tags.length > 0) {
-                        slug = frontmatter.tags
-                            .filter(tag => /^[a-zA-Z0-9-]+$/.test(tag))
-                            .slice(0, 4)
-                            .join('-')
-                            .toLowerCase();
-                    } else {
-                        const filename = file.split(/[/\\]/).pop().replace('.md', '');
-                        slug = filename.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '');
-                    }
+                if (urlData) {
+                    const oldHtmlPath = path.join(config.outDir, relativePath.replace('.md', '.html'));
+                    const newHtmlPath = path.join(config.outDir, `${urlData.permalink}.html`);
 
-                    if (slug) {
-                        const permalink = `/posts/${year}/${month}/${day}/${slug}`;
-                        const relativePath = 'posts/' + file.replace(/\\/g, '/');
-                        const oldHtmlPath = path.join(config.outDir, relativePath.replace('.md', '.html'));
-                        const newHtmlPath = path.join(config.outDir, permalink + '.html');
-
-                        if (await fs.pathExists(oldHtmlPath)) {
-                            await fs.ensureDir(path.dirname(newHtmlPath));
-                            await fs.move(oldHtmlPath, newHtmlPath, { overwrite: true });
-                            movedCount++;
-                        }
+                    if (await fs.pathExists(oldHtmlPath) && oldHtmlPath !== newHtmlPath) {
+                        await fs.ensureDir(path.dirname(newHtmlPath));
+                        await fs.copy(oldHtmlPath, newHtmlPath, { overwrite: true });
+                        copiedCount++;
                     }
                 }
             }
 
-            console.log(`[URL Optimization] Moved ${movedCount} HTML files to SEO-friendly paths`);
+            console.log(`[URL Optimization] Copied ${copiedCount} HTML files to SEO-friendly paths`);
         },
         // vite
         vite: {

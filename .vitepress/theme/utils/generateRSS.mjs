@@ -1,7 +1,8 @@
-import { createContentLoader } from "vitepress";
 import { writeFileSync } from "fs";
 import { Feed } from "feed";
 import path from "path";
+import { getAllPosts } from "./getPostData.mjs";
+import { getPostPublicPath } from "./postUrl.mjs";
 
 /**
  * 生成 RSS
@@ -25,27 +26,27 @@ export const createRssFile = async (config, themeConfig) => {
     updated: new Date(),
   });
   // 加载文章
-  let posts = await createContentLoader("posts/**/*.md", {
-    render: true,
-  }).load();
+  let posts = await getAllPosts();
   // 日期降序排序
   posts = posts.sort((a, b) => {
-    const dateA = new Date(a.frontmatter.date);
-    const dateB = new Date(b.frontmatter.date);
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
     return dateB - dateA;
   });
-  for (const { url, frontmatter } of posts) {
+  for (const post of posts) {
     // 仅保留最近 10 篇文章
     if (feed.items.length >= 10) break;
     // 文章信息
-    let { title, description, date } = frontmatter;
+    let { title, description, date } = post;
+    const publicPath = getPostPublicPath(post);
     // 处理日期
     if (typeof date === "string") date = new Date(date);
+    if (typeof date === "number") date = new Date(date);
     // 添加文章
     feed.addItem({
       title,
-      id: `${hostLink}${url}`,
-      link: `${hostLink}${url}`,
+      id: `${hostLink}${publicPath}`,
+      link: `${hostLink}${publicPath}`,
       description,
       date,
       // updated,

@@ -12,7 +12,7 @@
             v-for="(post, postIndex) in theme.archivesData.data[year].articles"
             :key="postIndex"
             class="posts-item s-card hover"
-            @click="router.go(post.regularPath)"
+            @click="router.go(post.permalink || post.regularPath)"
           >
             <span class="title">{{ post.title }}</span>
             <div class="tags">

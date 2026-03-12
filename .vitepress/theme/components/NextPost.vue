@@ -10,7 +10,7 @@
         show: infoPosition === 'fixed' && nextPostShow && !footerIsShow,
       },
     ]"
-    @click="router.go(nextPostData?.regularPath)"
+    @click="router.go(nextPostData?.permalink || nextPostData?.regularPath)"
   >
     <span class="post-tip">
       {{ isNextPost ? "下一篇阅读" : "阅读上一篇" }}

@@ -26,8 +26,10 @@ export const selectMostPopularPosts = (postData, mostPopularConfig = {}, options
 
   const byPath = new Map();
   postData.forEach((post) => {
-    if (!post || typeof post.regularPath !== "string") return;
-    byPath.set(post.regularPath, post);
+    if (!post) return;
+    if (typeof post.regularPath === "string") byPath.set(post.regularPath, post);
+    if (typeof post.legacyPath === "string") byPath.set(post.legacyPath, post);
+    if (typeof post.permalink === "string") byPath.set(post.permalink, post);
   });
 
   const selected = [];
@@ -137,8 +139,8 @@ export const selectRecentPosts = (postData, recentConfig = {}, options = {}) => 
     const bModified = Number(b.lastModified) || 0;
     if (aModified !== bModified) return bModified - aModified;
 
-    const aPath = typeof a.regularPath === "string" ? a.regularPath : "";
-    const bPath = typeof b.regularPath === "string" ? b.regularPath : "";
+    const aPath = typeof a.permalink === "string" ? a.permalink : (typeof a.regularPath === "string" ? a.regularPath : "");
+    const bPath = typeof b.permalink === "string" ? b.permalink : (typeof b.regularPath === "string" ? b.regularPath : "");
     return aPath.localeCompare(bPath);
   });
 
