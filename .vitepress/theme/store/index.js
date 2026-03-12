@@ -9,7 +9,7 @@ export const mainStore = defineStore("main", {
       // banner
       bannerType: "half",
       // 加载状态
-      loadingStatus: true,
+      loadingStatus: false,
       // 滚动高度
       scrollData: {
         // 滚动高度
