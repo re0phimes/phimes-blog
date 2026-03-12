@@ -24,11 +24,11 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
-import { generateId } from "@/utils/commonTools";
+import { resolveCurrentPostId } from "@/utils/postUrl.mjs";
 
 const router = useRouter();
 const store = mainStore();
-const { theme, page } = useData();
+const { theme, page, frontmatter } = useData();
 const { footerIsShow, infoPosition } = storeToRefs(store);
 
 // 文章信息
@@ -40,10 +40,10 @@ const nextPostData = ref(null);
 // 获取文章
 const getNextPostData = () => {
   const { postData } = theme.value;
-  const { filePath } = page.value;
-  if (!postData || !filePath) return false;
+  if (!postData) return false;
   // 本篇索引
-  const postId = generateId(filePath);
+  const postId = resolveCurrentPostId(page.value, frontmatter.value);
+  if (postId === null || postId === undefined) return false;
   const postIndex = postData.findIndex((post) => post.id === postId);
   // 是否有下一篇
   if (postIndex >= 0 && postIndex < postData.length - 1) {

@@ -6,6 +6,7 @@ import {
   buildPageViewPathCandidates,
   buildPostRewriteRules,
   buildPostUrlData,
+  resolveCurrentPostId,
 } from "../.vitepress/theme/utils/postUrl.mjs";
 
 test("buildPostUrlData prefers topic slug and keeps legacy html path", () => {
@@ -69,4 +70,18 @@ test("buildLegacyRedirectHtml points legacy pages to the canonical permalink", (
   assert.match(html, /http-equiv="refresh" content="0; url=\/posts\/2026\/01\/16\/transformer-kv-cache-attention-roofline"/);
   assert.match(html, /location\.replace\("\/posts\/2026\/01\/16\/transformer-kv-cache-attention-roofline"\)/);
   assert.match(html, /rel="canonical" href="\/posts\/2026\/01\/16\/transformer-kv-cache-attention-roofline"/);
+});
+
+test("resolveCurrentPostId prefers frontmatter id for rewritten post routes", () => {
+  const id = resolveCurrentPostId(
+    {
+      relativePath: "posts/2026/01/16/transformer-kv-cache-attention-roofline.md",
+      filePath: "posts/2026/KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解。.md",
+    },
+    {
+      id: "20260116-transformer-kv-cache-attention-roofline",
+    },
+  );
+
+  assert.equal(id, "20260116-transformer-kv-cache-attention-roofline");
 });

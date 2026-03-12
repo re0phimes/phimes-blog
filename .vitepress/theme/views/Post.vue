@@ -104,9 +104,9 @@
 
 <script setup>
 import { formatTimestamp } from "@/utils/helper";
-import { generateId } from "@/utils/commonTools";
 import initFancybox from "@/utils/initFancybox";
 import { usePageViews } from "@/composables/usePageViews";
+import { resolveCurrentPostId } from "@/utils/postUrl.mjs";
 
 const { page, theme, frontmatter } = useData();
 const route = useRoute();
@@ -116,7 +116,7 @@ const commentRef = ref(null);
 
 // 获取对应文章数据
 const postMetaData = computed(() => {
-  const postId = generateId(page.value.relativePath);
+  const postId = resolveCurrentPostId(page.value, frontmatter.value);
   return theme.value.postData.find((item) => item.id === postId);
 });
 
