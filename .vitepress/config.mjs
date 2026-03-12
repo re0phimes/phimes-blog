@@ -15,7 +15,12 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import fs from "fs-extra";
 import path from "path";
-import { buildPageViewPathCandidates, buildPostUrlData } from "./theme/utils/postUrl.mjs";
+import {
+    buildLegacyRedirectHtml,
+    buildPageViewPathCandidates,
+    buildPostRewriteRules,
+    buildPostUrlData,
+} from "./theme/utils/postUrl.mjs";
 import { transformSitemapItems } from "./theme/utils/sitemap.mjs";
 
 // 获取全局数据
@@ -103,6 +108,7 @@ const mergeMostPopularExternalCache = async (posts, config) => {
 };
 
 await mergeMostPopularExternalCache(postData, themeConfig);
+const postRewriteMap = buildPostRewriteRules(postData);
 
 // https://vitepress.dev/reference/site-config
 export default withPwa(
@@ -112,6 +118,7 @@ export default withPwa(
         lang: themeConfig.siteMeta.lang,
         // 简洁的 URL
         cleanUrls: true,
+        rewrites: (page) => postRewriteMap[page],
         // 最后更新时间戳
         lastUpdated: true,
         // 主题
@@ -206,43 +213,19 @@ export default withPwa(
             await createRssFile(config, themeConfig);
             await createBlogIndex(config, themeConfig);
 
-            // 复制HTML文件到permalink路径，保留旧路径兼容历史外链
-            console.log('[URL Optimization] Copying HTML files to permalink paths...');
-            let copiedCount = 0;
+            console.log("[URL Optimization] Generating legacy redirect pages...");
+            let redirectCount = 0;
 
-            // 重新获取文章数据
-            const matter = await import('gray-matter');
-            const postsDir = path.resolve(__dirname, '../posts');
-            const mdFiles = await fs.readdir(postsDir, { recursive: true });
+            for (const post of postData) {
+                if (!post?.legacyPath || !post?.permalink) continue;
 
-            for (const file of mdFiles) {
-                if (!file.endsWith('.md')) continue;
-
-                const fullPath = path.join(postsDir, file);
-                const content = await fs.readFile(fullPath, 'utf-8');
-                const { data: frontmatter } = matter.default(content);
-
-                const relativePath = 'posts/' + file.replace(/\\/g, '/');
-                const urlData = buildPostUrlData({
-                    relativePath,
-                    date: frontmatter.date,
-                    topic: frontmatter.topic,
-                    tags: frontmatter.tags,
-                });
-
-                if (urlData) {
-                    const oldHtmlPath = path.join(config.outDir, relativePath.replace('.md', '.html'));
-                    const newHtmlPath = path.join(config.outDir, `${urlData.permalink}.html`);
-
-                    if (await fs.pathExists(oldHtmlPath) && oldHtmlPath !== newHtmlPath) {
-                        await fs.ensureDir(path.dirname(newHtmlPath));
-                        await fs.copy(oldHtmlPath, newHtmlPath, { overwrite: true });
-                        copiedCount++;
-                    }
-                }
+                const legacyHtmlPath = path.join(config.outDir, post.legacyPath.replace(/^\//, ""));
+                await fs.ensureDir(path.dirname(legacyHtmlPath));
+                await fs.writeFile(legacyHtmlPath, buildLegacyRedirectHtml(post.permalink), "utf-8");
+                redirectCount++;
             }
 
-            console.log(`[URL Optimization] Copied ${copiedCount} HTML files to SEO-friendly paths`);
+            console.log(`[URL Optimization] Generated ${redirectCount} legacy redirect pages`);
         },
         // vite
         vite: {

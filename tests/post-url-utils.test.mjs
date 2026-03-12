@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildPostUrlData, buildPageViewPathCandidates } from "../.vitepress/theme/utils/postUrl.mjs";
+import {
+  buildLegacyRedirectHtml,
+  buildPageViewPathCandidates,
+  buildPostRewriteRules,
+  buildPostUrlData,
+} from "../.vitepress/theme/utils/postUrl.mjs";
 
 test("buildPostUrlData prefers topic slug and keeps legacy html path", () => {
   const result = buildPostUrlData({
@@ -42,4 +47,26 @@ test("buildPageViewPathCandidates returns permalink and legacy fallbacks", () =>
     "/posts/2026/KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解。",
     "/posts/2026/KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解。.html",
   ]);
+});
+
+test("buildPostRewriteRules maps legacy markdown sources to permalink routes", () => {
+  const rewrites = buildPostRewriteRules([
+    {
+      legacyPath: "/posts/2026/KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解。.html",
+      permalink: "/posts/2026/01/16/transformer-kv-cache-attention-roofline",
+    },
+  ]);
+
+  assert.deepEqual(rewrites, {
+    "posts/2026/KV Cache（二）：从如何让GPU不摸鱼开始思考——MQA、GQA到MLA的计算拆解。.md":
+      "posts/2026/01/16/transformer-kv-cache-attention-roofline.md",
+  });
+});
+
+test("buildLegacyRedirectHtml points legacy pages to the canonical permalink", () => {
+  const html = buildLegacyRedirectHtml("/posts/2026/01/16/transformer-kv-cache-attention-roofline");
+
+  assert.match(html, /http-equiv="refresh" content="0; url=\/posts\/2026\/01\/16\/transformer-kv-cache-attention-roofline"/);
+  assert.match(html, /location\.replace\("\/posts\/2026\/01\/16\/transformer-kv-cache-attention-roofline"\)/);
+  assert.match(html, /rel="canonical" href="\/posts\/2026\/01\/16\/transformer-kv-cache-attention-roofline"/);
 });
