@@ -44,12 +44,18 @@
 import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 import { calculateScroll, specialDayGray } from "@/utils/helper";
+import { loadCSS } from "@/utils/commonTools.mjs";
 
 const route = useRoute();
 const store = mainStore();
 const { frontmatter, page, theme } = useData();
 const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize } =
   storeToRefs(store);
+
+const externalFontStylesheets = {
+  hmos: "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
+  lxgw: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css",
+};
 
 // 右键菜单
 const rightMenuRef = ref(null);
@@ -112,7 +118,10 @@ const changeSiteFont = () => {
   try {
     const htmlElement = document.documentElement;
     htmlElement.classList.remove("lxgw", "hmos");
-    htmlElement.classList.add(fontFamily.value);
+    if (fontFamily.value && externalFontStylesheets[fontFamily.value]) {
+      loadCSS(externalFontStylesheets[fontFamily.value]);
+      htmlElement.classList.add(fontFamily.value);
+    }
     htmlElement.style.fontSize = fontSize.value + "px";
   } catch (error) {
     console.error("切换系统字体样式失败", error);

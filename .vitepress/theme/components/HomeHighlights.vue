@@ -45,46 +45,68 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
-import { buildPageViewPathCandidates, getPostPublicPath } from "@/utils/postUrl.mjs";
+import { computed, ref } from "vue";
+import { getPostPublicPath } from "@/utils/postUrl.mjs";
 
 const { theme } = useData();
 
 const enabled = computed(() => Boolean(theme.value?.home?.highlights?.enable));
 
-// 实时浏览量数据
-const pageViews = ref({});
+const getPostKey = (post) =>
+  post?.id ?? post?.permalink ?? post?.regularPath ?? post?.legacyPath ?? post?.title;
 
-// 获取所有浏览量
-onMounted(async () => {
-  try {
-    const res = await fetch("https://blog-page-views.re0phimes.workers.dev/all");
-    pageViews.value = await res.json();
-  } catch (e) {
-    console.error("Failed to fetch page views:", e);
-  }
-});
-
-// 获取所有有封面的文章，按实时热度排序
 const popularPostsWithCover = computed(() => {
-  const posts = theme.value?.postData ?? [];
-  const views = pageViews.value;
-  const getViewScore = (post) =>
-    buildPageViewPathCandidates(post)
-      .map((path) => encodeURI(path))
-      .reduce((sum, currentPath) => sum + Number(views[currentPath] || 0), 0);
+  const posts = Array.isArray(theme.value?.postData) ? theme.value.postData : [];
+  const mostPopularConfig = theme.value?.home?.highlights?.mostPopular ?? {};
+  const rawLimit = Number(mostPopularConfig.limit);
+  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 6;
+  const curatedPaths = Array.isArray(mostPopularConfig.curated) ? mostPopularConfig.curated : [];
 
-  return posts
-    .filter((p) => p && p.cover)
+  const byPath = new Map();
+  posts.forEach((post) => {
+    if (!post) return;
+    if (typeof post.regularPath === "string") byPath.set(post.regularPath, post);
+    if (typeof post.legacyPath === "string") byPath.set(post.legacyPath, post);
+    if (typeof post.permalink === "string") byPath.set(post.permalink, post);
+  });
+
+  const selected = [];
+  const selectedKeys = new Set();
+  const tryAdd = (post) => {
+    if (!post?.cover) return false;
+    const key = String(getPostKey(post));
+    if (!key || selectedKeys.has(key)) return false;
+    selected.push(post);
+    selectedKeys.add(key);
+    return true;
+  };
+
+  for (const path of curatedPaths) {
+    if (selected.length >= limit) break;
+    if (typeof path !== "string" || !path) continue;
+    tryAdd(byPath.get(path));
+  }
+
+  const rankedPosts = posts
+    .filter((post) => post?.cover && !selectedKeys.has(String(getPostKey(post))))
     .sort((a, b) => {
-      // 优先按实时浏览量降序
-      const aViews = getViewScore(a);
-      const bViews = getViewScore(b);
-      if (aViews !== bViews) return bViews - aViews;
-      // 浏览量相同则按时间降序
-      return (b.date || 0) - (a.date || 0);
-    })
-    .slice(0, 20);
+      const aRank = Number(a?.popularRank) || 0;
+      const bRank = Number(b?.popularRank) || 0;
+      if (aRank !== bRank) return bRank - aRank;
+
+      const aDate = Number(a?.date) || 0;
+      const bDate = Number(b?.date) || 0;
+      if (aDate !== bDate) return bDate - aDate;
+
+      return String(getPostKey(a)).localeCompare(String(getPostKey(b)));
+    });
+
+  for (const post of rankedPosts) {
+    if (selected.length >= limit) break;
+    tryAdd(post);
+  }
+
+  return selected;
 });
 
 // 轮播滚动

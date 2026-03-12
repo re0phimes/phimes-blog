@@ -4,6 +4,9 @@ const initFancybox = (themeConfig) => {
   try {
     const option = themeConfig.fancybox;
     if (!option.enable) return false;
+    if (typeof document === "undefined" || !document.querySelector("[data-fancybox]")) {
+      return false;
+    }
     // 引入css及js
     loadCSS(option.css);
     loadScript(option.js, {

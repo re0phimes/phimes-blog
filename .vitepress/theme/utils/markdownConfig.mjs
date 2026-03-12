@@ -1,6 +1,7 @@
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 import markdownItAttrs from "markdown-it-attrs";
 import container from "markdown-it-container";
+import markdownItKatex from "markdown-it-katex";
 
 // SVG 图标
 const icons = {
@@ -32,6 +33,7 @@ const markdownConfig = (md, themeConfig) => {
   // 插件
   md.use(markdownItAttrs);
   md.use(tabsMarkdownPlugin);
+  md.use(markdownItKatex, { throwOnError: false, strict: "ignore" });
 
   // 处理 Obsidian callout 语法: > [!type] title
   md.core.ruler.after('block', 'obsidian-callout', (state) => {
