@@ -28,6 +28,33 @@ const postData = await getAllPosts();
 
 // 获取主题配置
 const themeConfig = await getThemeConfig();
+const fontStylesheetUrls = new Set([
+    "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
+    "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css",
+    "https://use.sevencdn.com/css2?family=Fira+Code:wght@300..700&display=swap",
+]);
+
+const optionalHeadHosts = new Set([
+    "https://s1.hdslb.com",
+    "https://mirrors.sustech.edu.cn",
+    "https://use.sevencdn.com",
+    "https://fonts.gstatic.com",
+]);
+
+const algoliaHost = "https://X5EBEZB53I-dsn.algolia.net";
+
+const resolvedHeadEntries = (themeConfig.inject?.header || []).filter((entry) => {
+    if (!Array.isArray(entry) || entry.length < 2) return true;
+    const attrs = entry[1] || {};
+    const href = attrs.href;
+    if (typeof href !== "string" || !href) return true;
+
+    if (fontStylesheetUrls.has(href)) return false;
+    if (!themeConfig?.search?.enable && href === algoliaHost) return false;
+    if (optionalHeadHosts.has(href)) return false;
+
+    return true;
+});
 
 /**
  * Optional: merge Most Popular ranking cache into postData at build-time.
@@ -124,9 +151,7 @@ export default withPwa(
         // 主题
         appearance: "dark",
         head: [
-            // 1. 使用展开语法(...)保留所有原有的 head 标签
-            // 这行代码至关重要，确保不会破坏您主题原有的功能和样式
-            ...themeConfig.inject.header,
+            ...resolvedHeadEntries,
 
             // 2. 添加 Microsoft Clarity 的跟踪脚本
             [
@@ -163,8 +188,8 @@ export default withPwa(
         },
         // markdown
         markdown: {
-            math: true,
-            lineNumbers: true,
+            math: false,
+            lineNumbers: false,
             toc: { level: [1, 2, 3] },
             image: {
                 lazyLoading: true,
