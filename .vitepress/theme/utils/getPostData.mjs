@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import fs from "fs-extra";
 import path from "node:path";
 import crypto from "node:crypto";
+import { buildPageViewPathCandidates, buildPostUrlData } from "./postUrl.mjs";
 
 // 封面图片缓存目录
 const COVERS_DIR = path.resolve(process.cwd(), "public/covers");
@@ -127,9 +128,22 @@ export const getAllPosts = async () => {
           const popularRankNumber =
             rawPopularRank === undefined || rawPopularRank === null ? undefined : Number(rawPopularRank);
 
+          const urlData = buildPostUrlData({
+            relativePath: item,
+            date,
+            topic,
+            tags: tags || tag,
+          });
+          const legacyPath = urlData?.legacyPath || `/${item.replace(".md", ".html")}`;
+          const permalink = urlData?.permalink || legacyPath.replace(/\.html$/, "");
+          const legacyCleanPath = urlData?.legacyCleanPath || legacyPath.replace(/\.html$/, "");
+
           // 从 popular.json 获取页面浏览量作为 popularRank
-          const regularPath = `/${item.replace(".md", ".html")}`;
-          const viewCount = popularData[regularPath] || 0;
+          const viewCount = buildPageViewPathCandidates({
+            permalink,
+            legacyPath,
+            legacyCleanPath,
+          }).reduce((sum, currentPath) => sum + Number(popularData[currentPath] || 0), 0);
           // 优先使用 frontmatter 中的 popularRank，否则使用浏览量
           const popularRank = Number.isFinite(popularRankNumber) ? popularRankNumber : (viewCount > 0 ? viewCount : undefined);
           const popular = Boolean(data?.popular) || popularRank !== undefined;
@@ -182,7 +196,7 @@ export const getAllPosts = async () => {
           const resolvedTags = tags || tag || undefined;
 
           return {
-            id: generateId(item),
+            id: urlData?.id || generateId(item),
             title: title || "未命名文章",
             date: date ? new Date(date).getTime() : birthtimeMs,
             lastModified: mtimeMs,
@@ -193,7 +207,10 @@ export const getAllPosts = async () => {
             topic: topic || undefined,
             categories,
             description: autoDescription,
-            regularPath: `/${item.replace(".md", ".html")}`,
+            regularPath: legacyPath,
+            legacyPath,
+            legacyCleanPath,
+            permalink,
             top,
             cover: articleCover,
             popular,

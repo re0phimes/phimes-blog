@@ -1,6 +1,7 @@
-import { createContentLoader } from "vitepress";
 import { writeFileSync } from "fs";
 import path from "path";
+import { getAllPosts } from "./getPostData.mjs";
+import { getPostPublicPath } from "./postUrl.mjs";
 
 /**
  * 生成博客文章索引 JSON
@@ -9,18 +10,18 @@ import path from "path";
  */
 export const createBlogIndex = async (config, themeConfig) => {
   const hostLink = themeConfig.siteMeta.site;
-  let posts = await createContentLoader("posts/**/*.md").load();
+  let posts = await getAllPosts();
 
   // 日期降序排序
   posts = posts.sort((a, b) => {
-    const dateA = new Date(a.frontmatter.date);
-    const dateB = new Date(b.frontmatter.date);
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
     return dateB - dateA;
   });
 
-  const index = posts.map(({ url, frontmatter }) => ({
-    title: frontmatter.title,
-    url: `${hostLink}${url}`,
+  const index = posts.map((post) => ({
+    title: post.title,
+    url: `${hostLink}${getPostPublicPath(post)}`,
   }));
 
   writeFileSync(

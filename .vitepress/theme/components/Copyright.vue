@@ -1,7 +1,7 @@
 <template>
   <div class="copyright s-card">
     <div class="title">
-      <a :href="theme.siteMeta.site + route.path" class="post-name" target="_blank">
+      <a :href="theme.siteMeta.site + (postData?.permalink || route.path)" class="post-name" target="_blank">
         {{ postData?.title || "未命名文章" }}
       </a>
     </div>

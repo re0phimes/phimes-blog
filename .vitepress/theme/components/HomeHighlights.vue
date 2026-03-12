@@ -21,8 +21,8 @@
       <div ref="carouselRef" class="carousel-track">
         <a
           v-for="post in popularPostsWithCover"
-          :key="post.id ?? post.regularPath"
-          :href="post.regularPath"
+          :key="post.id ?? post.permalink ?? post.regularPath"
+          :href="getPostPublicPath(post)"
           class="carousel-card"
         >
           <div class="card-cover">
@@ -46,6 +46,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from "vue";
+import { buildPageViewPathCandidates, getPostPublicPath } from "@/utils/postUrl.mjs";
 
 const { theme } = useData();
 
@@ -57,10 +58,10 @@ const pageViews = ref({});
 // 获取所有浏览量
 onMounted(async () => {
   try {
-    const res = await fetch('https://blog-page-views.re0phimes.workers.dev/all');
+    const res = await fetch("https://blog-page-views.re0phimes.workers.dev/all");
     pageViews.value = await res.json();
   } catch (e) {
-    console.error('Failed to fetch page views:', e);
+    console.error("Failed to fetch page views:", e);
   }
 });
 
@@ -68,16 +69,17 @@ onMounted(async () => {
 const popularPostsWithCover = computed(() => {
   const posts = theme.value?.postData ?? [];
   const views = pageViews.value;
+  const getViewScore = (post) =>
+    buildPageViewPathCandidates(post)
+      .map((path) => encodeURI(path))
+      .reduce((sum, currentPath) => sum + Number(views[currentPath] || 0), 0);
 
   return posts
-    .filter(p => p && p.cover)
+    .filter((p) => p && p.cover)
     .sort((a, b) => {
-      // 转换路径格式匹配 KV 的 key（URL编码，无.html后缀）
-      const aPath = encodeURI(a.regularPath?.replace('.html', '') || '');
-      const bPath = encodeURI(b.regularPath?.replace('.html', '') || '');
       // 优先按实时浏览量降序
-      const aViews = views[aPath] || 0;
-      const bViews = views[bPath] || 0;
+      const aViews = getViewScore(a);
+      const bViews = getViewScore(b);
       if (aViews !== bViews) return bViews - aViews;
       // 浏览量相同则按时间降序
       return (b.date || 0) - (a.date || 0);
@@ -98,12 +100,12 @@ const scrollCarousel = (dir) => {
 
   if ((dir < 0 && atStart) || (dir > 0 && atEnd)) {
     // 震动提示
-    el.classList.add('shake');
-    setTimeout(() => el.classList.remove('shake'), 300);
+    el.classList.add("shake");
+    setTimeout(() => el.classList.remove("shake"), 300);
     return;
   }
 
-  el.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
+  el.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
 };
 </script>
 

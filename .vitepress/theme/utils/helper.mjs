@@ -1,5 +1,6 @@
 import { mainStore } from "@/store";
 import { throttle } from "lodash-es";
+import { getPostPublicPath } from "./postUrl.mjs";
 
 /**
  * 计算滚动高度和滚动百分比
@@ -126,7 +127,7 @@ export const shufflePost = (postData) => {
   const randomPost = postData[randomIndex];
   console.log(randomPost);
   // 跳转到随机文章
-  return randomPost.regularPath;
+  return getPostPublicPath(randomPost);
 };
 
 /**

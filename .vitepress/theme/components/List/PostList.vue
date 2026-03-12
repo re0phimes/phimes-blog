@@ -4,7 +4,7 @@
     <a
       v-for="(item, index) in listData"
       :key="index"
-      :href="item.regularPath"
+      :href="item.permalink || item.regularPath"
       class="post-item s-card hover"
       :style="{ animationDelay: `${0.4 + index / 10}s` }"
     >
