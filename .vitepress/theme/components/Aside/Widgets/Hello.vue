@@ -8,10 +8,10 @@
         <span class="desc">{{ theme.siteMeta.description }}</span>
       </div>
       <div class="link">
-        <a href="https://github.com/imsyy/" target="_blank" class="social-link">
+        <a v-if="githubLink" :href="githubLink" target="_blank" class="social-link">
           <i class="iconfont icon-github"></i>
         </a>
-        <a href="mailto:one@imsyy.top" target="_blank" class="social-link">
+        <a v-if="emailLink" :href="emailLink" target="_blank" class="social-link">
           <i class="iconfont icon-email"></i>
         </a>
       </div>
@@ -23,6 +23,17 @@
 import { getGreetings } from "@/utils/helper";
 
 const { site, theme } = useData();
+
+const footerSocial = computed(() => Array.isArray(theme.value?.footer?.social) ? theme.value.footer.social : []);
+const githubLink = computed(() => footerSocial.value.find((item) => item?.icon === "github")?.link || "");
+const emailLink = computed(() => {
+  const rawEmail =
+    footerSocial.value.find((item) => item?.icon === "email")?.link || theme.value?.siteMeta?.author?.email || "";
+  if (!rawEmail) return "";
+  if (rawEmail.startsWith("mailto:")) return rawEmail;
+  if (rawEmail.includes("@") && !rawEmail.includes("://")) return `mailto:${rawEmail}`;
+  return rawEmail;
+});
 
 // 问候数据
 const helloClick = ref(0);

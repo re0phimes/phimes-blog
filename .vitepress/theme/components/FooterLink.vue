@@ -46,11 +46,22 @@ const props = defineProps({
   },
 });
 
+const normalizeSocialLink = (link = "") => {
+  if (!link) return "";
+  if (link.startsWith("mailto:") || link.startsWith("http://") || link.startsWith("https://")) return link;
+  if (link.includes("@") && !link.includes("://")) return `mailto:${link}`;
+  return link;
+};
+
 // 社交链接数据
 const socialLinkData = computed(() => {
-  const halfLength = Math.ceil(footer.social.length / 2);
-  const firstHalf = footer.social.slice(0, halfLength);
-  const secondHalf = footer.social.slice(halfLength);
+  const normalizedSocial = footer.social.map((item) => ({
+    ...item,
+    link: normalizeSocialLink(item?.link),
+  }));
+  const halfLength = Math.ceil(normalizedSocial.length / 2);
+  const firstHalf = normalizedSocial.slice(0, halfLength);
+  const secondHalf = normalizedSocial.slice(halfLength);
   return { first: firstHalf, second: secondHalf };
 });
 </script>
