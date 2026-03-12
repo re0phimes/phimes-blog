@@ -60,6 +60,10 @@ const changeLoading = (option = {}) => {
   const store = mainStore();
   // 获取配置
   const { status = true, always = false } = option;
+  if (loadingTimer) {
+    clearTimeout(loadingTimer);
+    loadingTimer = null;
+  }
   // 开始加载
   store.loadingStatus = status;
   // 是否不结束
@@ -73,6 +77,7 @@ const changeLoading = (option = {}) => {
       // jumpRedirect(null, true);
       // 清除定时器
       clearTimeout(loadingTimer);
+      loadingTimer = null;
     },
     Math.floor(Math.random() * (800 - 260 + 1)) + 260,
   );
