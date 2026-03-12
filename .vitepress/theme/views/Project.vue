@@ -8,7 +8,7 @@
       image="https://pic.efefee.cn/uploads/2024/02/27/65dd8dae6043c.webp"
     >
       <template #footer-slot>
-        <a class="to-github" href="https://github.com/imsyy/" target="_blank">
+        <a v-if="githubLink" class="to-github" :href="githubLink" target="_blank">
           <i class="iconfont icon-github"></i>
           <span>前往 Github</span>
         </a>
@@ -19,6 +19,12 @@
 
 <script setup>
 import Banner from "@/components/Banner.vue";
+
+const { theme } = useData();
+const githubLink = computed(() => {
+  const social = Array.isArray(theme.value?.footer?.social) ? theme.value.footer.social : [];
+  return social.find((item) => item?.icon === "github")?.link || "";
+});
 </script>
 
 <style lang="scss" scoped>

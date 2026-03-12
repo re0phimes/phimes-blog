@@ -24,7 +24,7 @@
               </div>
             </div>
           </div>
-          <div class="site-name" @click="window.open('https://phimes.top', '_blank')">
+          <div class="site-name" @click="goHome">
             {{ site.title }}
           </div>
         </div>
@@ -128,9 +128,18 @@ import { mainStore } from "@/store";
 import { smoothScrolling, shufflePost } from "@/utils/helper";
 
 const router = useRouter();
+const route = useRoute();
 const store = mainStore();
 const { scrollData } = storeToRefs(store);
 const { site, theme, frontmatter, page } = useData();
+
+const goHome = () => {
+  if (route.path === "/") {
+    smoothScrolling();
+    return;
+  }
+  router.go("/");
+};
 
 // 处理导航点击
 const handleNavClick = (link) => {
