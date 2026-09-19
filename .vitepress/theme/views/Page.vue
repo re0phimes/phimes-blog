@@ -54,6 +54,7 @@ const { frontmatter } = useData();
     animation: fade-up 0.6s 0.3s backwards;
     .page-content {
       width: calc(100% - 300px);
+      min-width: 0;
     }
     .main-aside {
       width: 300px;

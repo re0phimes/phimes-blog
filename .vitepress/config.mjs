@@ -194,7 +194,11 @@ export default withPwa(
             image: {
                 lazyLoading: true,
             },
-            config: (md) => markdownConfig(md, themeConfig),
+            config: (md) =>
+                markdownConfig(md, themeConfig, {
+                    posts: postData,
+                    tags: Object.keys(getAllType(postData)),
+                }),
         },
         // 构建排除
         srcExclude: ["**/README.md", "**/TODO.md", "**/TEST_REPORT.md", "docs/plans/**", "plan/**"],

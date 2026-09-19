@@ -73,6 +73,8 @@
     text-align: left;
     letter-spacing: 0.6px;
     line-height: 2;
+    // 长 URL / 长英文串不换行会撑破卡片
+    overflow-wrap: anywhere;
     // 行内代码
     code {
       display: inline-flex;
@@ -125,12 +127,13 @@
     }
     // 重点
     strong {
-      color: var(--main-color);
+      color: var(--main-highlight-color);
     }
   }
   // 图片
   img {
-    width: 100%;
+    max-width: 100%;
+    height: auto;
     border-radius: 12px;
   }
   .img-fancybox {
@@ -141,8 +144,10 @@
     color: var(--main-font-color);
     .post-img {
       width: auto;
-      max-height: 450px;
       max-width: 100%;
+      // 不要限制高度：文章里有大量竖长截图（如 1516×6144），
+      // 一旦用 max-height 压，图会被缩到 10% 以下完全看不清。
+      height: auto;
       margin: 0 auto;
       border-radius: 12px;
       cursor: zoom-in;
@@ -267,6 +272,8 @@
         margin: 0;
         padding: 6px 10px;
         width: 100%;
+        // 显式写 overflow-x，避免依赖 visible→auto 的隐式计算
+        overflow-x: auto;
         overflow-y: auto;
         user-select: text;
         border-left: 1px solid var(--main-card-border);
@@ -295,6 +302,7 @@
   }
   pre {
     width: 100%;
+    overflow-x: auto;
     overflow-y: auto;
     user-select: text;
   }
@@ -320,7 +328,8 @@
       position: relative;
       padding-left: 1.2rem;
       margin: 0.6rem 0;
-      overflow: auto;
+      // 注意：这里不能加 overflow: auto。
+      // 行内公式（\sqrt、\frac 等）会比行高更高，overflow 会把公式裁掉并让 li 出现滚动条。
       &::before {
         content: "";
         position: absolute;
@@ -360,7 +369,8 @@
     overflow-x: auto;
     table {
       width: 100%;
-      min-width: 512px;
+      // 桌面端保证表格最小可读宽度，窄屏则跟随容器，避免把整页顶出横向滚动
+      min-width: min(512px, 100%);
       max-width: 1200px;
       margin: 0 auto;
       border-collapse: collapse;
@@ -399,11 +409,28 @@
   label {
     cursor: pointer;
   }
-  // mathjax
-  mjx-container {
-    overflow: auto;
-    padding-bottom: 8px;
-    font-family: auto;
+  // Obsidian 双链 [[...]]
+  .wikilink {
+    color: var(--main-color);
+    border-bottom: 1px dashed var(--main-color);
+    transition: all 0.3s;
+    &:hover {
+      color: var(--main-color-hover);
+      border-bottom-color: var(--main-color-hover);
+    }
+  }
+  // katex —— 宽公式必须能横向滚动，否则会撑破卡片、把整页顶出横向滚动条
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0;
+  }
+  .katex-display > .katex {
+    padding: 2px 0;
+  }
+  .math-error {
+    color: var(--main-error-color);
+    font-size: 0.9em;
   }
   // custom-block
   .custom-block {
@@ -438,17 +465,17 @@
       }
     }
     &.info {
-      background-color: rgba(59, 130, 246, 0.1);
-      border-left-color: #3b82f6;
+      background-color: var(--main-info-color-gray);
+      border-left-color: var(--main-info-color);
       p {
-        color: #3b82f6;
+        color: var(--main-info-color);
       }
     }
     &.question {
-      background-color: rgba(234, 179, 8, 0.1);
-      border-left-color: #eab308;
+      background-color: var(--main-warning-color-gray);
+      border-left-color: var(--main-warning-color);
       p {
-        color: #ca8a04;
+        color: var(--main-warning-color);
       }
     }
     &.warning {

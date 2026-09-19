@@ -36,6 +36,7 @@ cover: https://image.phimes.top/img/202601040941582.png
 3. **BS 平衡点**：通过提升BS来均摊模型参数的搬运量，能否让计算和搬运追平？
 
 **MLA 篇**：
+
 4. **以算换存**：低秩压缩 KV → latent vector，用闲置算力换搬运时间
 5. **矩阵吸收**：把 Up-Projection 吸收进权重矩阵，推理时跳过解压
 6. **Compute Bound 翻转**：head 数量决定 MLA 能否翻转瓶颈，DeepSeek-V2（$n_h=128$）实现了翻转
