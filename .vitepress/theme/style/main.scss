@@ -2,43 +2,54 @@
 @use "./animation";
 
 // 全局颜色变量
+// 亮色配色：Anthropic / Claude 设计语言（暖米白画布 + 珊瑚色强调）
 :root {
-  --main-color: #3c4994;
-  --main-color-bg: #4259ef0d;
-  --main-site-background: #f7f9fe;
-  --main-card-background: #fff;
-  --main-card-second-background: #f7f7f9;
-  --main-font-color: #363636;
-  --main-font-second-color: #3c3c43cc;
-  --main-card-border: #e3e8f7;
-  --main-border-shadow: #2c2d300c;
-  --main-scrollbar-bar: rgba(60, 60, 67, 0.4);
-  --main-mask-background: rgba(255, 255, 255, 0.95);
-  --main-mask-Inverse-background: rgba(0, 0, 0, 0.08);
-  --main-mask-second-background: rgba(255, 255, 255, 0.45);
+  // 品牌色
+  --main-color: #cc785c; // Claude 珊瑚（Anthropic 品牌主色）
+  --main-color-hover: #b8634a; // 悬停加深
+  --main-color-bg: #cc785c14; // 珊瑚 8%
+  --main-highlight-color: #cc785c; // 正文重点（**加粗**）—— 按需求用红色系
+  // 画布与卡片
+  --main-site-background: #faf9f5; // canvas，暖米白
+  --main-card-background: #ffffff;
+  --main-card-second-background: #f5f0e8; // surface-soft
+  // 文字
+  --main-font-color: #141413; // ink
+  --main-font-second-color: #3d3d3a; // body
+  // 线条与阴影
+  --main-card-border: #e6dfd8; // hairline
+  --main-border-shadow: #1414130d;
+  --main-scrollbar-bar: rgba(20, 20, 19, 0.35);
+  // 遮罩
+  --main-mask-background: rgba(250, 249, 245, 0.95);
+  --main-mask-Inverse-background: rgba(20, 20, 19, 0.08);
+  --main-mask-second-background: rgba(250, 249, 245, 0.45);
   --main-color-opacity: rgba(255, 255, 255, 0.15);
   --main-dark-opacity: rgba(255, 255, 255, 0.15);
   --main-dark-shadow: #0000006e;
-  --main-info-color: #50bfff;
-  --main-info-color-gray: #50bfff60;
-  --main-warning-color: #ffa500;
-  --main-warning-color-gray: #f7ba2a60;
-  --main-success-color: #13ce66;
-  --main-success-color-gray: #13ce6660;
-  --main-error-color: #ff3842;
-  --main-error-color-gray: #ff38423b;
-  --main-color-blue: #0084ff;
+  // 语义色（Anthropic token 加深到正文可读的对比度）
+  --main-info-color: #2f8574; // accent-teal #5db8a6 加深
+  --main-info-color-gray: #5db8a626;
+  --main-warning-color: #b8791f; // warning #d4a017 加深
+  --main-warning-color-gray: #e8a55a2e;
+  --main-success-color: #3f8f56; // success #5db872 加深
+  --main-success-color-gray: #5db8722e;
+  --main-error-color: #c64545; // Anthropic error
+  --main-error-color-gray: #c6454526;
+  --main-color-blue: #6a9bcc; // Anthropic sky
   --main-color-white: #ffffff40;
-  --main-color-gray: #999;
-  --main-color-red: #ff3842;
+  --main-color-gray: #8e8b82; // muted-soft
+  --main-color-red: #c64545;
   --main-font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen-Sans, Ubuntu,
     Cantarell, "Helvetica Neue", sans-serif;
-  --vp-c-bg-rgb: 255, 255, 255;
+  --vp-c-bg-rgb: 250, 249, 245;
 }
 
 html.dark {
   --main-color: #c2b637;
+  --main-color-hover: #d4c94a;
   --main-color-bg: #f2b94b23;
+  --main-highlight-color: #c2b637;
   --main-site-background: #18171d;
   --main-card-background: #1b1c20;
   --main-card-second-background: #21232a;
@@ -233,7 +244,7 @@ a {
 // 选中文本
 ::selection {
   background-color: var(--main-color);
-  color: #efefef;
+  color: #fff;
 }
 
 // fancybox

@@ -256,6 +256,8 @@ onMounted(() => {
     animation: fade-up 0.6s 0.3s backwards;
     .post-article {
       width: calc(100% - 300px);
+      // flex 子项默认 min-width: auto，宽公式会把卡片顶宽、溢出到侧边栏
+      min-width: 0;
       padding: 1rem 2.2rem 2.2rem 2.2rem;
       user-select: text;
       cursor: auto;

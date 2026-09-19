@@ -1,7 +1,8 @@
 import { tabsMarkdownPlugin } from "vitepress-plugin-tabs";
 import markdownItAttrs from "markdown-it-attrs";
 import container from "markdown-it-container";
-import markdownItKatex from "markdown-it-katex";
+import markdownKatex from "./markdownKatex.mjs";
+import markdownWikilink, { createWikilinkResolver } from "./markdownWikilink.mjs";
 
 // SVG 图标
 const icons = {
@@ -29,11 +30,14 @@ const calloutTypes = {
 };
 
 // markdown-it
-const markdownConfig = (md, themeConfig) => {
+const markdownConfig = (md, themeConfig, { posts = [], tags = [] } = {}) => {
   // 插件
   md.use(markdownItAttrs);
   md.use(tabsMarkdownPlugin);
-  md.use(markdownItKatex, { throwOnError: false, strict: "ignore" });
+  // 数学公式：直接使用项目依赖里的 katex（markdown-it-katex 内置的是 2017 年的 katex@0.6.0）
+  md.use(markdownKatex);
+  // Obsidian 双链 [[...]]
+  md.use(markdownWikilink, createWikilinkResolver({ posts, tags }));
 
   // 处理 Obsidian callout 语法: > [!type] title
   md.core.ruler.after('block', 'obsidian-callout', (state) => {
@@ -49,7 +53,10 @@ const markdownConfig = (md, themeConfig) => {
       if (inlineIdx === -1) continue;
 
       const inline = tokens[inlineIdx];
-      const match = inline.content.match(/^\[!(\w+)\]\s*(.*?)(?:\n|$)/i);
+      // 注意：这里只能用 [ \t] 匹配标题前的空白。
+      // 用 \s 会把换行也吃掉，导致 `> [!question]`（标题留空、正文在下一行）
+      // 的整段正文被当成标题塞进 raw HTML，正文里的公式/双链/加粗全部失去渲染。
+      const match = inline.content.match(/^\[!(\w+)\][ \t]*(.*?)(?:\n|$)/i);
       if (!match) continue;
 
       const type = match[1].toLowerCase();
@@ -63,8 +70,8 @@ const markdownConfig = (md, themeConfig) => {
       tokens[i].content = `<div class="${config.className} custom-block"><p class="custom-block-title">${icon} ${title}</p>`;
       tokens[i].tag = '';
 
-      // 移除第一行的 [!type] 标记
-      inline.content = inline.content.replace(/^\[!\w+\]\s*[^\n]*\n?/, '');
+      // 移除第一行的 [!type] 标记（同样只吃掉行内空白，不要吞掉换行后的正文）
+      inline.content = inline.content.replace(/^\[!\w+\][ \t]*[^\n]*\n?/, '');
       if (inline.children) {
         // 重建 children，移除 callout 标记
         const newChildren = [];
@@ -199,9 +206,9 @@ const markdownConfig = (md, themeConfig) => {
   // 图片
   md.renderer.rules.image = (tokens, idx) => {
     const token = tokens[idx];
-    const src = token.attrs[token.attrIndex("src")][1];
-    const alt = token.content;
-    if (!themeConfig.fancybox.enable) {
+    const src = md.utils.escapeHtml(token.attrs[token.attrIndex("src")][1]);
+    const alt = md.utils.escapeHtml(token.content);
+    if (!themeConfig?.fancybox?.enable) {
       return `<img src="${src}" alt="${alt}" loading="lazy">`;
     }
     return `<a class="img-fancybox" href="${src}" data-fancybox="gallery" data-caption="${alt}">
