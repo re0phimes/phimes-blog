@@ -10,8 +10,6 @@ export const themeConfig = {
     logo: "/images/logo/logo.webp",
     // 站点地址
     site: "https://blog.phimes.top",
-    // 左上角回首页按钮的文案
-    homeLabel: "Home Page",
     // 语言
     lang: "zh-CN",
     // 作者
@@ -111,11 +109,12 @@ export const themeConfig = {
       link: "https://demo.phimes.top",
     },
     {
-      text: "AI FAQ",
+      // 与 About 页里「AI 问答知识库」的说法保持一致
+      text: "AI 问答",
       link: "https://aifaq.phimes.top",
     },
     {
-      text: "About Me",
+      text: "关于我",
       link: "https://phimes.top",
     },
   ],
