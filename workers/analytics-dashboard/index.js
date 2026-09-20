@@ -66,6 +66,58 @@ async function aeQuery(env, sql) {
   return JSON.parse(text);
 }
 
+// 设备归类表达式（Analytics Engine 不支持 multiIf / CASE WHEN，只能嵌套 if()）
+const DEVICE_EXPR =
+  "if(blob8 LIKE '%iPhone%','iPhone', if(blob8 LIKE '%iPad%','iPad', if(blob8 LIKE '%Android%','Android', if(blob8 LIKE '%Macintosh%','macOS', if(blob8 LIKE '%Windows%','Windows', if(blob8 LIKE '%Linux%','Linux', '其他'))))))";
+
+// 可下钻的维度白名单。val 由前端传入，必须经过这些定义才能拼进 SQL。
+const DETAIL_DIMS = {
+  bot: {
+    botType: { col: "blob7", label: "爬虫类型" },
+    kind: { col: "blob8", label: "分类" },
+    path: { col: "blob1", label: "路径" },
+    country: { col: "blob5", label: "国家" },
+    asOrg: { col: "blob10", label: "AS 组织" },
+  },
+  human: {
+    path: { col: "blob1", label: "路径" },
+    country: { col: "blob5", label: "国家" },
+    city: { col: "blob6", label: "城市" },
+    referer: { col: "blob4", label: "来源" },
+    asOrg: { col: "blob11", label: "AS 组织" },
+    device: { expr: DEVICE_EXPR, label: "设备" },
+  },
+};
+
+// 把值安全地放进 SQL 字面量：AE 的 SQL API 不支持参数化查询
+const sqlStr = (v) =>
+  "'" +
+  String(v == null ? "" : v)
+    .replace(/\\/g, "")
+    .replace(/'/g, "''") +
+  "'";
+
+async function detail(env, rangeKey, src, dimName, val, limit) {
+  const r = RANGES[rangeKey] || RANGES[DEFAULT_RANGE];
+  const dimTable = DETAIL_DIMS[src];
+  if (!dimTable) throw new Error("bad src");
+  const dim = dimTable[dimName];
+  if (!dim) throw new Error("bad dim");
+  const dimSql = dim.col || dim.expr;
+  const lim = Math.min(Math.max(Number(limit) || 200, 1), 500);
+
+  if (src === "bot") {
+    return aeQuery(
+      env,
+      `SELECT timestamp, blob1 AS path, blob3 AS ua, blob5 AS country, blob7 AS botType, blob8 AS kind, blob9 AS status, blob10 AS asOrg, blob2 AS oldIp, blob6 AS ipHash FROM bot_visits WHERE timestamp > NOW() - ${r.interval} AND ${dimSql} = ${sqlStr(val)} ORDER BY timestamp DESC LIMIT ${lim}`,
+    );
+  }
+  return aeQuery(
+    env,
+    `SELECT timestamp, blob1 AS path, blob8 AS ua, blob5 AS country, blob6 AS city, blob4 AS referer, blob9 AS clientClass, blob10 AS status, blob11 AS asOrg, blob2 AS ipHash, blob3 AS oldIp FROM site_visits WHERE timestamp > NOW() - ${r.interval} AND ${dimSql} = ${sqlStr(val)} ORDER BY timestamp DESC LIMIT ${lim}`,
+  );
+}
+
 async function collect(env, rangeKey) {
   const r = RANGES[rangeKey] || RANGES[DEFAULT_RANGE];
   const W = `timestamp > NOW() - ${r.interval}`;
@@ -111,8 +163,7 @@ async function collect(env, rangeKey) {
       `SELECT blob4 AS referer, count() AS n FROM site_visits WHERE ${HUMAN} GROUP BY referer ORDER BY n DESC LIMIT 12`,
     ),
     q(
-      // 注意：Analytics Engine SQL 不支持 multiIf / CASE WHEN，只能用嵌套 if()
-      `SELECT if(blob8 LIKE '%iPhone%','iPhone', if(blob8 LIKE '%iPad%','iPad', if(blob8 LIKE '%Android%','Android', if(blob8 LIKE '%Macintosh%','macOS', if(blob8 LIKE '%Windows%','Windows', if(blob8 LIKE '%Linux%','Linux', '其他')))))) AS device, count() AS n FROM site_visits WHERE ${HUMAN} GROUP BY device ORDER BY n DESC LIMIT 8`,
+      `SELECT ${DEVICE_EXPR} AS device, count() AS n FROM site_visits WHERE ${HUMAN} GROUP BY device ORDER BY n DESC LIMIT 8`,
     ),
     // 内容优化用：每篇文章的真人阅读量
     q(
@@ -193,11 +244,17 @@ const PAGE = `<!doctype html>
   .tag.warn{color:var(--amber);border-color:#e6d5b0}
   .tag.bad{color:#a33;border-color:#e6c9c9}
   .full{grid-column:1/-1}
+  #detail{overflow-x:auto}
+  #detail table{min-width:900px}
+  tr.rowlink{cursor:pointer}
+  tr.rowlink:hover td{background:rgba(204,120,92,.07)}
+  tr.rowlink td:first-child::before{content:"› ";color:var(--coral);opacity:.6}
 </style></head><body>
 <div class="top"><h1>站点统计</h1></div>
 <div class="meta" id="meta">加载中…</div>
 <div class="ranges" id="ranges"></div>
 <div id="app"></div>
+<div id="detail" class="card" style="display:none;margin-top:16px;overflow-x:auto"></div>
 <div class="note">
   <b>口径说明</b><br>
   · <b>真人</b> = 返回 200 的页面浏览（静态资源不计）。RSS 阅读器单独记为「订阅者」。<br>
@@ -229,10 +286,65 @@ function renderRanges(){
 
 function bar(v, max, cls){ return '<span class="bar '+(cls||'')+'" style="width:'+Math.max(2,Math.round(v/max*54))+'px"></span>'; }
 
-function table(rows, cols){
+function table(rows, cols, drill){
   let h = '<table><tr>' + cols.map(c=>'<th'+(c.n?' class="n"':'')+'>'+c.t+'</th>').join('') + '</tr>';
-  h += rows.map(r => '<tr>' + cols.map(c=>'<td'+(c.n?' class="n"':'')+'>'+c.f(r)+'</td>').join('') + '</tr>').join('');
+  h += rows.map(r => {
+    const d = drill ? drill(r) : null;
+    const attrs = d ? ' class="rowlink" data-src="'+d.src+'" data-dim="'+d.dim+'" data-val="'+esc(d.val)+'"' : '';
+    return '<tr'+attrs+'>' + cols.map(c=>'<td'+(c.n?' class="n"':'')+'>'+c.f(r)+'</td>').join('') + '</tr>';
+  }).join('');
   return h + '</table>';
+}
+
+// ── 下钻详情 ──
+function detailTable(rows, src){
+  if(!rows.length) return '<div class="muted">这个条件下没有记录</div>';
+  const isBot = src === 'bot';
+  const cols = [
+    {t:'时间', f:r=>'<span class="muted">'+esc(String(r.timestamp).slice(0,19))+'</span>'},
+    {t:'路径', f:r=>'<span style="word-break:break-all">'+esc(r.path)+'</span>'},
+    {t:'国家', f:r=>esc(r.country||'—')},
+  ];
+  if(!isBot) cols.push({t:'城市', f:r=>esc(r.city||'—')});
+  cols.push({t:'IP / 标识', f:r=>{
+    if(r.oldIp) return '<span title="明文 IP（2026-09-20 之前的旧数据）">'+esc(r.oldIp)+'</span>';
+    if(r.ipHash) return '<span class="muted" title="加盐 SHA-256 前 8 字节，不能反推 IP">'+esc(r.ipHash)+'</span>';
+    return '—';
+  }});
+  cols.push({t:'AS 组织', f:r=>'<span class="muted">'+esc(r.asOrg||'—')+'</span>'});
+  if(!isBot) cols.push({t:'来源', f:r=>'<span class="muted" style="word-break:break-all">'+esc(r.referer||'（直接访问）')+'</span>'});
+  cols.push({t:'状态', n:true, f:r=>esc(r.status||'—')});
+  cols.push({t:'User-Agent', f:r=>'<span class="muted" style="word-break:break-all;font-size:11px">'+esc(r.ua)+'</span>'});
+  return '<table>' + '<tr>' + cols.map(c=>'<th'+(c.n?' class="n"':'')+'>'+c.t+'</th>').join('') + '</tr>' +
+    rows.map(r=>'<tr>'+cols.map(c=>'<td'+(c.n?' class="n"':'')+'>'+c.f(r)+'</td>').join('')+'</tr>').join('') + '</table>';
+}
+
+async function drill(src, dim, val){
+  const box = document.getElementById('detail');
+  box.style.display = 'block';
+  box.innerHTML = '<h2>明细：'+esc(val)+' <span class="muted">加载中…</span></h2>';
+  box.scrollIntoView({behavior:'smooth', block:'start'});
+  try {
+    const q = '/api/detail?range='+encodeURIComponent(CURRENT)+'&src='+esc(src)+'&dim='+esc(dim)+'&val='+encodeURIComponent(val)+'&limit=200';
+    const res = await fetch(q);
+    if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text()).slice(0,160));
+    const d = await res.json();
+    const rows = d.data || [];
+    const plain = rows.filter(r=>r.oldIp).length;
+    box.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">' +
+        '<h2 style="margin:0">明细：'+esc(val)+' <span class="muted">共 '+rows.length+' 条（最多显示 200）</span></h2>' +
+        '<button id="detail-close" style="border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 12px;cursor:pointer;font-family:inherit;font-size:13px">收起</button>' +
+      '</div>' +
+      '<div class="muted" style="margin:8px 0 10px">' +
+        (plain ? ('其中 <b>'+plain+'</b> 条是 2026-09-20 之前的旧数据，带<b>明文 IP</b>；其余只有哈希标识。')
+               : '这些记录都只有加盐哈希标识（不能反推 IP）—— 明文 IP 已于 2026-09-20 停止写入。') +
+      '</div>' + detailTable(rows, src);
+    const btn = document.getElementById('detail-close');
+    if(btn) btn.onclick = () => { box.style.display='none'; box.innerHTML=''; };
+  } catch(e) {
+    box.innerHTML = '<h2>明细：'+esc(val)+'</h2><div class="err">加载失败：'+esc(String(e.message||e))+'</div>';
+  }
 }
 
 function chart(human, bot){
@@ -316,35 +428,35 @@ async function load(){
     html += '<div class="card full"><h2>趋势（按'+(d.bucket==='hour'?'小时':'天')+'）</h2>' + chart(d.trendHuman, d.trendBot) + '</div>';
 
     const mk = Math.max(1, ...d.kinds.map(x=>Number(x.n)));
-    html += '<div class="card"><h2>爬虫 / 扫描器分类</h2>' + table(d.kinds, [
+    html += '<div class="card"><h2>爬虫 / 扫描器分类 <span class="muted">点行看明细</span></h2>' + table(d.kinds, [
       {t:'类型', f:x=>esc(x.botType)+bar(Number(x.n),mk)},
       {t:'kind', f:x=>'<span class="muted">'+esc(x.kind||'（旧数据无分类）')+'</span>'},
       {t:'次数', n:true, f:x=>fmt(Number(x.n))},
-    ]) + '</div>';
+    ], x=>x.botType ? ({src:'bot', dim:'botType', val:x.botType}) : null) + '</div>';
 
     const mp = Math.max(1, ...d.pages.map(x=>Number(x.n)));
-    html += '<div class="card"><h2>真人访问最多的页面</h2>' + table(d.pages, [
+    html += '<div class="card"><h2>真人访问最多的页面 <span class="muted">点行看明细</span></h2>' + table(d.pages, [
       {t:'路径', f:x=>'<span class="muted" style="word-break:break-all">'+esc(x.path)+'</span>'+bar(Number(x.n),mp)},
       {t:'PV', n:true, f:x=>fmt(Number(x.n))},
-    ]) + '</div>';
+    ], x=>({src:'human', dim:'path', val:x.path})) + '</div>';
 
     const mc = Math.max(1, ...d.countries.map(x=>Number(x.n)));
-    html += '<div class="card"><h2>真人来源国家</h2>' + table(d.countries, [
+    html += '<div class="card"><h2>真人来源国家 <span class="muted">点行看明细</span></h2>' + table(d.countries, [
       {t:'国家', f:x=>esc(x.country||'（未知）')+bar(Number(x.n),mc,'teal')},
       {t:'PV', n:true, f:x=>fmt(Number(x.n))},
-    ]) + '</div>';
+    ], x=>({src:'human', dim:'country', val:x.country})) + '</div>';
 
     const md = Math.max(1, ...d.devices.map(x=>Number(x.n)));
-    html += '<div class="card"><h2>真人设备 / 系统</h2>' + table(d.devices, [
+    html += '<div class="card"><h2>真人设备 / 系统 <span class="muted">点行看明细</span></h2>' + table(d.devices, [
       {t:'设备', f:x=>esc(x.device)+bar(Number(x.n),md,'blue')},
       {t:'PV', n:true, f:x=>fmt(Number(x.n))},
-    ]) + '</div>';
+    ], x=>({src:'human', dim:'device', val:x.device})) + '</div>';
 
     const mr = Math.max(1, ...d.referers.map(x=>Number(x.n)));
-    html += '<div class="card"><h2>真人来源（Referer）</h2>' + table(d.referers, [
+    html += '<div class="card"><h2>真人来源（Referer） <span class="muted">点行看明细</span></h2>' + table(d.referers, [
       {t:'来源', f:x=>'<span class="muted" style="word-break:break-all">'+esc(x.referer||'（直接访问 / 无来源）')+'</span>'+bar(Number(x.n),mr,'teal')},
       {t:'PV', n:true, f:x=>fmt(Number(x.n))},
-    ]) + '</div>';
+    ], x=>({src:'human', dim:'referer', val:x.referer})) + '</div>';
 
     html += contentAnalysis(d.postHuman, d.postBot);
     html += '</div>';
@@ -353,6 +465,12 @@ async function load(){
     app.innerHTML = '<div class="err">加载失败：' + esc(String(e.message||e)) + '</div>';
   }
 }
+
+document.getElementById('app').addEventListener('click', ev => {
+  const tr = ev.target.closest('tr.rowlink');
+  if(!tr) return;
+  drill(tr.dataset.src, tr.dataset.dim, tr.dataset.val);
+});
 
 renderRanges();
 load();
@@ -364,6 +482,24 @@ export default {
     if (!checkAuth(request, env)) return unauthorized();
 
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/detail") {
+      try {
+        const data = await detail(
+          env,
+          url.searchParams.get("range") || DEFAULT_RANGE,
+          url.searchParams.get("src") || "bot",
+          url.searchParams.get("dim") || "",
+          url.searchParams.get("val") || "",
+          url.searchParams.get("limit"),
+        );
+        return Response.json(data, {
+          headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" },
+        });
+      } catch (e) {
+        return new Response(String(e.message || e), { status: 400 });
+      }
+    }
 
     if (url.pathname === "/api/stats") {
       try {
