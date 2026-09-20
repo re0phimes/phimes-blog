@@ -28,19 +28,6 @@ const postData = await getAllPosts();
 
 // 获取主题配置
 const themeConfig = await getThemeConfig();
-const fontStylesheetUrls = new Set([
-  "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
-  "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css",
-  "https://use.sevencdn.com/css2?family=Fira+Code:wght@300..700&display=swap",
-]);
-
-const optionalHeadHosts = new Set([
-  "https://s1.hdslb.com",
-  "https://mirrors.sustech.edu.cn",
-  "https://use.sevencdn.com",
-  "https://fonts.gstatic.com",
-]);
-
 const algoliaHost = "https://X5EBEZB53I-dsn.algolia.net";
 
 const resolvedHeadEntries = (themeConfig.inject?.header || []).filter((entry) => {
@@ -49,9 +36,7 @@ const resolvedHeadEntries = (themeConfig.inject?.header || []).filter((entry) =>
   const href = attrs.href;
   if (typeof href !== "string" || !href) return true;
 
-  if (fontStylesheetUrls.has(href)) return false;
   if (!themeConfig?.search?.enable && href === algoliaHost) return false;
-  if (optionalHeadHosts.has(href)) return false;
 
   return true;
 });
@@ -153,17 +138,14 @@ export default withPwa(
     head: [
       ...resolvedHeadEntries,
 
-      // 2. 添加 Microsoft Clarity 的跟踪脚本
-      [
-        "script",
-        {}, // 这个空对象用于存放 script 标签的属性，这里我们不需要额外属性
-        // 下面是您从 Clarity 官网获取的脚本内容，已包含您的 Project ID
-        `(function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "ty1lrwm16k");`,
-      ],
+      // 说明：这里原来挂着 Microsoft Clarity 的会话录制脚本（Project ID ty1lrwm16k）。
+      // 它会记录访客的点击、滚动、输入并回放到微软服务器，属于隐私成本最高的一类统计，
+      // 而且从国内加载很慢。已移除。
+      // 想继续看流量，用 Cloudflare Web Analytics（免费、无 cookie、不采集个人数据）：
+      //   Cloudflare 控制台 → Analytics & Logs → Web Analytics → 添加站点 → 复制 beacon
+      //
+      // 全站 PV/UV 目前仍由侧边栏的 busuanzi 提供（见 Aside/Widgets/SiteData.vue），
+      // 文章阅读量由自建 Worker 提供（见 composables/usePageViews.js）。
     ],
 
     // sitemap

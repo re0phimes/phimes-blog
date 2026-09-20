@@ -41,8 +41,12 @@ export const mainStore = defineStore("main", {
       useRightMenu: false, //默认不开启
       // 背景模糊
       backgroundBlur: true,
-      // 全站字体
-      fontFamily: "hmos",
+      // 全站字体。默认 system = 系统字体栈（零下载）；
+      // hmos / lxgw 会联网下载 webfont（HarmonyOS 约 700 KB / 46 个请求）
+      fontFamily: "system",
+      // 用于一次性迁移老用户的字体设置：v1 的默认值是 hmos（会下载 webfont），
+      // v2 改成系统字体栈。老用户 localStorage 里存的是 v1 的默认值，需要迁移一次。
+      fontConfigVersion: 1,
       // 全站字体大小
       fontSize: 16,
       // 信息显示位置
@@ -131,6 +135,7 @@ export const mainStore = defineStore("main", {
         "backgroundType",
         "fontFamily",
         "fontSize",
+        "fontConfigVersion",
         "infoPosition",
         "bgAnimationEnabled",
       ],

@@ -19,6 +19,12 @@
           <span class="set-label">全站字体</span>
           <div class="set-options">
             <span
+              :class="['options', { choose: fontFamily === 'system' }]"
+              @click="fontFamily = 'system'"
+            >
+              系统字体
+            </span>
+            <span
               :class="['options', { choose: fontFamily === 'hmos' }]"
               @click="fontFamily = 'hmos'"
             >

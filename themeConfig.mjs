@@ -71,39 +71,6 @@ export const themeConfig = {
         },
       ],
       // 预载 CDN
-      [
-        "link",
-        {
-          crossorigin: "",
-          rel: "preconnect",
-          href: "https://s1.hdslb.com",
-        },
-      ],
-      [
-        "link",
-        {
-          crossorigin: "",
-          rel: "preconnect",
-          href: "https://mirrors.sustech.edu.cn",
-        },
-      ],
-      // HarmonyOS font
-      [
-        "link",
-        {
-          crossorigin: "anonymous",
-          rel: "stylesheet",
-          href: "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
-        },
-      ],
-      [
-        "link",
-        {
-          crossorigin: "anonymous",
-          rel: "stylesheet",
-          href: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css",
-        },
-      ],
       // iconfont
       [
         "link",
@@ -111,17 +78,6 @@ export const themeConfig = {
           crossorigin: "anonymous",
           rel: "stylesheet",
           href: "https://cdn2.codesign.qq.com/icons/g5ZpEgx3z4VO6j2/latest/iconfont.css",
-        },
-      ],
-      // Embed code
-      ["link", { rel: "preconnect", href: "https://use.sevencdn.com" }],
-      ["link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" }],
-      [
-        "link",
-        {
-          crossorigin: "anonymous",
-          href: "https://use.sevencdn.com/css2?family=Fira+Code:wght@300..700&display=swap",
-          rel: "stylesheet",
         },
       ],
       // 预载 DocSearch

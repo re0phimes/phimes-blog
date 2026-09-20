@@ -52,10 +52,12 @@ const { frontmatter, page, theme } = useData();
 const { loadingStatus, footerIsShow, themeValue, themeType, backgroundType, fontFamily, fontSize } =
   storeToRefs(store);
 
+// 只有这两个可选字体需要联网下载。system（默认）用系统字体栈，不加载任何东西。
 const externalFontStylesheets = {
   hmos: "https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css",
   lxgw: "https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.css",
 };
+const FONT_CLASSES = ["system", ...Object.keys(externalFontStylesheets)];
 
 // 右键菜单
 const rightMenuRef = ref(null);
@@ -117,11 +119,13 @@ const changeSiteThemeType = () => {
 const changeSiteFont = () => {
   try {
     const htmlElement = document.documentElement;
-    htmlElement.classList.remove("lxgw", "hmos");
-    if (fontFamily.value && externalFontStylesheets[fontFamily.value]) {
-      loadCSS(externalFontStylesheets[fontFamily.value]);
-      htmlElement.classList.add(fontFamily.value);
+    htmlElement.classList.remove(...FONT_CLASSES);
+    const family = fontFamily.value || "system";
+    // 只有 hmos / lxgw 需要下载；system 什么都不做
+    if (externalFontStylesheets[family]) {
+      loadCSS(externalFontStylesheets[family]);
     }
+    htmlElement.classList.add(family);
     htmlElement.style.fontSize = fontSize.value + "px";
   } catch (error) {
     console.error("切换系统字体样式失败", error);
@@ -142,6 +146,13 @@ onMounted(() => {
   console.log(frontmatter.value, page.value, theme.value);
   // 全站置灰
   // specialDayGray();
+  // 一次性迁移：v1 的默认字体是 hmos（要下载约 700 KB 的 webfont），
+  // v2 改成系统字体栈。老用户 localStorage 里存的还是 v1 的默认值，
+  // 不迁移的话他们会一直背着这 700 KB。迁移只跑一次，之后尊重用户选择。
+  if ((store.fontConfigVersion ?? 1) < 2) {
+    if (store.fontFamily === "hmos") store.fontFamily = "system";
+    store.fontConfigVersion = 2;
+  }
   // 更改主题类别
   changeSiteThemeType();
   // 切换系统字体样式
