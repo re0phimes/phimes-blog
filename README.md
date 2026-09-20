@@ -84,8 +84,19 @@ cover: https://image.phimes.top/img/xxx.png
 
 ## 部署
 
-推送到 `master` 后由 Vercel 自动构建部署。另外有一个 GitHub Actions
-（`.github/workflows/trigger-faq-rebuild.yml`）会在推送后触发 AI FAQ 站点的重建。
+托管在 **Cloudflare Pages**（项目名 `phimes-blog`，域名 `blog.phimes.top`）。
+
+选择 Pages 而不是 Vercel 的原因：Pages 的静态文件**本身就存在 Cloudflare 的边缘**，
+不存在「回源到境外源站」这一跳；而且每次部署会自动失效边缘缓存，改完立刻生效。
+
+- 部署：`.github/workflows/deploy-pages.yml`，推送到 `master` 触发
+- 需要两个仓库 Secret：`CLOUDFLARE_API_TOKEN`（权限只需 Cloudflare Pages:Edit）
+  和 `CLOUDFLARE_ACCOUNT_ID`
+- 手动部署：`npm run deploy`
+- 响应头配置在 `public/_headers`（HTML 不配 —— 由 Pages 自己管理边缘缓存并在部署时失效）
+
+另外有一个 GitHub Actions（`.github/workflows/trigger-faq-rebuild.yml`）
+会在推送后触发 AI FAQ 站点的重建。
 
 ## 测试
 
