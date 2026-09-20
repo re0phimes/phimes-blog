@@ -64,7 +64,7 @@ tags:
 
 大名鼎鼎的克莱因瓶就是一个经典的流形，下面的几种情况都是流形或者流形的局部
 
-![多个流形](https://phimesimage.oss-accelerate.aliyuncs.com/img/20250829232129706.png)
+![多个流形](https://image.phimes.top/img/20250829232129706.png)
 
 好，内容变得抽象起来了。那我们再看个经典形象的例子：
 
