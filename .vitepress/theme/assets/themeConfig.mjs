@@ -10,6 +10,8 @@ export const themeConfig = {
     logo: "/images/logo/logo.webp",
     // 站点地址
     site: "",
+    // 左上角回首页按钮的文案
+    homeLabel: "Home Page",
     // 语言
     lang: "zh-CN",
     // 作者

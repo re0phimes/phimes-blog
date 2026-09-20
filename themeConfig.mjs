@@ -4,12 +4,14 @@ export const themeConfig = {
   siteMeta: {
     // 站点标题
     title: "Phimes",
-    // 站点描述
-    description: "Phimes的个人博客",
+    // 站点描述（同时作为首页 banner 的问候语，见 Banner.vue）
+    description: "Phimes 的技术空间",
     // 站点logo
     logo: "/images/logo/logo.webp",
     // 站点地址
     site: "https://blog.phimes.top",
+    // 左上角回首页按钮的文案
+    homeLabel: "Home Page",
     // 语言
     lang: "zh-CN",
     // 作者
@@ -107,37 +109,21 @@ export const themeConfig = {
     {
       text: "可视化理解",
       link: "https://demo.phimes.top",
-      icon: "code",
     },
     {
       text: "AI FAQ",
       link: "https://aifaq.phimes.top",
-      icon: "chat",
-    },
-  ],
-  // 导航栏菜单 - 左侧
-  navMore: [
-    {
-      name: "博客",
-      list: [
-        {
-          icon: "/images/logo/logo.webp",
-          name: "主站",
-          url: "https://phimes.top",
-        },
-      ],
     },
     {
-      name: "项目",
-      list: [
-        {
-          icon: "/images/logo/logo.webp",
-          name: "Demo",
-          url: "https://demo.phimes.top",
-        },
-      ],
+      text: "About Me",
+      link: "https://phimes.top",
     },
   ],
+  // 导航栏菜单 - 左侧折叠菜单
+  // 已清空：原来这里的「主站」和导航栏的 About Me 重复。
+  // 左上角只保留 Home Page 按钮（见 Nav.vue）。要恢复折叠菜单，
+  // 按下面结构填回即可：{ name: "分组名", list: [{ icon, name, url }] }
+  navMore: [],
   // 封面配置
   cover: {
     // 是否开启双栏布局
@@ -253,14 +239,17 @@ export const themeConfig = {
       enable: true,
     },
     // 标签
+    // 首页不再显示「热门标签」（只留文章流，更干净）。
+    // 文章页的「相关标签」由 Post.vue 按需单独开启，不受这里影响。
     tags: {
-      enable: true,
+      enable: false,
       // 侧边栏显示多少个（首页 = 热门 Top N；文章页 = 相关标签 Top N）
+      // 注意：themeConfig 是浅合并，关掉标签也要保留 limit，否则会被整个替换掉
       limit: 10,
     },
-    // 站点数据
+    // 站点数据（文章总数）—— 全站不显示
     siteData: {
-      enable: true,
+      enable: false,
     },
   },
   // 友链

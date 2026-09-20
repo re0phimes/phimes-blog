@@ -35,6 +35,11 @@ const props = defineProps({
     type: String,
     default: "home",
   },
+  // 只显示相关标签：没有相关标签时整个组件不渲染（而不是退回全局热门）
+  relatedOnly: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const LIMIT_FALLBACK = 10;
@@ -91,7 +96,9 @@ const relatedTags = computed(() => {
 
 const tags = computed(() => {
   const list = isPost.value ? relatedTags.value : hotTags.value;
-  // 文章没有相关标签时退回全局热门，别让侧边栏空着
+  // 文章页：有关联标签就显示关联的；一个都没有时是否退回全局热门，
+  // 由 relatedOnly 决定 —— 开启后宁可不显示，也不让「热门标签」冒出来。
+  if (props.relatedOnly && list.length === 0) return [];
   const source = list.length > 0 ? list : hotTags.value;
 
   return source.slice(0, limit.value).map((item) => ({

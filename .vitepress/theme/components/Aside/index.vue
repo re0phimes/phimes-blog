@@ -2,7 +2,12 @@
   <aside class="main-aside">
     <div class="sticky">
       <Toc v-if="theme.aside.toc.enable && showToc" class="weidgets" />
-      <Tags v-if="theme.aside.tags.enable" class="weidgets" :context="context" />
+      <!--
+        标签组件：
+        - 文章页（context="post"）：只显示「相关标签」，且没有相关标签时整个隐藏
+        - 其他页面：跟随 aside.tags.enable（首页已关掉热门标签）
+      -->
+      <Tags v-if="showTags" class="weidgets" :context="context" :relatedOnly="isPostAside" />
       <SiteData v-if="theme.aside.siteData.enable" class="weidgets" />
     </div>
   </aside>
@@ -22,6 +27,13 @@ const props = defineProps({
     default: "home",
   },
 });
+
+// 文章页侧边栏：只保留「相关标签」
+const isPostAside = computed(() => props.context === "post");
+
+// 文章页不受 aside.tags.enable 影响（那是首页热门标签的开关），
+// 其余页面跟随配置
+const showTags = computed(() => isPostAside.value || theme.value.aside.tags.enable);
 </script>
 
 <style lang="scss" scoped>
