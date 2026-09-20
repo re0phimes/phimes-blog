@@ -10,8 +10,16 @@
  *  4. 所有页面 priority 一刀切，不反映内容价值
  */
 
-const INTERNAL_PREFIXES = ["docs/plans/", "plan/"];
-const EXCLUDED_EXACT_URLS = new Set(["TEST_REPORT", "page", "page/", "page/1", "pages/"]);
+const INTERNAL_PREFIXES = ["docs/", "plan/"];
+// 内部文档即使被误构建，也不该进 sitemap 主动喂给爬虫（srcExclude 是第一道防线）
+const EXCLUDED_EXACT_URLS = new Set([
+  "PROJECT_STATE",
+  "TEST_REPORT",
+  "page",
+  "page/",
+  "page/1",
+  "pages/",
+]);
 // /page/N 是跳转到 /?p=N 的重定向页，页面本身没有内容
 const EXCLUDED_PATTERNS = [/^page\/\d+$/, /^page\/\d+\//];
 
