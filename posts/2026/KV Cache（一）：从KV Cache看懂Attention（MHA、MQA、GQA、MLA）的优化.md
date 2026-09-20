@@ -2,7 +2,7 @@
 title: KV Cache（一）：从KV Cache看懂Attention（MHA、MQA、GQA、MLA）的优化之路
 tags:
   - Attention
-  - kvcache
+  - KV-Cache
   - memorybound
 date: 2026-1-4
 status: published
