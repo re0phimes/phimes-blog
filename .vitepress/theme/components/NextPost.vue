@@ -52,7 +52,7 @@ const getNextPostData = () => {
     return true;
   }
   // 是否有上一篇
-  else if (postIndex > 0) {
+  if (postIndex > 0) {
     nextPostData.value = postData[postIndex - 1];
     isNextPost.value = false;
     return true;
@@ -69,7 +69,7 @@ const isShowNext = () => {
   if (observer.value) observer.value?.disconnect();
   observer.value = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      nextPostShow.value = entry.isIntersecting ? false : true;
+      nextPostShow.value = !entry.isIntersecting;
     });
   });
   // 添加监视器

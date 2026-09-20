@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { useData } from 'vitepress';
+import { useData } from "vitepress";
 import { loadScript } from "@/utils/commonTools";
 import { daysFromNow } from "@/utils/helper";
 

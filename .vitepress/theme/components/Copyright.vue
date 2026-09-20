@@ -1,7 +1,11 @@
 <template>
   <div class="copyright s-card">
     <div class="title">
-      <a :href="theme.siteMeta.site + (postData?.permalink || route.path)" class="post-name" target="_blank">
+      <a
+        :href="theme.siteMeta.site + (postData?.permalink || route.path)"
+        class="post-name"
+        target="_blank"
+      >
         {{ postData?.title || "未命名文章" }}
       </a>
     </div>
@@ -41,7 +45,8 @@ const props = defineProps({
   // 文章数据
   postData: {
     type: Object,
-    default: {},
+    // 对象/数组类型的默认值必须用工厂函数，否则 Vue 会报 Invalid default value for prop
+    default: () => ({}),
   },
 });
 const route = useRoute();

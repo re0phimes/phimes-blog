@@ -4,23 +4,22 @@
     <div class="about-content" style="grid-template-columns: 3fr 2fr">
       <!-- 介绍 -->
       <div class="about-item hello">
-        <span class="text1">你好，很高兴认识你👋</span>
-        <span class="text2 title2">我是 無名</span>
-        <span class="text3">是一名 前端开发工程师、独立开发者、博主</span>
+        <span class="text1">你好，很高兴认识你 👋</span>
+        <span class="text2 title2">我是 Phimes</span>
+        <span class="text3">做有挑战的事，走有壁垒的路</span>
       </div>
-      <!-- 追求 -->
+      <!-- 关注 -->
       <div class="about-item pursuit">
-        <span class="tip">追求</span>
-        <span class="title2">源于</span>
-        <span class="title2">热爱而去开发</span>
-        <span class="title2">优秀的作品</span>
+        <span class="tip">关注</span>
+        <span class="title2">在 AI 时代</span>
+        <span class="title2">思考与分享</span>
       </div>
     </div>
     <div class="about-content" style="grid-template-columns: 2fr 3fr">
-      <!-- 技能 -->
+      <!-- 技术栈 -->
       <div class="about-item skills">
-        <span class="tip">技能</span>
-        <span class="title2">开启创造力</span>
+        <span class="tip">技术栈</span>
+        <span class="title2">常用的工具</span>
         <div class="skills-list">
           <a
             v-for="(item, index) in skillsData"
@@ -29,6 +28,7 @@
             :href="item.link"
             class="skills-item"
             target="_blank"
+            rel="noopener"
           >
             <div class="skills-logo">
               <i :class="`iconfont icon-${item.icon}`"></i>
@@ -37,123 +37,55 @@
           </a>
         </div>
       </div>
-      <!-- 生涯 -->
-      <div class="about-item career">
-        <span class="tip">生涯</span>
-        <span class="title2">
-          <i>無限進步</i>
-        </span>
-        <div class="list">
-          <span class="list-item" style="--color: #357ef5">ZZRVTC · 计算机应用技术</span>
-          <span class="list-item" style="--color: #eb372a">FE · 前端开发工程师</span>
-        </div>
-        <img
-          class="career-img"
-          src="https://pic.efefee.cn/uploads/2024/02/22/65d71db18bcf9.png"
-          alt="career"
-        />
-      </div>
-    </div>
-    <div class="about-content" style="grid-template-columns: 3fr 2fr">
-      <!-- 性格 -->
-      <div class="about-item character" style="--color: #4298b4">
-        <span class="tip">性格</span>
-        <span class="title2">物流师</span>
-        <span class="title2" style="color: var(--color)">ISTJ-A / ISTJ-T</span>
-        <span class="more">
-          在
-          <a href="https://www.16personalities.com/ch/" target="_blank">16personalities</a>
-          了解更多关于
-          <a href="https://www.16personalities.com/ch/istj-%E4%BA%BA%E6%A0%BC" target="_blank">
-            物流师
+      <!-- 站点 -->
+      <div class="about-item sites">
+        <span class="tip">站点</span>
+        <span class="title2">几个自己写的小东西</span>
+        <div class="site-list">
+          <a
+            v-for="(site, index) in siteData"
+            :key="index"
+            :href="site.link"
+            class="site-item"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="site-name">{{ site.name }}</span>
+            <span class="site-desc">{{ site.desc }}</span>
+            <i class="iconfont icon-right-round site-arrow" />
           </a>
-        </span>
-        <img
-          src="https://pic.efefee.cn/uploads/2024/02/22/65d6bc7ae72ae.png"
-          alt="male"
-          class="male"
-        />
-      </div>
-      <!-- 座右铭 -->
-      <div class="about-item">
-        <span class="tip">座右铭</span>
-        <span class="title1" style="margin-top: 20px">脚踏实地，</span>
-        <span class="title2">一丝不苟。</span>
+        </div>
       </div>
     </div>
     <div class="about-content" style="grid-template-columns: 1fr 1fr">
-      <div
-        class="about-item like image"
-        style="
-          --color: #0c0e20;
-          background-image: url(https://pic.efefee.cn/uploads/2024/02/27/65dd812567723.webp);
-        "
-      >
-        <div class="image-content">
-          <span class="tip">关注偏好</span>
-          <span class="title2">数码科技</span>
-          <div class="image-desc">
-            <span class="left">手机、电脑及软硬件</span>
-          </div>
-        </div>
+      <!-- 座右铭 -->
+      <div class="about-item motto">
+        <span class="tip">座右铭</span>
+        <span class="title1">做有挑战的事，</span>
+        <span class="title2">走有壁垒的路。</span>
       </div>
-      <div
-        class="about-item like image"
-        style="
-          --color: #7b3c25;
-          background-image: url(https://pic.efefee.cn/uploads/2024/02/27/65dd836099d16.webp);
-        "
-      >
-        <div class="image-content">
-          <span class="tip">音乐偏好</span>
-          <span class="title2">欧美、华语流行、纯音乐、ACG</span>
-          <div class="image-desc">
-            <span class="left">一起欣赏更多音乐</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="about-content" style="grid-template-columns: 2fr 3fr">
-      <!-- 数据 -->
-      <div
-        class="about-item static image"
-        style="
-          --color: #0f1114;
-          background-image: url(https://pic.efefee.cn/uploads/2024/04/15/661c8fbf226d3.webp);
-        "
-      >
+      <!-- 本站数据 -->
+      <div class="about-item static" style="--color: #0f1114">
         <div class="image-content">
           <span class="tip">数据</span>
-          <span class="title2">访问统计</span>
+          <span class="title2">这里写了多少</span>
           <div class="static-data">
-            <div v-for="(item, key, index) in statisticsData" :key="index" class="static-item">
-              <span class="static-name">{{ key }}</span>
-              <span class="static-num">{{ item }}</span>
+            <div class="static-item">
+              <span class="static-name">文章</span>
+              <span class="static-num">{{ postCount }}</span>
             </div>
-          </div>
-          <div class="image-desc opacity">
-            <span class="left">
-              统计信息来自 <a href="https://v6.51.la/" target="_blank">51la</a>
-            </span>
-          </div>
-        </div>
-      </div>
-      <!-- 信息 -->
-      <div class="about-item child">
-        <div
-          class="about-item map image"
-          style="background-image: url(https://pic.efefee.cn/uploads/2024/04/15/661cbccc56af5.webp)"
-        >
-          <span class="position">我现在住在 <strong>中国，河南省</strong></span>
-        </div>
-        <div class="about-item info">
-          <div class="info-item">
-            <span class="info-name">生于</span>
-            <span class="info-num" style="--color: #43a6c6">2001</span>
-          </div>
-          <div class="info-item">
-            <span class="info-name">现在职业</span>
-            <span class="info-num" style="--color: #dfac46">前端开发工程师</span>
+            <div class="static-item">
+              <span class="static-name">标签</span>
+              <span class="static-num">{{ tagCount }}</span>
+            </div>
+            <div class="static-item">
+              <span class="static-name">建站于</span>
+              <span class="static-num small">{{ since }}</span>
+            </div>
+            <div class="static-item">
+              <span class="static-name">累计</span>
+              <span class="static-num small">{{ runningDays }} 天</span>
+            </div>
           </div>
         </div>
       </div>
@@ -167,7 +99,8 @@
           创建这个站的时候，想要就是能够有一个自己能够<strong>积累知识</strong>、<strong>积累兴趣</strong>的地方。和他人分享，会让这些成为<strong>积累和沉淀</strong>。如果能够帮助到更多的人，帮助更多人解决问题，那一定是非常棒的事情。
         </p>
         <p class="text">
-          这里大多都是<strong>技术向</strong>的文章，可能不太会有很多人看，权当是做个自我记录吧。当然，如果某篇文章能够帮助到你，那我也是很开心的。
+          这里大多都是<strong>大模型与深度学习</strong>相关的文章——从 Transformer 的注意力机制、KV
+          Cache 的推理优化，到微调与部署的工程实践。写得比较慢，但尽量把每一步算清楚。
         </p>
         <p class="text">
           这些就是创造这个小站的本意，<strong>也是我分享生活的方式</strong>。有幸能和你相遇在这里，相信我们能共同留下一段美好记忆。
@@ -178,91 +111,41 @@
 </template>
 
 <script setup>
-import { getStatistics } from "@/api";
-
 const { theme } = useData();
 
-// 技能数据
+// 技术栈（图标使用主题自带 iconfont 中已有的名字）
 const skillsData = [
+  { name: "Python", color: "#3776AB", icon: "python", link: "https://www.python.org/" },
+  { name: "PyTorch", color: "#EE4C2C", icon: "python", link: "https://pytorch.org/" },
   {
     name: "JavaScript",
     color: "#f1e05abd",
     icon: "javascript",
     link: "https://developer.mozilla.org/zh-CN/docs/Web/JavaScript",
   },
-  {
-    name: "HTML5",
-    color: "#e34f26",
-    icon: "html5",
-    link: "https://developer.mozilla.org/zh-CN/docs/Web/HTML",
-  },
-  {
-    name: "CSS3",
-    color: "#563d7c",
-    icon: "css3",
-    link: "https://developer.mozilla.org/zh-CN/docs/Web/CSS",
-  },
-  {
-    name: "Vue",
-    color: "#41b883",
-    icon: "vue",
-    link: "https://cn.vuejs.org/",
-  },
-  {
-    name: "React",
-    color: "#149ECA",
-    icon: "react",
-    link: "https://zh-hans.reactjs.org/",
-  },
-  {
-    name: "Node.js",
-    color: "#026E00",
-    icon: "nodejs",
-    link: "https://nodejs.org/",
-  },
-  {
-    name: "Python",
-    color: "#3776AB",
-    icon: "python",
-    link: "https://www.python.org/",
-  },
-  {
-    name: "Docker",
-    color: "#2496f2",
-    icon: "docker",
-    link: "https://www.docker.com/",
-  },
-  {
-    name: "Git",
-    color: "#F05032",
-    icon: "git",
-    link: "https://git-scm.com/",
-  },
-  {
-    name: "Photoshop",
-    color: "#31A8FF",
-    icon: "photoshop",
-    link: "https://www.adobe.com/cn/lead/creativecloud/business.html",
-  },
-  {
-    name: "ChatGPT",
-    color: "#4AA181",
-    icon: "chatgpt",
-    link: "https://chat.openai.com/",
-  },
+  { name: "Vue", color: "#41b883", icon: "vue", link: "https://cn.vuejs.org/" },
+  { name: "Node.js", color: "#026E00", icon: "nodejs", link: "https://nodejs.org/" },
+  { name: "Docker", color: "#2496f2", icon: "docker", link: "https://www.docker.com/" },
+  { name: "Git", color: "#F05032", icon: "git", link: "https://git-scm.com/" },
+  { name: "LLM", color: "#4AA181", icon: "chatgpt", link: "https://www.deepseek.com/" },
 ];
 
-// 站点统计数据
-const statisticsData = ref(null);
+// 我自己的站点
+const siteData = [
+  { name: "主站", desc: "入口与导航", link: "https://www.phimes.top/" },
+  { name: "技术博客", desc: "就是你现在看的这个", link: "https://blog.phimes.top/" },
+  { name: "AI FAQ", desc: "AI 问答知识库", link: "https://aifaq.phimes.top/" },
+  { name: "Demo", desc: "项目演示", link: "https://demo.phimes.top/" },
+];
 
-// 获取站点统计数据
-const getStatisticsData = async () => {
-  const result = await getStatistics(theme.value.tongji["51la"]);
-  statisticsData.value = result;
-};
-
-onMounted(() => {
-  getStatisticsData();
+// 本站数据（全部来自构建期生成的真实数据）
+const postCount = computed(() => theme.value?.postData?.length ?? 0);
+const tagCount = computed(() => Object.keys(theme.value?.tagsData ?? {}).length);
+const since = computed(() => theme.value?.since || "");
+const runningDays = computed(() => {
+  const start = new Date(theme.value?.since || "");
+  if (Number.isNaN(start.getTime())) return "—";
+  return Math.max(0, Math.floor((Date.now() - start.getTime()) / 86400000));
 });
 </script>
 
@@ -308,16 +191,6 @@ onMounted(() => {
         font-size: 18px;
         margin: 0.6rem 0;
       }
-      &.child {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        padding: 0;
-        gap: 20px;
-        .about-item {
-          height: 100%;
-        }
-      }
       &.hello {
         justify-content: center;
         padding: 2rem;
@@ -343,36 +216,23 @@ onMounted(() => {
           }
         }
       }
-      &.character {
-        min-height: 220px;
-        cursor: pointer;
-        .more {
-          margin-top: auto;
-          font-size: 14px;
-          color: var(--main-color-gray);
-          a {
-            color: var(--main-color-gray);
-            &:hover {
-              color: var(--color);
-            }
-          }
+      // 座右铭：用渐变代替原来失效的背景图
+      &.motto {
+        justify-content: center;
+        min-height: 180px;
+        background-image: linear-gradient(135deg, #0c0e20 0%, #2b3a55 100%);
+        color: #fff;
+        .tip {
+          opacity: 0.6;
         }
-        .male {
-          position: absolute;
-          top: 20px;
-          right: -10px;
-          height: 140%;
-          width: auto;
-          transition: transform 0.5s;
-          transform-origin: top center;
-          @media (max-width: 768px) {
-            height: 80%;
-          }
+        .title1 {
+          opacity: 1;
         }
-        &:hover {
-          .male {
-            transform: scale(1.2);
-          }
+        .title2 {
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-image: linear-gradient(45deg, #7fd8ff 0%, #b18cff 100%);
         }
       }
       &.skills {
@@ -416,93 +276,48 @@ onMounted(() => {
           }
         }
       }
-      &.career {
-        .title2 {
-          letter-spacing: 0.2rem;
-          font-size: 40px;
-        }
-        .list {
+      // 站点列表（替代原来失效的生涯配图）
+      &.sites {
+        .site-list {
           margin-top: 12px;
           display: flex;
           flex-direction: column;
-          .list-item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-bottom: 12px;
-            color: var(--main-font-second-color);
-            &::before {
-              content: "";
-              display: block;
-              width: 16px;
-              height: 16px;
-              background-color: var(--color);
-              border-radius: 50%;
-              margin-right: 8px;
-            }
-          }
+          gap: 8px;
         }
-        .career-img {
-          position: absolute;
-          bottom: -10px;
-          left: 0;
-          width: 100%;
-          @media (max-width: 768px) {
-            position: static;
-          }
-        }
-      }
-      &.game {
-        min-height: 300px;
-        @media (max-width: 768px) {
-          min-height: 240px;
-        }
-      }
-      &.like {
-        min-height: 400px;
-        @media (max-width: 768px) {
-          min-height: 300px;
-        }
-      }
-      &.image {
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        .image-content {
-          flex-grow: 1;
+        .site-item {
           display: flex;
-          flex-direction: column;
-          z-index: 2;
-          color: #fff;
-          .image-desc {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: auto;
-            &.opacity {
-              font-size: 14px;
-              color: #eee;
-              opacity: 0.8;
-              a {
-                color: #eee;
-                &:hover {
-                  color: var(--main-color);
-                }
-              }
+          align-items: baseline;
+          gap: 10px;
+          padding: 10px 14px;
+          border-radius: 10px;
+          background-color: var(--main-site-background);
+          border: 1px solid var(--main-card-border);
+          transition:
+            border-color 0.3s,
+            background-color 0.3s,
+            transform 0.3s;
+          .site-name {
+            font-weight: bold;
+          }
+          .site-desc {
+            font-size: 13px;
+            opacity: 0.65;
+          }
+          .site-arrow {
+            margin-left: auto;
+            font-size: 12px;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+          }
+          &:hover {
+            border-color: var(--main-color);
+            background-color: var(--main-color-bg);
+            transform: translateX(4px);
+            .site-arrow {
+              opacity: 1;
+              color: var(--main-color);
             }
           }
-        }
-        &::after {
-          content: "";
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          box-shadow: inset 0 -70px 204px 10px var(--color);
-          z-index: 0;
         }
       }
       &.static {
@@ -521,57 +336,10 @@ onMounted(() => {
             .static-num {
               font-size: 34px;
               font-weight: bold;
+              &.small {
+                font-size: 20px;
+              }
             }
-          }
-        }
-      }
-      &.map {
-        min-height: 170px;
-        background-size: 100%;
-        transition: background 1.5s ease-in-out;
-        cursor: pointer;
-        @media (max-width: 768px) {
-          background-size: cover;
-          pointer-events: none;
-        }
-        .position {
-          display: block;
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          width: 100%;
-          padding: 20px 30px;
-          color: #fff;
-          background-color: #636352;
-          font-size: 20px;
-          transition: bottom 1s;
-        }
-        &:hover {
-          background-size: 120%;
-          background-position-x: 0;
-          background-position-y: 36%;
-          .position {
-            bottom: -80px;
-          }
-        }
-      }
-      &.info {
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        .info-item {
-          display: flex;
-          flex-direction: column;
-          margin-right: 32px;
-          .info-name {
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: var(--main-font-second-color);
-          }
-          .info-num {
-            font-size: 34px;
-            font-weight: bold;
-            color: var(--color);
           }
         }
       }

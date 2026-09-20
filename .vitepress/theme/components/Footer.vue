@@ -19,7 +19,11 @@
         <a class="theme link" href="https://github.com/phi/phimes-blog" target="_blank">
           <span class="name">Theme by phi</span>
         </a>
-        <a class="cc link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">
+        <a
+          class="cc link"
+          href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans"
+          target="_blank"
+        >
           <i class="iconfont icon-line" />
           <i class="iconfont icon-by-line" />
           <i class="iconfont icon-nc-line" />
@@ -51,7 +55,7 @@ const isShowFooter = () => {
   if (observer.value) observer.value?.disconnect();
   observer.value = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      footerIsShow.value = entry.isIntersecting ? true : false;
+      footerIsShow.value = !!entry.isIntersecting;
     });
   });
   // 添加监视器

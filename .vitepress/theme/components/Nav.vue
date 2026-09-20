@@ -32,11 +32,11 @@
         <div class="nav-center">
           <div class="site-menu">
             <div v-for="(item, index) in theme.nav" :key="index" class="menu-item">
-              <span 
-                class="link-btn" 
+              <span
+                class="link-btn"
                 @click="item.link && !item.items ? handleNavClick(item.link) : null"
                 :style="{ cursor: item.link && !item.items ? 'pointer' : 'default' }"
-              > 
+              >
                 {{ item.text }}
               </span>
               <div v-if="item.items" class="link-child">
@@ -144,11 +144,11 @@ const goHome = () => {
 // 处理导航点击
 const handleNavClick = (link) => {
   if (!link) return;
-  
+
   // 判断是否为外部链接
-  if (link.startsWith('http://') || link.startsWith('https://')) {
+  if (link.startsWith("http://") || link.startsWith("https://")) {
     // 外部链接，在新标签页打开
-    window.open(link, '_blank');
+    window.open(link, "_blank");
   } else {
     // 内部链接，使用路由跳转
     router.go(link);

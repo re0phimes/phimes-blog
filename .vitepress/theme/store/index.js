@@ -40,7 +40,7 @@ export const mainStore = defineStore("main", {
       // 使用自定义右键菜单
       useRightMenu: false, //默认不开启
       // 背景模糊
-      backgroundUrl: true,
+      backgroundBlur: true,
       // 全站字体
       fontFamily: "hmos",
       // 全站字体大小
@@ -53,7 +53,7 @@ export const mainStore = defineStore("main", {
       backgroundType: "image",
       backgroundUrl: "/images/百万2.jpg",
       // 背景动画
-      bgAnimationEnabled: true
+      bgAnimationEnabled: true,
     };
   },
   getters: {},
@@ -75,10 +75,8 @@ export const mainStore = defineStore("main", {
         if (this.fontSize < 20) {
           this.fontSize++;
         }
-      } else {
-        if (this.fontSize > 14) {
-          this.fontSize--;
-        }
+      } else if (this.fontSize > 14) {
+        this.fontSize--;
       }
       const htmlElement = document.documentElement;
       htmlElement.style.fontSize = this.fontSize + "px";

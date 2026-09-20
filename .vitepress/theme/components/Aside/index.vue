@@ -1,9 +1,7 @@
 <template>
   <aside class="main-aside">
-    <!-- <Hello v-if="theme.aside.hello.enable" class="weidgets" /> -->
     <div class="sticky">
       <Toc v-if="theme.aside.toc.enable && showToc" class="weidgets" />
-      <Countdown class="weidgets" />
       <Tags v-if="theme.aside.tags.enable" class="weidgets" :context="context" />
       <SiteData v-if="theme.aside.siteData.enable" class="weidgets" />
     </div>

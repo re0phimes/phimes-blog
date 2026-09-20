@@ -44,3 +44,7 @@ docs/
 
 # Downloaded covers (regenerated on build)
 public/covers/
+
+# 构建产物：由 npm run build 的 fetch-popular 步骤生成，不该进版本库
+# （每次构建都会变，之前的做法导致每次构建都产生无意义 diff）
+data/popular.json

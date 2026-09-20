@@ -12,7 +12,7 @@
       :future="{
         preserveSharedStateOnUnmount: true,
       }"
-      index-name="imsyy"
+      :index-name="indexName"
       @state-change="searchChange"
     >
       <ais-configure :hits-per-page.camel="8" />
@@ -63,7 +63,7 @@ const store = mainStore();
 const router = useRouter();
 
 const { theme } = useData();
-const { appId, apiKey } = theme.value.search;
+const { appId, apiKey, indexName = "" } = theme.value.search;
 
 const searchClient = liteClient(appId, apiKey);
 

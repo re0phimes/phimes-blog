@@ -85,9 +85,6 @@
 
 <script setup>
 import { selectHomeFeed } from "@/utils/homeSections.mjs";
-
-const { theme } = useData();
-
 import {
   archiveFilter,
   applyArchiveFilter,
@@ -95,6 +92,8 @@ import {
   resetArchiveFilter,
   writeArchiveFilterToUrl,
 } from "@/composables/useArchiveFilter";
+
+const { theme } = useData();
 
 // 只有这一份状态：侧边栏标签、列表筛选控件改的都是它
 const sort = computed(() => archiveFilter.sort);

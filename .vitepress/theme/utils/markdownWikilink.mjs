@@ -38,7 +38,10 @@ const normalizeName = (input) =>
     .toLowerCase();
 
 const toBasename = (regularPath) => {
-  const file = String(regularPath || "").split("/").pop() || "";
+  const file =
+    String(regularPath || "")
+      .split("/")
+      .pop() || "";
   return file.replace(/\.[^.]+$/, "");
 };
 
@@ -88,22 +91,25 @@ export const createWikilinkResolver = ({ posts = [], tags = [] } = {}) => {
     const target = targetPart.trim();
     const hashIndex = target.indexOf("#");
     const pagePart = hashIndex === -1 ? target : target.slice(0, hashIndex);
-    const heading = hashIndex === -1 ? "" : target.slice(hashIndex + 1).split("#").pop().trim();
+    const heading =
+      hashIndex === -1
+        ? ""
+        : target
+            .slice(hashIndex + 1)
+            .split("#")
+            .pop()
+            .trim();
     // 显示文字：优先别名，其次笔记名（不含 # 小节），最后退回小节名
     const label = (aliasPart ?? (pagePart || heading)).trim() || target;
 
     if (!pagePart) {
       // [[#标题]] —— 当前页锚点
-      return heading
-        ? { href: `#${slugifyHeading(heading)}`, label, title: heading }
-        : { label };
+      return heading ? { href: `#${slugifyHeading(heading)}`, label, title: heading } : { label };
     }
 
     const post = matchPost(pagePart);
     if (post) {
-      const href = heading
-        ? `${post.permalink}#${slugifyHeading(heading)}`
-        : post.permalink;
+      const href = heading ? `${post.permalink}#${slugifyHeading(heading)}` : post.permalink;
       return { href, label, title: post.title || label };
     }
 
