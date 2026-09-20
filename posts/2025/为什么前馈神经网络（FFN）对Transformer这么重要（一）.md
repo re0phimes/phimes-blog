@@ -15,7 +15,7 @@ created: 2025-06-20
 
 FFN，也就是前馈神经网络（Feed-Forward Network）是一个相对简单的结构，原版的论文（attention is all you need）里这块描述的比较简洁，直接进入了更深入的部分，虽然叫”attention is all you need" 但是FFN同样重要。对于FFN，我最初的时候也搜了不少资料，依然觉得展开的太少了。所以这次我打算从FFN中的**线性和非线性**详细展开，当然，这少不了公式和数学的部分，不过我也尽可能的“说人话”。
 
-![transformer架构](https://image.phimes.top/img/20250516232343.png)
+![transformer架构](https://image.phimes.top/img/20250516232343.webp)
 
 ## 2 前馈神经网络（FFN）
 
@@ -23,9 +23,9 @@ FFN，也就是前馈神经网络（Feed-Forward Network）是一个相对简单
 
 FFN（Feed-Forward Network）作为Transformer架构中的核心组件，本质是一个**位置独立的两层感知机**。**通常FFN位于attention之后**，采用"扩展-压缩"维度路径（512→2048→512），通过高维空间中的非线性变换增强表征能力，在**高维空间捕捉更多的信息**，然后应用`ReLU`来**提取更丰富的特征表示**，最后再**映射回原本的维度**。
 
-![attention is all you need](https://image.phimes.top/img/202505161439206.png)
+![attention is all you need](https://image.phimes.top/img/202505161439206.webp)
 
-![FFN](https://image.phimes.top/img/20250516213552.png)
+![FFN](https://image.phimes.top/img/20250516213552.webp)
 > 注：图出自 3Blue1Brown。b站就可以搜到。
 ### 2.2 公式
 
@@ -112,7 +112,7 @@ $W_{rotate\_90}·X_{cat} = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix} \begin{
 
 这是一个二维线性方程，我们可以对它做任何线性复合变换，比如拉伸，和平移旋转。
 
-![多次线性变换](https://image.phimes.top/img/%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2.excalidraw.png)
+![多次线性变换](https://image.phimes.top/img/线性变换.excalidraw.webp)
 
 ##### 3.1.2.1 线性特征不变
 
@@ -142,7 +142,7 @@ $$FFN(x)=Activation(xW_1+b_1)W_2+b_2$$
 $$FFN(x)=ReLU(xW_{1}+b_{1})W_{2}+b_{2}$$
 而$ReLU$又是一个非常简单明了的公式：$ReLU(x) = max(0,x)$
 
-![ReLU](https://image.phimes.top/img/202505161434505.png)
+![ReLU](https://image.phimes.top/img/202505161434505.webp)
 
 其原理十分直观：**当输入值$x$小于0时，其对应的特征将被抑制为0；而当$x$大于或等于0时，则直接返回该特征值**。
 
@@ -157,11 +157,11 @@ $$FFN(x)=ReLU(xW_{1}+b_{1})W_{2}+b_{2}$$
 
 **在高维空间中，这些特征可能并不是泾渭分明地由单个神经元表示，而是分布式地编码在许多神经元的激活模式中。一个神经元的激活可能同时贡献于多个细微特征的表达。**
 
-![FFN的线性和非线性可视化对比-使用非线性](https://image.phimes.top/img/FFN%E7%9A%84%E7%BA%BF%E6%80%A7%E5%92%8C%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%8F%AF%E8%A7%86%E5%8C%96%E5%AF%B9%E6%AF%94-%E4%BD%BF%E7%94%A8%E9%9D%9E%E7%BA%BF%E6%80%A7.excalidraw.png)
+![FFN的线性和非线性可视化对比-使用非线性](https://image.phimes.top/img/FFN的线性和非线性可视化对比-使用非线性.excalidraw.webp)
 
 假设，我们没有使用非线性函数会怎样，我们在高维空间中得到了更多的细节，然后不断的应用线性变换，这些细节被展开又被压缩。但是他们依然只是这些细节，没有新的有效信息。最终即使组成了新的句子，也可能是毫无含义的内容，因为对于模型而言，很多信息没并没有被组合。
 
-![FFN的线性和非线性可视化对比-只使用线性](https://image.phimes.top/img/FFN%E7%9A%84%E7%BA%BF%E6%80%A7%E5%92%8C%E9%9D%9E%E7%BA%BF%E6%80%A7%E5%8F%AF%E8%A7%86%E5%8C%96%E5%AF%B9%E6%AF%94-%E5%8F%AA%E4%BD%BF%E7%94%A8%E7%BA%BF%E6%80%A7.excalidraw.png)
+![FFN的线性和非线性可视化对比-只使用线性](https://image.phimes.top/img/FFN的线性和非线性可视化对比-只使用线性.excalidraw.webp)
 
 
 到这里，我们终于说完了线性和非线性的特点。**这里也就是为什么我们的transformer中必须要有FFN，而FFN中又必须要又非线性的激活函数。**

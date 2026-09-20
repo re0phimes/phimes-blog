@@ -15,7 +15,7 @@ topic: [ai-coding, spec, maintainability, vibe-coding]
 
 Vibe Coding比较火的时候，可以在社交媒体上看到那些：一个人对着屏幕说了句“给我做一个类似 Uber 的界面”，然后 AI 刷刷刷生成了一套漂亮的 UI。
 
-![vibe coding时代](https://image.phimes.top/img/202512261503955.png)
+![vibe coding时代](https://image.phimes.top/img/202512261503955.webp)
 
 
 并且现在，“一句话生成XX”依然是模型基座能力评估一种方法。这种“一句话生成 ”通常只能产出一个看起来像模像样的独立模块。一旦规模变大，与其他模块交互变多，业务内容复杂起来。或者试图修改其中的一个核心逻辑，事情就麻烦起来了。
@@ -50,7 +50,7 @@ spec本质逻辑依然可以解释为：先规划，后执行。不过这个规�
 
 ## 3 可维护性的缺失
 
-![可维护性的缺失导致时间成本转移](https://image.phimes.top/img/202512261502487.png)
+![可维护性的缺失导致时间成本转移](https://image.phimes.top/img/202512261502487.webp)
 
 
 可维护性很少作为宣传的一个标准存在。这主要归结于大家的前置知识和编程水平不同，导致难以量化。所以市面上大部分能看到的标准通常是以下几点：
@@ -81,7 +81,7 @@ spec本质逻辑依然可以解释为：先规划，后执行。不过这个规�
 
 尽管现在大家也做了这样的探索也就是多个AI的结合。比如[cccc](https://github.com/ChesterRa/cccc)。一种多个AI工具并行结合的方案。我自己也试过类似codex mcp来做协同编码的工作。这些工作**很优秀**，但是如果编程上面那种自动化review的流程的话，我认为 **”还不够“**。
 
-![cccc仓库的多AI工具协调例子](https://image.phimes.top/img/202512261253025.png)
+![cccc仓库的多AI工具协调例子](https://image.phimes.top/img/202512261253025.webp)
 
 其缺陷十分明显，我相信这是所有在一线写代码的人都有过的经验，出了BUG，AI给了解决方案，但是几个小时过去了，怎么改都不对，最后搜索到一个帖子说了同样的情况，一试还真好了。
 
@@ -198,7 +198,7 @@ sorted_users = sorter.sort(users)
 
 其实聊到这里，可维护性的本质也就比较清晰了。就是 **“能看懂”**。
 
-![能看懂](https://image.phimes.top/img/202512261500568.png)
+![能看懂](https://image.phimes.top/img/202512261500568.webp)
 
 我们制定代码规范，以前是为了让团队协作顺畅，现在是为了**保护人类的能力边界**。
 
@@ -209,7 +209,7 @@ sorted_users = sorter.sort(users)
 
 它看过太多 GitHub 上的“最佳实践”，它试图把所有可能性都考虑到。但在实际工程中，你并不需要那么多最佳实现。你需要的是你能介入，如果AI做的事情让你介入变得无比复杂，那你实际要耗费更长的时间在这**最后一公里的优化上**。
 
-![认知减负](https://image.phimes.top/img/202512261504430.png)
+![认知减负](https://image.phimes.top/img/202512261504430.webp)
 
 ## 5 抛砖引玉：spec之外的辅助约束
 
@@ -234,7 +234,7 @@ sorted_users = sorter.sort(users)
 
 spec-kit确实有这个部分，但正如之前所说，spec-kit适合0-1项目。但是更多的时候，我们是已经拆分好了功能，然后对项目进行持续的更新，我更多用的openspec，或者自己编写的一些方案。通过agents.md或者claude.md里加入约束，我可以全局生效，是我目前比较喜欢的偏好，我也集成到了codex中的命令里，有我常用的两天不同于openspec的设计约束。
 
-![codex中的自定义prompt](https://image.phimes.top/img/202512261441427.png)
+![codex中的自定义prompt](https://image.phimes.top/img/202512261441427.webp)
 
 ## 6 冲突与权衡：规范不是死教条
 

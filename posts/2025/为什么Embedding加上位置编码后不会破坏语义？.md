@@ -64,7 +64,7 @@ PE_{test1}(pos) = sin(pos)
 $$
 根据我们熟悉的~~忘光了的~~ 小学还是初中的知识，sin和cos经过$2\pi$就会重复，也就是说。sin(2) = sin(2+2π)，也就是说每增加6.28左右的位置，我们就当做6好了，数值就很接近。这下机器也迷糊了。
 
-![sin计算](https://image.phimes.top/img/20250927214021751.png)
+![sin计算](https://image.phimes.top/img/20250927214021751.webp)
 
 由于我们直接把pos作为参数，所以即使，我们放到高维空间去，比如
 $$
@@ -97,7 +97,7 @@ $$
 所以回到我们的例子：
 `pos=2` 和 `pos=8`。在单一高频维度下，这两个位置的值会非常接近。但是现在，我们在高维空间下，改变了频次，看图来说就是这样：
 
-![不同频率sin曲线](https://image.phimes.top/img/20250927222247489.png)
+![不同频率sin曲线](https://image.phimes.top/img/20250927222247489.webp)
 
 - **对于位置 `pos=2`**:
     - 第一维（高频）: `sin(2) ≈ 0.909`
@@ -202,7 +202,7 @@ $$
 
 也就是说：**高维空间提供了信息分离的基础**
 
-![向量的信息可分离](https://image.phimes.top/img/20250926160420.png)
+![向量的信息可分离](https://image.phimes.top/img/20250926160420.webp)
 
 
 这可以说的通了。但是这里有两个前提。
@@ -347,7 +347,7 @@ print(f"    - 夹角范围: {pos_angles.min():.2f}° ~ {pos_angles.max():.2f}°"
 >[!Note]
 >虽然许多头表现出明显的专业化倾向，但它们的功能并非绝对单一。一个头可能主要关注位置，但同时也编码了部分语义或句法信息。专业化是一种显著趋势。也就说一个头虽然被称为”位置头“但是依然可能有语法或者句法的部分信息在里面。
 
-![Analyzing Multi-Head Self-Attention: Specialized Heads Do the Heavy Lifting, the Rest Can Be Pruned](https://image.phimes.top/img/20250926213732801.png)
+![Analyzing Multi-Head Self-Attention: Specialized Heads Do the Heavy Lifting, the Rest Can Be Pruned](https://image.phimes.top/img/20250926213732801.webp)
 
 当然除了这一个佐证以外，我们还能从数学公式上去进一步论证。
 

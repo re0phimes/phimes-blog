@@ -18,11 +18,11 @@ cover: https://image.phimes.top/img/202501101129372.png
 
 之前谈过agent的组成，base model、编排层和tools。为了更好的构建agent，如何调用tool，将是必不可少的知识点。
 
-![claude的agent结构](https://image.phimes.top/img/202501101129372.png)
+![claude的agent结构](https://image.phimes.top/img/202501101129372.webp)
 
 最近翻阅各llm的tools use的文档的时候，发现这块的文档的例子都比较简单。这次通过调用本地的`drissionpage`来实现一个deepseek一样的联网搜索。
 
-![deepseek的联网搜索按钮](https://image.phimes.top/img/20250201104751.png)
+![deepseek的联网搜索按钮](https://image.phimes.top/img/20250201104751.webp)
 
 
 ## 2 效果展示
@@ -30,11 +30,11 @@ cover: https://image.phimes.top/img/202501101129372.png
 我们用一个最近的例子，让llm获得访问外部信息的能力。以`2025年春晚机器人表演，会导致以后机器人觉醒后认为自己被羞辱么？`为问题。
 
 这是第一次，system输入后，llm知道了自己的执行逻辑。
-![image.png](https://image.phimes.top/img/20250202173119.png)
+![image.png](https://image.phimes.top/img/20250202173119.webp)
 
 于是当user prompt输入后，它开始发现需要调用工具，于是调用了我本地的方法进行搜索，然后进行了总结。
 
-![image.png](https://image.phimes.top/img/20250202203846.png)
+![image.png](https://image.phimes.top/img/20250202203846.webp)
 
 
 
@@ -57,7 +57,7 @@ Tool use（工具使用）是一种让大语言模型能够通过调用外部工
 
 **当我自己有一个tool，我要如何让llm调用它，以便于他可以访问外界的知识**
 
-![OPEN AI的工具调用流程](https://image.phimes.top/img/20250201175201.png)
+![OPEN AI的工具调用流程](https://image.phimes.top/img/20250201175201.webp)
 
 ### 3.3 调用的流程说明
 
@@ -396,7 +396,7 @@ tools = [
 
 `send_message`主要是封装了请求。这里要注意的是`data`里的`tool_choice`，一般来说使用"auto"就能让llm自己决定什么时候用什么tool。
 
-![image.png](https://image.phimes.top/img/20250202184143.png)
+![image.png](https://image.phimes.top/img/20250202184143.webp)
 
 - Auto模式：模型可以自由决定是否调用工具以及调用几个。
 
@@ -653,7 +653,7 @@ def process_conversation(messages: Optional[List[Dict[str, Any]]] = None):
 ```
 
 那么我会得到一个这样的response。
-![image.png](https://image.phimes.top/img/20250202193416.png)
+![image.png](https://image.phimes.top/img/20250202193416.webp)
 
 你会注意到`tools_calls`这个字段有两个tools调用的结果。**所以，不是一个问题它就只执行一次。**
 

@@ -9,8 +9,24 @@ import { buildPageViewPathCandidates, buildPostUrlData } from "./postUrl.mjs";
 // 封面图片缓存目录
 const COVERS_DIR = path.resolve(process.cwd(), "public/covers");
 
+// sharp 用于把封面转成 webp（体积通常只有原来的 1/3）。
+// 它是 devDependency，缺失时自动降级为直接存原图，不影响构建。
+let sharpLoader = null;
+const loadSharp = async () => {
+  if (sharpLoader === null) {
+    try {
+      const mod = await import("sharp");
+      sharpLoader = mod.default ?? mod;
+    } catch {
+      console.warn("[cover] 未安装 sharp，封面将保持原格式");
+      sharpLoader = false;
+    }
+  }
+  return sharpLoader;
+};
+
 /**
- * 下载外部图片到本地
+ * 下载外部图片到本地（尽量转成 webp）
  * @param {string} url - 图片 URL
  * @returns {Promise<string|null>} - 本地路径或 null
  */
@@ -20,25 +36,50 @@ const downloadCover = async (url) => {
   try {
     // 用 URL hash 作为文件名
     const hash = crypto.createHash("md5").update(url).digest("hex").slice(0, 12);
-    const ext = path.extname(new URL(url).pathname) || ".png";
-    const filename = `${hash}${ext}`;
-    const localPath = path.join(COVERS_DIR, filename);
+    const ext = (path.extname(new URL(url).pathname) || ".png").toLowerCase();
 
-    // 已存在则跳过
-    if (fs.existsSync(localPath)) {
-      return `/covers/${filename}`;
+    // 已经转过 webp 的优先复用
+    const webpPath = path.join(COVERS_DIR, `${hash}.webp`);
+    if (fs.existsSync(webpPath)) {
+      return `/covers/${hash}.webp`;
     }
 
     // 确保目录存在
     await fs.ensureDir(COVERS_DIR);
 
-    // 下载图片
-    const res = await fetch(url, { timeout: 10000 });
+    // 下载图片。
+    // 注意：Node 的 fetch 不支持 timeout 选项（原来这里写的 timeout: 10000 会被静默忽略），
+    // 要真正超时得用 AbortController。
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    let res;
+    try {
+      res = await fetch(url, { signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const buffer = Buffer.from(await res.arrayBuffer());
-    await fs.writeFile(localPath, buffer);
-    console.log(`[cover] Downloaded: ${filename}`);
+
+    // gif 保持原样（转 webp 会丢动画）
+    const sharp = ext === ".gif" ? false : await loadSharp();
+    if (sharp) {
+      try {
+        await sharp(buffer).webp({ quality: 82 }).toFile(webpPath);
+        console.log(`[cover] Downloaded + webp: ${hash}.webp`);
+        return `/covers/${hash}.webp`;
+      } catch (e) {
+        console.warn(`[cover] webp 转换失败，退回原图: ${e.message}`);
+      }
+    }
+
+    const filename = `${hash}${ext}`;
+    const localPath = path.join(COVERS_DIR, filename);
+    if (!fs.existsSync(localPath)) {
+      await fs.writeFile(localPath, buffer);
+      console.log(`[cover] Downloaded: ${filename}`);
+    }
     return `/covers/${filename}`;
   } catch (e) {
     console.warn(`[cover] Failed to download ${url}:`, e.message);

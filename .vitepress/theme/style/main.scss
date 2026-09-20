@@ -50,24 +50,45 @@
   --vp-c-bg-rgb: 250, 249, 245;
 }
 
+// 暗色：Anthropic 的暖色暗面（与亮色的米白画布是同一套设计语言）
 html.dark {
-  --main-color: #c2b637;
-  --main-color-hover: #d4c94a;
-  --main-color-bg: #f2b94b23;
-  --main-highlight-color: #c2b637;
-  --main-site-background: #18171d;
-  --main-card-background: #1b1c20;
-  --main-card-second-background: #21232a;
-  --main-font-color: #f7f7fa;
-  --main-font-second-color: #a1a2b8;
-  --main-card-border: #3d3d3f;
-  --main-border-shadow: #00000050;
-  --main-scrollbar-bar: rgba(200, 200, 223, 0.4);
-  --main-mask-background: rgba(0, 0, 0, 0.95);
-  --main-mask-Inverse-background: rgba(255, 255, 255, 0.08);
-  --main-mask-second-background: rgba(0, 0, 0, 0.45);
+  // 强调色与亮色同一支珊瑚；暗背景下提亮一档保证对比度
+  --main-color: #cc785c;
+  --main-color-hover: #e08a6b;
+  --main-color-bg: #cc785c24;
+  --main-highlight-color: #e0906f;
+  // 画布与卡片
+  --main-site-background: #181715; // surface-dark
+  --main-card-background: #1f1e1b; // surface-dark-soft
+  --main-card-second-background: #252320; // surface-dark-elevated
+  // 文字
+  --main-font-color: #faf9f5; // on-dark
+  --main-font-second-color: #a09d96; // on-dark-soft
+  // 线条与阴影
+  --main-card-border: #302e29;
+  --main-border-shadow: #00000059;
+  --main-scrollbar-bar: rgba(250, 249, 245, 0.28);
+  // 遮罩
+  --main-mask-background: rgba(24, 23, 21, 0.95);
+  --main-mask-Inverse-background: rgba(250, 249, 245, 0.08);
+  --main-mask-second-background: rgba(24, 23, 21, 0.45);
   --main-color-opacity: rgba(0, 0, 0, 0.15);
-  --vp-c-bg-rgb: 18, 18, 18;
+  --main-dark-opacity: rgba(255, 255, 255, 0.15);
+  --main-dark-shadow: #0000006e;
+  // 语义色：暗背景需要提亮。
+  // 之前这里没有覆盖，等于直接继承了 :root 的亮色值（深绿深红），在暗色下几乎看不清。
+  --main-info-color: #6cc4b0;
+  --main-info-color-gray: #5db8a633;
+  --main-warning-color: #e0a94a;
+  --main-warning-color-gray: #e8a55a33;
+  --main-success-color: #6fc98a;
+  --main-success-color-gray: #5db87233;
+  --main-error-color: #e0705f;
+  --main-error-color-gray: #c6454533;
+  --main-color-blue: #7fb0dd;
+  --main-color-gray: #8e8b82;
+  --main-color-red: #e0705f;
+  --vp-c-bg-rgb: 24, 23, 21;
 }
 
 // 字体
@@ -102,7 +123,8 @@ html {
       @media (max-width: 768px) {
         &.down {
           .nav-center {
-            background-color: #1b1c20 !important;
+            // 原来写死 #1b1c20（旧暗色卡片色），亮色模式 + 壁纸时会是一块突兀的黑
+            background-color: var(--main-card-background) !important;
           }
         }
       }
