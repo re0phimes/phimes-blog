@@ -28,26 +28,26 @@ llm越来越多，以前喜欢直接网页开一个窗口，但是现在因为�
 
 #### 2.1.1 Moonshot-v1
 
-![image.png](https://image.phimes.top/img/202501231234596.png)
+![image.png](https://image.phimes.top/img/202501231234596.webp)
 
 #### 2.1.2 gpt-4o-mini
-![image.png](https://image.phimes.top/img/202501231237683.png)
+![image.png](https://image.phimes.top/img/202501231237683.webp)
 
 #### 2.1.3 deepseek
 
-![image.png](https://image.phimes.top/img/202501231159156.png)
+![image.png](https://image.phimes.top/img/202501231159156.webp)
 
 ### 2.2 创建DeepSeek的API KEY
 
 首先登陆[DeepSeek Platform](https://platform.deepseek.com/api_keys)，创建自己的`API KEY`，记住这个，后面要用。
-![image.png](https://image.phimes.top/img/202501231157353.png)
+![image.png](https://image.phimes.top/img/202501231157353.webp)
 
 ## 3 客户端
 
 ### 3.1 怎么选
 
 客户端选择可以很多，web的，手机的，桌面端的。这里用的是[Cherry Studio](https://github.com/CherryHQ/cherry-studio)，目前综合使用起来体验还不错。如果有其他去客户端需求可以查看 [DeepSeek Integration](https://github.com/deepseek-ai/awesome-deepseek-integration/blob/main/README.md) （这是Deepseek提供的集成了其API的应用列表）。
-![image.png](https://image.phimes.top/img/20250123201120.png)
+![image.png](https://image.phimes.top/img/20250123201120.webp)
 
 ### 3.2 Cherry Studio 配置
 
@@ -61,12 +61,12 @@ llm越来越多，以前喜欢直接网页开一个窗口，但是现在因为�
 4. API地址一般来说cherry studio都给你写好了，除非你是自己运行的本地llm，一般都是兼容`openai api`风格的 `xxxxx/v1`格式，不需要手动修改。
 5. 模型名称和官网一致就行，用你想用的。如果是在不在到，cherry给出了该平台的说明文档地址，查一下。
 
-![image.png](https://image.phimes.top/img/202501231005637.png)
+![image.png](https://image.phimes.top/img/202501231005637.webp)
 
 #### 3.2.2 模型配置
 
 接着切到默认模型，把我们添加好的模型给`默认助手模型`选上。我一般使用DeepSeek Chat。
-![image.png](https://image.phimes.top/img/202501231105633.png)
+![image.png](https://image.phimes.top/img/202501231105633.webp)
 
 基础功能已经可以满足需求了，现在是时候解锁模型的全部潜能了。点击配置按钮，让我们进入Prompt调优阶段，为模型注入更精准的指令。
 ## 4 激活CoT的Prompt
@@ -90,7 +90,7 @@ llm越来越多，以前喜欢直接网页开一个窗口，但是现在因为�
 ```
 
 
-![gpt的token](https://image.phimes.top/img/20250123190641.png)
+![gpt的token](https://image.phimes.top/img/20250123190641.webp)
 
 
 通过`Thinking Claude`，我们也可以管窥基础prompt的CoT设计是什么样的。
@@ -116,20 +116,20 @@ llm越来越多，以前喜欢直接网页开一个窗口，但是现在因为�
 
 然后我们切换到对话界面，按照顺序点击。在对话框上方可以点击后设置提示词。在提示词中填入`Thinking Claude`的所有内容。
 
-![image.png](https://image.phimes.top/img/20250123193536.png)
+![image.png](https://image.phimes.top/img/20250123193536.webp)
 
 ### 5.2 测试效果
 
 用一个简单的问题来测试。当我们使用prompt让模型强制思考以后，可以发现右边的回答实际上更贴近我们想要的结果。现在我们可以愉快的开始使用llm了
 
-![image.png](https://image.phimes.top/img/20250123195902.png)
+![image.png](https://image.phimes.top/img/20250123195902.webp)
 
 
 ### 5.3 价格消耗
 
 我用V3模型的价格，因为我们的prompt就是12000个，因为一直都是这个prompt作为第一次输出，总是hit cache，价格低到可怕，50w的token只要2毛6！
 
-![image.png](https://image.phimes.top/img/20250123200759.png)
+![image.png](https://image.phimes.top/img/20250123200759.webp)
 
 ## 6 参考
 [Models & Pricing | DeepSeek API Docs](https://api-docs.deepseek.com/quick_start/pricing/)

@@ -18,7 +18,7 @@ topic: [qwen3, model-test, llm, moe]
 
 ### 概要速览
 
-![image.png](https://image.phimes.top/img/20250501133721.png)
+![image.png](https://image.phimes.top/img/20250501133721.webp)
 
 ### 模型规格
 
@@ -67,7 +67,7 @@ Qwen3的预训练过程相比前代模型有了显著升级：
 
 ### Qwen3的后训练
 
-![](https://image.phimes.top/img/20250501093811.png)
+![](https://image.phimes.top/img/20250501093811.webp)
 
   为了开发能够同时具备思考推理和快速响应能力的混合模型，Qwen3团队实施了一个创新的四阶段后训练流程：
 
@@ -140,7 +140,7 @@ user_prompt = """
 总token是1618个
 
 think的时间是22.5秒  
-![image.png](https://image.phimes.top/img/20250501175405.png)
+![image.png](https://image.phimes.top/img/20250501175405.webp)
 
 #### 输出结果
 
@@ -223,7 +223,7 @@ think的时间是22.5秒
 
 我在刚才原样的输入最后就加入了`no_think`测试了一下：
 
-![image.png](https://image.phimes.top/img/20250501180624.png)
+![image.png](https://image.phimes.top/img/20250501180624.webp)
 
 时间上看，`no_think`模式下首字延迟只有271ms。73的token输出也达到了理想性能。
 
@@ -376,7 +376,7 @@ think的时间是22.5秒
 
 #### 对比一下看区别
 
-![image.png](https://image.phimes.top/img/20250501162311.png)
+![image.png](https://image.phimes.top/img/20250501162311.webp)
 
 **蓝色**是我们看到的新的参数
 

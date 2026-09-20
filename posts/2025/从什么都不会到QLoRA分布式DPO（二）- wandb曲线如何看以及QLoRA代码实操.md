@@ -35,7 +35,7 @@ wandb https://wandb.ai/ 是一个在线平台，可以帮助记录模型训练�
 我们也可以给不同的用户设置不同的权限。但一般都是自己训练，随便设置team，自己是admin就行了。
 
 然后在你的命令行里敲下`wandb login`，输入你的token。因为我已经登录过了，所以提示如下。
-![wandb login](https://image.phimes.top/img/20250304120915.png)
+![wandb login](https://image.phimes.top/img/20250304120915.webp)
 
 ### 2.2 使用
 
@@ -162,13 +162,13 @@ if __name__ == "__main__":
 训练起来以后，访问 wandb.ai/home 以后，我们到对应的`project`（wandb init中设置的）找到对应的`name`。如果是训练过程中，你可以看到`status`是`running`。点进去就能找到一堆曲线记录。
 #### 2.4.1 train的曲线
 
-![image.png](https://image.phimes.top/img/20250227223107.png)
+![image.png](https://image.phimes.top/img/20250227223107.webp)
 
-![image.png](https://image.phimes.top/img/20250227223047.png)
+![image.png](https://image.phimes.top/img/20250227223047.webp)
 
 #### 2.4.2 eval的曲线
 
-![image.png](https://image.phimes.top/img/20250227223144.png)
+![image.png](https://image.phimes.top/img/20250227223144.webp)
 
 ### 2.5 我们关心哪些曲线？
 
@@ -420,11 +420,11 @@ https://github.com/bitsandbytes-foundation/bitsandbytes/blob/main/bitsandbytes/o
 #### 3.4.2 prepare_model_for_kbit_training
 
 另一个是在模型加载之后，peft加载之前。
-![image.png](https://image.phimes.top/img/20250307105205.png)
+![image.png](https://image.phimes.top/img/20250307105205.webp)
 
 看一下这个方法的用法：
 
-![image.png](https://image.phimes.top/img/20250307105727.png)
+![image.png](https://image.phimes.top/img/20250307105727.webp)
 
 这个方法属于`peft`库的utils。其实际代码说的也很明白，主要目的是包括：
 - **检测模型是否量化**：根据不同的量化方法适配。
@@ -560,7 +560,7 @@ for name, param in model.named_parameters():
 因为我们用了量化，冻结了基础的模型，使用LoRA训练，所以这个参数量是正常的。
 
 再看看第二个部分，对于所有LoRA要训练的的层，`requires_grad`应该都是`True`：
-![image.png](https://image.phimes.top/img/20250307150108.png)
+![image.png](https://image.phimes.top/img/20250307150108.webp)
 
 ### 3.6 完整代码
 

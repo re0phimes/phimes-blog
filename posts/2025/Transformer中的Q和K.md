@@ -89,7 +89,7 @@ class MultiHeadAttention(nn.Module):
 ### 3.1 transformer的流程
 
 整个transformer流程（不考虑multi-head的情况）：
-![image.png](https://image.phimes.top/img/20250129225821.png)
+![image.png](https://image.phimes.top/img/20250129225821.webp)
 
 
 1. 文本输入 → 词嵌入（Embedding）得到 `E`。
@@ -113,7 +113,7 @@ $$
 
 现在我们回到$Q、K、V$
 
-![image.png](https://image.phimes.top/img/20250127210837.png)
+![image.png](https://image.phimes.top/img/20250127210837.webp)
 
 大部分的blog和视频材料会说
 - Q是查询
@@ -132,7 +132,7 @@ $$
 
 `我来自福州，现在住在北京，是一个正值壮年的牛马程序员`
 
-![image.png](https://image.phimes.top/img/20250127221341.png)
+![image.png](https://image.phimes.top/img/20250127221341.webp)
 
 我们把这个句子拆解以后，比如`程序`个词，我们从语义上理解，他应该是和`员`连在一起的。但是机器不知道，所以它为了知道其他词的关系，会对`员`发出询问，这个询问是Q矩阵中的一个向量，我们称为$Q_{i}$。
 
@@ -181,7 +181,7 @@ $$
 V = XW_{v}
 $$
 
-![image.png](https://image.phimes.top/img/20250127211755.png)
+![image.png](https://image.phimes.top/img/20250127211755.webp)
 
 我们看一段多头注意力的代码，在注意力这个部分，直接就使用了一个transformer中的线性层，而这个线性层只规定了大小，其内容是完全随机的。
 
@@ -298,7 +298,7 @@ $Q$和$K^T$是进行点积，在[[Transformer中的Q和K 2025-01-29#2 前置知�
 更说人话一点，先前我们已经知道了attention其实是一个关于$Q、K、V$的公式。所以我们可以说transformer的注意力来自$Q、K、V$三个矩阵，而$Q、K、V$又是$XWq，XWk，XWv$得来的。$X$是词嵌入的向量，$Wq、Wk、Wv$是训练（反向传播）学习大量语料，抽象地表示了注意力的模式，是我们调整和训练的核心之一。所以当它乘以X的时候，我们就得到了$Q、K、V$，也就可以通过之前的公式计算出当前输入的注意力分布。（再结合这张图体会体会）
 
 
-![image.png](https://image.phimes.top/img/20250129225821.png)
+![image.png](https://image.phimes.top/img/20250129225821.webp)
 
 
 

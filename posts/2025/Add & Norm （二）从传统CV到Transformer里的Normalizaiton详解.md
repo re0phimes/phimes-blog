@@ -118,7 +118,7 @@ $$
 
 我们可以把`H×W`看做一个平面，然后C是平面的堆叠。他们组成一个立方体之后，我们可以在这个立方体是堆叠Batch。
 
-![CNN的数据形态](https://image.phimes.top/img/202507281358664.png)
+![CNN的数据形态](https://image.phimes.top/img/202507281358664.webp)
 
 这类数据具有空间结构，平移不变性，通道间存在相关性。
 
@@ -161,7 +161,7 @@ NLP 数据的特点是**序列长度可变（Variable-Length Sequences）**。�
 
 **NCHW 到 (B, S, D) 的转换确实有多种方式，核心在于如何将图像的“空间维度”（H 和 W）以及“通道维度”（C）重新组织和解释为序列长度（S）和特征维度（D）**。
 
-![CNN和NLP的数据形态对比](https://image.phimes.top/img/202507281400684.png)
+![CNN和NLP的数据形态对比](https://image.phimes.top/img/202507281400684.webp)
 
 比如这张图，一种直观的转换思路是将图像的二维空间维度进行“展平”（Flattening）操作。具体而言，对于一个维度为 `(N, C, H, W)` 的图像张量，可以通过将高度（H）与宽度（W）维度直接相乘，将其重塑为一个长度为 `H×W` 的一维序列。例如，一个批次为2、通道为3、尺寸为2x2的图像 `(2, 3, 2, 2)`，通过展平可转换为 `(2, 4, 3)` 的序列化张量，其中序列长度S为4，特征维度D为3。
 
@@ -178,11 +178,11 @@ NLP 数据的特点是**序列长度可变（Variable-Length Sequences）**。�
 
 现在，我们有了足够的前置知识，可以开始说说Normalization了。这张图出自[Group Normalization](http://arxiv.org/abs/1803.08494)，网上特别多。不过该图是说明了CNN中应用的4种Normalization方法。其中LayerNorm是我们要讲的主要情况，不过需要注意的是，**CNN中的LayerNorm和NLP的概念一样，但是因为数据形态和应用领域原因，作用域不同**。所以我们先从CNN开始说。
 
-![CNN中的四种Norm](https://image.phimes.top/img/20250710000710842.png)
+![CNN中的四种Norm](https://image.phimes.top/img/20250710000710842.webp)
 ### 5.1 CNN中的Norm
 #### 5.1.1 Batch Norm
 
-![BatchNorm](https://image.phimes.top/img/20250724212053715.png)
+![BatchNorm](https://image.phimes.top/img/20250724212053715.webp)
 
 BatchNorm作为开创性的工作，是我们不得不提到的一个Nomalization，它主要是应用在计算机视觉的CNN中。在NLP或者音频领域，则不被推荐。
 ##### 5.1.1.1 定义
@@ -216,7 +216,7 @@ $$
 
 BN的操作从图中，可以理解为沿着Channel的数量，有多少个channel，我们就沿着channel切n-1下，分割出来的每个channel下所有的 N x W x H个元素进行归一化。在torch中就是`dim1`。
 
-![BatchNorm in CNN](https://image.phimes.top/img/BatchNorm%20in%20CV.excalidraw.png)
+![BatchNorm in CNN](https://image.phimes.top/img/BatchNorm in CV.excalidraw.webp)
 
 ##### 5.1.1.4 理解BatchNorm的隐式表达
 
@@ -243,7 +243,7 @@ BN的操作从图中，可以理解为沿着Channel的数量，有多少个chann
 
 他给予了模型一定程度上恢复原有分布的能力，也就是说，通过Norm去平滑损失曲面的同时，还获得了可控的恢复能力。
 
-![BatchNorm数据不同阶段](https://image.phimes.top/img/20250708222240670.png)
+![BatchNorm数据不同阶段](https://image.phimes.top/img/20250708222240670.webp)
 
 >[!Question]  
 >那为什么Batch数量不够，Batch Norm就效果不好了？
@@ -261,7 +261,7 @@ BN的操作从图中，可以理解为沿着Channel的数量，有多少个chann
 
 用图说一下BatchNorm破坏文本语义的特点。比如我们有一个batch size为5的embedding后的数据，其feature dimension为10。如果我们对它进行BatchNorm会发什么？
 
-![在NLP上强行套用BN的效果](https://image.phimes.top/img/20250708231110678.png)
+![在NLP上强行套用BN的效果](https://image.phimes.top/img/20250708231110678.webp)
 
 图中黄色部分是我们BatchNorm应用对象。首先，所有的句子因为长度不同需要进行填充，所以我们有大量的`<PAD>`符号，这种符号相当于在有意义的数据中加入了大量假信息，从而污染了整个BN的作用域。
 
@@ -277,7 +277,7 @@ BN的操作从图中，可以理解为沿着Channel的数量，有多少个chann
 ##### 5.1.1.6 对比torch实现和手动实现BN
 
 假设我们的两组数据如下：  
-![batch size为2的数据](https://image.phimes.top/img/20250708233759625.png)
+![batch size为2的数据](https://image.phimes.top/img/20250708233759625.webp)
 
 **使用torch.nn.BatchNorm2d**
 
@@ -416,7 +416,7 @@ tensor([[[ 1.110815,  0.254283],
 
 #### 5.1.2 Layer Norm
 
-![CNN中的LayerNorm](https://image.phimes.top/img/20250724212119008.png)
+![CNN中的LayerNorm](https://image.phimes.top/img/20250724212119008.webp)
 
 ##### 5.1.2.1 定义
 
@@ -454,7 +454,7 @@ $$
 
 CNN下的LN，是沿着Batch切分，将一个样本中的所有的C、H、W的每一个元素都放在一起进行归一化。可以理解为，当batch size是n，我们就沿着batch size横着切n-1下。如果batch size是2，那只要一下。计算方式如下图：
 
-![LayerNorm in CNN](https://image.phimes.top/img/LayerNorm%20in%20CV.excalidraw.png)
+![LayerNorm in CNN](https://image.phimes.top/img/LayerNorm in CV.excalidraw.webp)
 
 ##### 5.1.2.4 理解CNN-LN的隐式表达
 
@@ -471,7 +471,7 @@ CNN 的一个核心假设是**通道之间承载着相对独立的、专门化�
 
 #### 5.1.3 InstanceNorm
 
-![InstancceNorm](https://image.phimes.top/img/20250724212023564.png)
+![InstancceNorm](https://image.phimes.top/img/20250724212023564.webp)
 
 ##### 5.1.3.1 定义
 
@@ -508,7 +508,7 @@ $$
 这种设计剥离了样本间的统计依赖，突显单幅图像内部的风格特征。**机制上，IN通过消除样本特有的光照、对比度等全局风格差异，使模型聚焦于局部结构信息。** 这种特性在风格迁移任务中被证实具有独特优势——生成图像的风格描述子（如纹理、笔触）主要依赖于单幅图像内部的统计特征。
 #### 5.1.4 Group Norm/Power Norm
 
-![GroupNorm](https://image.phimes.top/img/20250724212132552.png)
+![GroupNorm](https://image.phimes.top/img/20250724212132552.webp)
 
 ##### 5.1.4.1 定义
 组归一化（Group Normalization, GN）的提出，是在理解BN、IN和LN各自局限性的基础上进行的。BN依赖批次大小而在小batch场景下不稳定；IN完全独立处理每个通道，统计信息过于稀疏；LN对所有通道统一归一化，可能混合语义差异巨大的通道特征。GN提出了一种介于IN和LN之间的折中方案。
@@ -597,7 +597,7 @@ $$
 
 #### 7.1.1 数据形态及其特点
 
-![LayerNorm in Transformer](https://image.phimes.top/img/20250724230056.png)
+![LayerNorm in Transformer](https://image.phimes.top/img/20250724230056.webp)
 
 > [!Question]
 > 为什么LayerNorm在NLP里和传统CV里是不一样的？这里怎么是一个“条”，而CNN里是一个“面”
@@ -624,14 +624,14 @@ $$
 
 #### 7.1.3 Transformer中的LayerNorm的可视化
 
-![LayerNorm的实际应用示例](https://image.phimes.top/img/202507291349631.png)
+![LayerNorm的实际应用示例](https://image.phimes.top/img/202507291349631.webp)
 
 还是这个图，黄色部分是我们的LayerNorm的作用域，可以看出来，它是对一个词本身的feature dimension进行归一化，然后执行`BatchSize x Sequence Length`次，在这里就是$5*10 = 50$次。
 
 这里可以直观的看出其在可变文本领域的优势，由于每个词元的归一化统计量完全在其自身的特征维度上计算，一个序列中真实词元的归一化计算**不会受到另一序列中PAD词元统计特征的干扰**
 #### 7.1.4 LayerNorm和InstanceNorm的区别
 
-![InstanceNorm VS Transformer-LN](https://image.phimes.top/img/InstanceNorm%20VS%20Transformer-LN.excalidraw.png)
+![InstanceNorm VS Transformer-LN](https://image.phimes.top/img/InstanceNorm VS Transformer-LN.excalidraw.webp)
 
 我们再来看一下Transformer-LayerNorm和CNN-InstanceNorm的图像区别，虽然他们看上去都是“一条”。**但是作用域不同，所以含义不同。**（反复强调） 一个是横着的条，一个是竖着的条。
 
@@ -646,7 +646,7 @@ Transformer下的LayerNorm的意思是就是将单个样本里的单个sequence�
 理论说完，我们看一下`PyTorch`[InstanceNorm2d — PyTorch 2.7 documentation](https://docs.pytorch.org/docs/stable/generated/torch.nn.InstanceNorm2d.html) 
 中怎么说的。
 
-![PyTorch中InstanceNorm2d的解释](https://image.phimes.top/img/20250629004201998.png)  
+![PyTorch中InstanceNorm2d的解释](https://image.phimes.top/img/20250629004201998.webp)  
 
 这里需要注意的是，PyTorch 将 IN的`affine` 默认为 `False` 是一个工程上的设计选择，可能基于在某些非风格迁移的生成任务（如某些GANs）中，禁用仿射变换能获得更稳定或更好的结果的考虑。而不是说理论领域的IN就没有仿射变换。
 
@@ -714,7 +714,7 @@ print(f"两个输出是否足够接近? {are_close}")
 
 我们只查看一个，可以看出手动实现和torch自带的结果是一样的。并且我们通过allclose计算整体，得到了True
 
-![LayerNorm输出结果对比](https://image.phimes.top/img/202507291254301.png)
+![LayerNorm输出结果对比](https://image.phimes.top/img/202507291254301.webp)
 
 ### 7.2 RMSNorm
 
@@ -832,7 +832,7 @@ else:
 
 得到结果：
 
-![RMSNorm输出结果对比](https://image.phimes.top/img/202507291313177.png)
+![RMSNorm输出结果对比](https://image.phimes.top/img/202507291313177.webp)
 
 #### 7.2.3 LayerNorm/RMSNorm在Transformer中的代码
 

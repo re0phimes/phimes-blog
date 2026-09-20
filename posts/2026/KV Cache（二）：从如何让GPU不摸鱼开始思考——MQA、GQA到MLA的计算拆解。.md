@@ -57,7 +57,7 @@ cover: https://image.phimes.top/img/202601040941582.png
 
 ## 4 MQA和GQA结构
 
-![MHA、GQA、MQA对比](https://image.phimes.top/img/202601040941582.png)
+![MHA、GQA、MQA对比](https://image.phimes.top/img/202601040941582.webp)
 
 MHA、MQA、GQA 三者其实改动很小，思想上就是从KV完全一一对应到分组对应。所以代码结构几乎完全相同。我们可以用一份代码去看出改动区别。
 
@@ -126,7 +126,7 @@ mqa = UnifiedAttention(d_model=512, num_heads=8, num_kv_heads=1)
 
 通过config.json其实能直观的看出来不同attention区别。`num_attention_heads`和`num_key_value_heads`的数量对比。同样多的就是MHA，`num_key_value_heads`少于`num_attention_heads`就是MQA或者GQA，如果`num_key_value_heads = 1`就是MQA了，如果不是1，那就是GQA了。
 
-![Qwen3-4B-Instruct的config.json](https://image.phimes.top/img/20260120214616200.png)
+![Qwen3-4B-Instruct的config.json](https://image.phimes.top/img/20260120214616200.webp)
 
 
 #### 4.1.2 模型结构：线性层维度
@@ -397,7 +397,7 @@ $$
 
 只要 BS 够大，计算时间总有可能追上搬运时间，前提是**计算的斜率 $t_c$ 比搬运的斜率 $a$ 更陡**。
 
-![不同Attention在当前场景下的斜率](https://image.phimes.top/img/20260218223900.png)
+![不同Attention在当前场景下的斜率](https://image.phimes.top/img/20260218223900.webp)
 
 也就是说，在这个场景里，MQA的斜率是比计算的低的。这两条直线，随着BS的增大，最终会相交。GQA-8和MHA则绝对不可能。
 
@@ -482,7 +482,7 @@ MQA/GQA 是"有损压缩"：通过砍 KV Head 来减少搬运量，但模型能�
 - 存储时：把 KV 压缩成一个很小的 Latent Vector
 - 推理时：用闲置算力把 Latent Vector "解压"回完整的 KV
 
-![MLA低秩压缩的思想](https://image.phimes.top/img/MLA%E4%BD%8E%E7%A7%A9%E5%8E%8B%E7%BC%A9.freeform.png)
+![MLA低秩压缩的思想](https://image.phimes.top/img/MLA低秩压缩.freeform.webp)
 
 我们至少有两套矩阵，压缩的Down-Project和还原的Up-Project。可以分别表示为 $W_{DKV}$ 和 $W_{UKV}$ ，将原本的$x_{t}$的$Q_{t}$和$K_{t}$压缩成$c_{t}^{KV}$
 
@@ -855,7 +855,7 @@ DeepSeek-V2（$n_h=128$）中则是：
 
 在 Memory Bound 的时候，减少搬运的收益远大于增加计算的代价。head 数量越多，"以算换存"的效果越彻底。
 
-![2 model comparison](https://image.phimes.top/img/Compute-Bound%E7%BF%BB%E8%BD%AC.comparison.png)
+![2 model comparison](https://image.phimes.top/img/Compute-Bound翻转.comparison.webp)
 
 
 > [!Note]
@@ -864,7 +864,7 @@ DeepSeek-V2（$n_h=128$）中则是：
 
 引用苏神原文：
 
-![Su博客)](https://image.phimes.top/img/20260220133456.png)
+![Su博客)](https://image.phimes.top/img/20260220133456.webp)
 ### 6.7 RoPE 的挑战与 Decoupled RoPE
 
 MLA 的数学逻辑看似完美闭环。但在工程落地时，遇到了一个棘手的问题：**旋转位置编码（RoPE）**。
@@ -991,7 +991,7 @@ $$
 > 而 MLA 的 Decoupled RoPE 用拼接代替相加，拼接后内积天然等于分段内积之和，交叉项在数学上直接消失了。所以本质上是同一个认知，**attention score
   天然可分解为内容和位置两部分**。只不过从"模型自己学着分"变成了"架构帮你分好"。
 
-![Decoupled-RoPE](https://image.phimes.top/img/Decoupled-RoPE%E6%9E%B6%E6%9E%84.freeform.png)
+![Decoupled-RoPE](https://image.phimes.top/img/Decoupled-RoPE架构.freeform.webp)
 
 ## 7 结语
 

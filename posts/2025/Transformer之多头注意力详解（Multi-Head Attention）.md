@@ -34,7 +34,7 @@ created: 2025-05-15
 接着应用注意力机制，生成随机的权重矩阵$W_q$ 、$W_k$、$W_v$，  
 $W \in \mathbb{R}^{512 \times 512}$。通过计算得到Q、K、V
 
-![QKV](https://image.phimes.top/img/20250127211755.png)
+![QKV](https://image.phimes.top/img/20250127211755.webp)
 
 接着计算注意力得到：
 
@@ -201,7 +201,7 @@ $$
 - 计算效率：头数量增加可以提升模型的并行性。
 ### 输入的维度是如何变化的
 
-![Transformer输入变化过程.png](https://image.phimes.top/img/Transformer%E8%BE%93%E5%85%A5%E5%8F%98%E5%8C%96%E8%BF%87%E7%A8%8B.png)
+![Transformer输入变化过程.png](https://image.phimes.top/img/Transformer输入变化过程.webp)
 
 ## 最后
 

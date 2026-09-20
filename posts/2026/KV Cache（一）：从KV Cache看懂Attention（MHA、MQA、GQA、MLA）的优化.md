@@ -73,7 +73,7 @@ $$
 
 用一个简化的例子来推一下，如果我的输入是“别偷着学了带带我啊”，可以表示为\[“别”, “偷着”, “学了”，“带带”，“我”，“啊”]。我们简化维度，设为6。也就是一个token会被表示成一个`[1, 6]`的向量，合起来就是一个`[6, 6]`的矩阵。在一个多头注意力下，我们的head为2，则会得到如下过程：
 
-![MHA的Prefill流程示意](https://image.phimes.top/img/20260101232311654.png)
+![MHA的Prefill流程示意](https://image.phimes.top/img/20260101232311654.webp)
 
 我们每个head，都要执行一次attention的score计算：
 
@@ -108,7 +108,7 @@ Prefill阶段，因为所有的输入我们都没见过，需要并行的计算�
 
 如果没有kv cache，我们完整的迭代计算prefill之后的每一个next token，其过程都是要完整的计算一遍所有内容，和prefill阶段没有任何区别。
 
-![MHA decoding（no kv cache）](https://image.phimes.top/img/20260101232926976.png)
+![MHA decoding（no kv cache）](https://image.phimes.top/img/20260101232926976.webp)
 
 但是仔细观察一下就能发现，QKV以及我们的attention score，浅色的部分都是计算过的。在上面的流程中，其实我们是重新计算了一遍。这种做法使得生成 $N$ 个 token 的总计算复杂度飙升至 $O(N^2)$（不包括矩阵乘法本身的复杂度，仅看处理量级）。
 
@@ -118,7 +118,7 @@ Prefill阶段，因为所有的输入我们都没见过，需要并行的计算�
 
 很明显，这是非常不合理的。
 
-![prefill和decoding（no cache）比较](https://image.phimes.top/img/20260101235324312.png)
+![prefill和decoding（no cache）比较](https://image.phimes.top/img/20260101235324312.webp)
 
 > [!question] 
 > 既然 $x_1$ 到 $x_{t-1}$ 的 K 和 V 矩阵在之前的步骤中是固定的，为什么不把它们存下来？
@@ -129,7 +129,7 @@ Prefill阶段，因为所有的输入我们都没见过，需要并行的计算�
 
 于是真正的计算流程就变成了这样，对于K和V，我们只要把缓存的K和V取出来，和新计算的$\vec{k}_{new​}$以及$\vec{v}_{new​}$拼接上即可：
 
-![decoding cache流程](https://image.phimes.top/img/20260101235721324.png)
+![decoding cache流程](https://image.phimes.top/img/20260101235721324.webp)
 
 现在，生成第 $t$ 个 token 的流程变了，输入的完整序列加上了上一次生成的$t-1$个token。表示为：
 
@@ -164,7 +164,7 @@ $$
 
 **这就是KV cache。** 我们再对比一下区别：
 
-![decoding的kv cache和no cache比较](https://image.phimes.top/img/20260103214824123.png)
+![decoding的kv cache和no cache比较](https://image.phimes.top/img/20260103214824123.webp)
 
 
 > [!note]
@@ -242,7 +242,7 @@ $$
 
 这时候KV cache用空间换来的时间又迎来问题了。因为**搬运**也是要成本的。而决定是搬运效率的就是**显存带宽**。
 
-![显存带宽结构](https://image.phimes.top/img/20260102235736.png)
+![显存带宽结构](https://image.phimes.top/img/20260102235736.webp)
 
 显存带宽有大有小，这里是大概的一个范围。具体可以参考：[nvidia-ada-gpu-architecture.pdf](https://image.nvidia.com/aem-dam/Solutions/geforce/ada/nvidia-ada-gpu-architecture.pdf) 或者其他Nvidia架构的官网资料。
 
@@ -269,7 +269,7 @@ $$
 
 **7.5/0.04=187.5**
 
-![愣住](https://image.phimes.top/img/20260103221544678.png)
+![愣住](https://image.phimes.top/img/20260103221544678.webp)
 
 好好好，187.5倍，也就是说。搬运的时候，计算单元**大部分时间是闲着的**。这就真不能忍了，我摸鱼也就算了，显卡也摸鱼？而且这只是1G的KV Cache，如果你的KV Cache积累到10G、20G或者更多呢？
 
@@ -314,7 +314,7 @@ MQA 通过让所有查询头共享单一组键值头来达成极致的缓存压�
 
 GQA 则通过将查询头分组并让每组共享一组键值头，提供了一个可灵活配置的权衡点，允许模型开发者在推理速度和模型质量之间进行更精细的平衡。
 
-![MHA、GQA、MQA对比](https://image.phimes.top/img/202601040941582.png)
+![MHA、GQA、MQA对比](https://image.phimes.top/img/202601040941582.webp)
 
 
 ### 6.1 MQA 

@@ -3,6 +3,7 @@ import markdownItAttrs from "markdown-it-attrs";
 import container from "markdown-it-container";
 import markdownKatex from "./markdownKatex.mjs";
 import markdownWikilink, { createWikilinkResolver } from "./markdownWikilink.mjs";
+import imageSize from "../assets/imageSize.mjs";
 
 // SVG 图标
 const icons = {
@@ -212,13 +213,17 @@ const markdownConfig = (md, themeConfig, { posts = [], tags = [] } = {}) => {
   // 图片
   md.renderer.rules.image = (tokens, idx) => {
     const token = tokens[idx];
-    const src = md.utils.escapeHtml(token.attrs[token.attrIndex("src")][1]);
+    const rawSrc = token.attrs[token.attrIndex("src")][1];
+    const src = md.utils.escapeHtml(rawSrc);
     const alt = md.utils.escapeHtml(token.content);
+    // 有尺寸就输出 width/height，浏览器能提前占好位置，图片加载完不会把正文顶下去
+    const size = imageSize[rawSrc];
+    const sizeAttrs = size ? ` width="${size[0]}" height="${size[1]}"` : "";
     if (!themeConfig?.fancybox?.enable) {
-      return `<img src="${src}" alt="${alt}" loading="lazy">`;
+      return `<img src="${src}" alt="${alt}" loading="lazy" decoding="async"${sizeAttrs}>`;
     }
     return `<a class="img-fancybox" href="${src}" data-fancybox="gallery" data-caption="${alt}">
-                <img class="post-img" src="${src}" alt="${alt}" loading="lazy" />
+                <img class="post-img" src="${src}" alt="${alt}" loading="lazy" decoding="async"${sizeAttrs} />
                 <span class="post-img-tip">${alt}</span>
               </a>`;
   };

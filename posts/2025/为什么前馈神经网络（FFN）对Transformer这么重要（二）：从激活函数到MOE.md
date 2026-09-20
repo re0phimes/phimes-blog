@@ -83,7 +83,7 @@ x & \text{当 } x \geq 0 \\
 \end{cases}
 $$
 
-![ReLU](https://image.phimes.top/img/matplot_figure_0_.png)
+![ReLU](https://image.phimes.top/img/matplot_figure_0_.webp)
 
 
 #### 3.1.2 ReLU的优点
@@ -96,7 +96,7 @@ ReLU的优点可以体现在以下三个方面：
 > 尤其注意的事，ReLU缓解梯度消失问题，主要集中体现在早期S形激活函数（sigmoid和tanh）相比，缓解梯度消失问题。我们可以从这个他们的导数来看。这里比较了三个激活函数的一阶导。ReLU在正区间提供了恒定为1的梯度，只要神经元被激活，那梯度就能无衰减的向前传递。
 > 而tanh和sigmoid则会在输入绝对值较大的情况下无限逼近于0，这就造成了连乘后的梯度指数级衰减，迅速变得非常小。并且sigmoid的一阶导的取值区间在(0, 0.25]所以梯度传递的本身效果就会导致梯度信号会被压缩。
 
-![ReLU、tanh、sigmoid导数](https://image.phimes.top/img/202505271446227.png)
+![ReLU、tanh、sigmoid导数](https://image.phimes.top/img/202505271446227.webp)
 
 #### 3.1.3 ReLU的缺点
 
@@ -201,7 +201,7 @@ x & \text{if } x \geq 0 \\
 $$
 
 
-![ELU在不同α值的图像](https://image.phimes.top/img/202505291641340.png)
+![ELU在不同α值的图像](https://image.phimes.top/img/202505291641340.webp)
 
 #### 3.3.2 那么实际情况下真的有那么多人用ELU么？
 
@@ -227,7 +227,7 @@ $$
 $$
 \text{GELU}(x) = x \cdot \Phi(x) = x \cdot \frac{1}{2} \left[1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right]
 $$
-![GELU及其近似](https://image.phimes.top/img/202505302210865.png)
+![GELU及其近似](https://image.phimes.top/img/202505302210865.webp)
 $Φ(x)$ 的含义: $Φ(x) = P(X ≤ x)$，其中 $X \sim N(0, 1)$属于标准正态分布。它表示一个标准正态随机变量小于或等于 x 的概率。
 	- 当 $x$ 很大时，$Φ(x)$ 趋近于 1，$GELU(x) ≈ x$ ，类似 ReLU。
 	- 当 $x$ 很小时 (比如远小于0)，$Φ(x)$ 趋近于 0，`GELU(x) ≈ 0`。
@@ -251,16 +251,16 @@ $2/√π$：这是一个归一化常数，使得 `erf(∞) = 1` 并且 `erf(-
 
 在论文[[1606.08415] Gaussian Error Linear Units (GELUs)](https://arxiv.org/abs/1606.08415)中，作者就提出了GELU的高效近似算法。这个算法使用tanh去逼近正常的GELU。这个方法好在于许多数学库（如libm, Intel MKL, cuDNN）提供了针对特定硬件指令集的`exp`和`tanh`的快速实现，例如通过查表、分段多项式逼近（如泰勒展开或切比雪夫多项式）等方法。这种优化使得`tanh`的计算远快于直接计算`erf`函数。 尽管是近似，但该方法在实践中被证明能够保持与精确GELU相近的模型性能
 
-![Gassian Error Linear Units原文公式](https://image.phimes.top/img/20250531204247320.png)
+![Gassian Error Linear Units原文公式](https://image.phimes.top/img/20250531204247320.webp)
 
 两个GELU图像如下图所示，人眼来看几乎是完全重合了。
 
-![GELU与其近似的图像比对](https://image.phimes.top/img/20250602011657808.png)
+![GELU与其近似的图像比对](https://image.phimes.top/img/20250602011657808.webp)
 
 
 现在我们从代码角度去看，`torch.nn.GELU`的参数，approximate为true时就会使用这种高效的近似。
 
-![torch中的GELU](https://image.phimes.top/img/202505301328411.png)
+![torch中的GELU](https://image.phimes.top/img/202505301328411.webp)
 
 #### 3.4.3 GELU的优点
 
@@ -328,11 +328,11 @@ $$
 - `sigma`: 就是`sigmoid`函数
 - $β$:是一个可训练的参数，通常默认为1，不过当它为1.702时也是一个特殊值。
 
-![Swish及其导数](https://image.phimes.top/img/20250602005402854.png)
+![Swish及其导数](https://image.phimes.top/img/20250602005402854.webp)
 
 有没有发现，这个图像居然和GELU高度重合相似。是的，如果我们把$β$设为1.702，就会发现两个几乎重叠的曲线。
 
-![Swish的β为1.702时和GELU的比较](https://image.phimes.top/img/20250602005651007.png)
+![Swish的β为1.702时和GELU的比较](https://image.phimes.top/img/20250602005651007.webp)
 
 > [!question]
 > 所以为什么GELU是transformer中一度推荐的激活函数而Swish不是
@@ -351,7 +351,7 @@ $$
 
 2017年，GLU改变了传统的FFN的`升维-非线性-降维`的结构，将**第一个升维的线性变换和非线性变换**整体替换为门控机制。GLU将输入 `X` 通过两个独立的线性变换成两部分。一部分 `(XW + b)` 作为主要的待处理信息，另一部分 `σ(XV + c)` 经过Sigmoid函数后作为门控信号。这个门控信号决定了第一部分信息中哪些元素应该被保留或抑制。如果门控值接近1，则对应的信息通过；如果接近0，则信息被抑制。从下面这张图来看可以看出标准的FFN和门控结构的FFN的区别：
 
-![标准FFN和门控结构对比](https://image.phimes.top/img/FFN%E7%BB%93%E6%9E%84%E5%AF%B9%E6%AF%94.excalidraw.png)
+![标准FFN和门控结构对比](https://image.phimes.top/img/FFN结构对比.excalidraw.webp)
 
 ### 4.1 GLU/SwiGLU/GeGLU
 
@@ -397,7 +397,7 @@ $$\text{Activation} \in \{ \sigma, \text{GELU}, \text{Swish}, \text{ReLU}\cdots 
 
 因为GLU的这些缺点，所以我们替换掉$σ$，通过Swish和GELU两种激活函数替代公式中的$σ$，从而得到GLU的变体SwiGLU和GeGLU，这两种激活函数均有不错的表现，尤其是对比传统的ReLU、GELU、Swish等，所以大部分人认为在计算性能可接受的情况下，门控机制是一种更为优秀的结构。在原文中提到SwiGLU的分数高达74.56，是平均表现最好的FFN结构。
 
-![GLU vaiants Imporve Transformer原文benchmark对比](https://image.phimes.top/img/20250601124450349.png)
+![GLU vaiants Imporve Transformer原文benchmark对比](https://image.phimes.top/img/20250601124450349.webp)
 
 > [!question]
 > 那么为什么没有使用门控结构时GELU更为流行，而到了门控结构这里是SwiGLU更优呢？
