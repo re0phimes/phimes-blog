@@ -1,9 +1,10 @@
 ---
 title: KV Cache（一）：从KV Cache看懂Attention（MHA、MQA、GQA、MLA）的优化之路
 tags:
+  - llm
   - Attention
   - KV-Cache
-  - memorybound
+  - memory-bound
 date: 2026-1-4
 status: published
 lastUpdated: 2026-02-27
