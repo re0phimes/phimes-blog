@@ -24,6 +24,20 @@ import {
 } from "./theme/utils/postUrl.mjs";
 import { transformSitemapItems } from "./theme/utils/sitemap.mjs";
 
+/**
+ * 构建排除清单 —— srcDir 是仓库根目录，VitePress 默认会把根下所有 .md 编译成公开页面。
+ * 内部文档（交接文档、测试报告、设计稿、计划）绝不能被发布，否则会随 sitemap
+ * 一起被搜索引擎和 AI 爬虫抓走。新增内部文档时优先直接放进 docs/。
+ */
+const srcExclude = [
+  "**/README.md",
+  "**/TODO.md",
+  "**/PROJECT_STATE.md",
+  "**/TEST_REPORT.md",
+  "docs/**",
+  "plan/**",
+];
+
 // 获取全局数据
 const postData = await getAllPosts();
 
@@ -188,7 +202,7 @@ export default withPwa(
         }),
     },
     // 构建排除
-    srcExclude: ["**/README.md", "**/TODO.md", "**/TEST_REPORT.md", "docs/plans/**", "plan/**"],
+    srcExclude,
     // transformHead
     transformPageData: async (pageData) => {
       // 新增：URL 结构优化
