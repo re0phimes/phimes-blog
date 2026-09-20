@@ -32,6 +32,7 @@
  │
  ├─ views.phimes.top ─→ Worker: blog-page-views   文章阅读量（KV 存储）
  ├─ stats.phimes.top ─→ Worker: analytics-dashboard  统计看板
+ │                      （源码都在仓库 workers/ 下，三个 Worker 都需要手动部署）
  │
  └─ phimes.top / www / aifaq / demo / quiz ─→ Vercel（**尚未迁移**）
 ```
