@@ -4,12 +4,12 @@
 
 ## 当前线上路由
 
-| 路由 | Worker | 作用 |
-|---|---|---|
-| `phimes.top/*` | `site-analytics` | 统计入口（见下） |
-| `*.phimes.top/*` | `site-analytics` | 同上，兜底所有子域 |
-| `views.phimes.top/*` | `blog-page-views` | 文章阅读量 API（KV 存储） |
-| `stats.phimes.top/*` | `analytics-dashboard` | 统计看板（Basic Auth） |
+| 路由                 | Worker                | 作用                      |
+| -------------------- | --------------------- | ------------------------- |
+| `phimes.top/*`       | `site-analytics`      | 统计入口（见下）          |
+| `*.phimes.top/*`     | `site-analytics`      | 同上，兜底所有子域        |
+| `views.phimes.top/*` | `blog-page-views`     | 文章阅读量 API（KV 存储） |
+| `stats.phimes.top/*` | `analytics-dashboard` | 统计看板（Basic Auth）    |
 
 路由按**具体程度**匹配，所以 `views` 和 `stats` 会覆盖 `*.phimes.top/*` 那条兜底。
 
@@ -21,12 +21,14 @@
 - `bot_visits` —— 爬虫 / 扫描器 / 空 UA / 404 探测（blob8 = kind）
 
 blob 布局：
+
 ```
 site_visits: 1 path | 2 ipHash | 3 ""(保留) | 4 referer | 5 country
              6 city | 7 hostname | 8 ua | 9 clientClass | 10 status
 bot_visits:  1 path | 2 ""(保留) | 3 ua | 4 hostname | 5 country
              6 ipHash | 7 botType | 8 kind | 9 status
 ```
+
 > blob3/blob2 原来是**明文 IP**，2026-09-20 起不再写入，位置保留以兼容旧查询。
 
 ### 部署（注意两点）
@@ -42,6 +44,7 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/
 ```
 
 `metadata.json`：
+
 ```json
 {
   "main_module": "site-analytics.js",
@@ -58,6 +61,33 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/
 只读看板，Basic Auth 保护（密码在 Worker secret `DASH_PASSWORD`）。
 另外需要两个 secret：`CF_ANALYTICS_TOKEN`（权限只要 Account Analytics Read）、`CF_ACCOUNT_ID`。
 
+功能：时间范围切换（1h / 6h / 24h / 7d / 30d / 90d，≤24h 按小时聚合，其余按天）、
+真人/爬虫趋势对比、爬虫分类、访问最多页面、来源国家、设备系统、Referer、
+以及「内容优化建议」（对比每篇文章的真人阅读量 vs 爬虫抓取次数）。
+
+### 两个 Analytics Engine SQL 的坑
+
+AE 的 SQL 是 ClickHouse 的**受限子集**，实测：
+
+| 写法                       | 结果                                |
+| -------------------------- | ----------------------------------- |
+| `multiIf(...)`             | ❌ `unknown function call: MULTIIF` |
+| `CASE WHEN ... END`        | ❌ `unsupported expression type`    |
+| `if(a,b,c)`（可嵌套）      | ✅                                  |
+| `toStartOfHour(timestamp)` | ✅                                  |
+| `count(DISTINCT blob)`     | ✅                                  |
+| `uniq()`                   | ❌ `unknown function call: UNIQ`    |
+
+### 一个模板字符串的坑
+
+看板的内联 `<script>` 是嵌在 Worker 源码的**模板字符串**里的。
+模板字符串会吃掉一层反斜杠：写 `\/` 到页面就变成 `/`，
+于是 `p.replace(/^\/posts\//, '')` 到浏览器变成 `/^/posts//` —— **非法正则**，
+整个脚本直接 SyntaxError，页面只剩一个「加载中…」。
+
+所以那段代码里**不要用带反斜杠转义的正则**，用 `indexOf` / `slice` 代替。
+ESLint 的 `no-useless-escape` 也能顺带发现这个问题。
+
 ## 常用查询
 
 Analytics Engine SQL API：
@@ -70,15 +100,15 @@ curl -X POST "https://api.cloudflare.com/client/v4/accounts/$ACC/analytics_engin
           GROUP BY path ORDER BY n DESC LIMIT 20"
 ```
 
-| 想查什么 | 关键条件 |
-|---|---|
-| 真人页面浏览 | `site_visits` + `blob9 != 'feed'` |
-| RSS 订阅者 | `site_visits` + `blob9 = 'feed'` |
-| 爬虫总数 | `bot_visits` |
-| 只在扫描器 | `bot_visits` + `blob8 = 'scanner'` |
-| 404 探测 | `bot_visits` + `blob8 = 'notfound'` |
-| 按爬虫类型 | `GROUP BY blob7`（botType） |
-| 真人 UV | `count(DISTINCT blob2)`（IP 哈希） |
+| 想查什么     | 关键条件                            |
+| ------------ | ----------------------------------- |
+| 真人页面浏览 | `site_visits` + `blob9 != 'feed'`   |
+| RSS 订阅者   | `site_visits` + `blob9 = 'feed'`    |
+| 爬虫总数     | `bot_visits`                        |
+| 只在扫描器   | `bot_visits` + `blob8 = 'scanner'`  |
+| 404 探测     | `bot_visits` + `blob8 = 'notfound'` |
+| 按爬虫类型   | `GROUP BY blob7`（botType）         |
+| 真人 UV      | `count(DISTINCT blob2)`（IP 哈希）  |
 
 > ⚠️ `blob8` / `blob9` 是 2026-09-20 才加的。之前的旧数据没有分类，
 > 所以历史「真人」统计里仍含扫描器噪音。
