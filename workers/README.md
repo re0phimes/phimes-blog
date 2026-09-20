@@ -110,6 +110,24 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/
 
 现在用的是旧值（保证 UV 连续），换不换由你决定。
 
+### 下钻（明细）
+
+看板里所有表格的行都**可点击**（行首有个 `›`），点进去看该分组的原始记录：
+时间 / 路径 / 国家 / 城市 / **IP 或哈希** / AS 组织 / Referer / 状态码 / 完整 UA。
+
+后端是 `/api/detail?range=&src=bot|human&dim=&val=&limit=`，
+`dim` 走白名单（见 `DETAIL_DIMS`），值经 `sqlStr()` 转义后拼进 SQL ——
+Analytics Engine 的 SQL API 不支持参数化查询，所以这是必须的。
+
+**能看到的 IP 分两种：**
+
+| 数据            | 显示                      | 说明                          |
+| --------------- | ------------------------- | ----------------------------- |
+| 2026-09-20 之前 | **明文 IP**               | 旧格式，共 26,296 + 40,728 条 |
+| 2026-09-20 之后 | 加盐哈希（16 位十六进制） | 不能反推 IP                   |
+
+明细页会明确标出「其中 N 条是旧数据，带明文 IP」。
+
 ### 两个 Analytics Engine SQL 的坑
 
 AE 的 SQL 是 ClickHouse 的**受限子集**，实测：
