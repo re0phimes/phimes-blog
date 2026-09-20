@@ -79,7 +79,7 @@ const activeTocItem = throttle(
     // 容错高度
     const bufferheight = 120;
     // 遍历所有标题
-    for (let header of headers) {
+    for (const header of headers) {
       const rect = header.getBoundingClientRect();
       // 检查标题是否在视口中
       if (rect.top - bufferheight <= 0 && rect.bottom + bufferheight >= 0) {
@@ -127,8 +127,8 @@ watch(
     const tocAllDom = document.getElementById("toc-all");
     const activeTocItem = document.getElementById("toc-" + val);
     if (!tocAllDom || !activeTocItem) return false;
-    activeTocHeight.value = activeTocItem?.offsetTop - 2 || 0;
-    tocAllDom?.scrollTo({ top: activeTocHeight.value - 80, behavior: "smooth" });
+    activeTocHeight.value = activeTocItem.offsetTop - 2 || 0;
+    tocAllDom.scrollTo({ top: activeTocHeight.value - 80, behavior: "smooth" });
   },
 );
 

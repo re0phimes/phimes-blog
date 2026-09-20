@@ -1,65 +1,98 @@
 <h1 align="center"> phimes-blog </h1>
-<p align="center">A Simple VitePress Theme for phimes-blog</p>
+
+<p align="center">在 AI 时代思考与分享 · 基于 VitePress 的个人博客</p>
+
+<p align="center">
+  <a href="https://blog.phimes.top/">线上站点</a> ·
+  <a href="https://www.phimes.top/">主站</a> ·
+  <a href="https://aifaq.phimes.top/">AI FAQ</a> ·
+  <a href="https://demo.phimes.top/">Demo</a>
+</p>
 
 ---
 
-Preview: 👻 [無名小栈](https://blog.imsyy.top/)
-
-Docs: 📖 [主题文档](https://blog.imsyy.top/pages/categories/%E4%B8%BB%E9%A2%98%E6%96%87%E6%A1%A3)
-
 > [!NOTE]
-> 该主题本意为自用，所以部分配置可能并不完善，包括评论系统的支持，目前仅支持 Artalk，如有其他需求，可提交 pr
+> 本站主题最初 fork 自 [vitepress-theme-blog](https://github.com/imsyy/vitepress-theme-blog)，
+> 之后做了较大改造：亮色主题换成 Anthropic 配色、首页改成「头条 + 历史文章（可排序/筛选）」、
+> 数学公式改用 katex 0.16 并修掉了渲染问题、支持 Obsidian 双链语法等。
 
-## Hello
-
-🎉 你好啊，很高兴你选择了 [phimes-blog](https://github.com/phi/phimes-blog)，你可以查看 [主题文档](https://github.com/phi/phimes-blog) 以了解更多，如果你在使用本主题时遇到问题，你可以在 [GitHub](https://github.com/phi/phimes-blog) 中正确的提交 [issues](https://github.com/phi/phimes-blog/issues) 以获取社区的帮助。
-
-## 快速开始
-
-若您有修改主题的需求，请确保您拥有基础的前端知识，最好能掌握 [Vue.js](https://vuejs.org/) 框架的相关知识，并确保阅读了 `VitePress` 的 [官方文档](https://vitepress.dev/zh/guide/what-is-vitepress)
-
-### 书写新的文章
-
-你可以直接在站点根目录中的 `posts` 文件夹中直接新建 `markdown` 文件来书写，您的文件路径即为实际生成的网址路径。
-
-### 添加新的页面
-
-你可以直接在站点根目录中的 `pages` 文件夹中直接新建 `markdown` 文件来实现新建页面，您的文件路径即为实际生成的网址路径。
-
-主题中已经内置了几个常用页面以供参考。
-
-### 主题配置
-
-本主题提供了一个 `themeConfig.mjs` 文件用来配置，它位于 `.vitepress\theme\assets\themeConfig.mjs`，你可以将它复制一份并移动至根目录中，在这里里面的修改将会覆盖初始配置，请注意，**请不要更改文件名或者删除原配置文件，否则它将会不起作用！**
-
-### 静态文件
-
-通常情况下，静态文件处于根目录下的 `public` 文件夹中，通常用于存放字体或图片等文件信息。
-
-了解更多：[资源处理](https://vitepress.dev/zh/guide/asset-handling#asset-handling)
-
-### 部署
-
-如果你之前使用过类似于 [Hexo](https://hexo.io/zh-cn/) 一样的静态站点生成器的话，那么这二者是极为相似的，都是构建为静态文件后上传至服务器以实现访问，当然，你也可以借助 GitHub 的 Actions 以实现自动部署，具体细节请参考我的博客，此处不再细说。
+## 本地开发
 
 ```bash
-# 安装依赖
-npm run install
-# 构建
-npm run build
+npm install
+npm run dev        # 开发服务器（默认 http://localhost:9877）
+npm run build      # 生产构建 → .vitepress/dist
+npm run preview    # 预览构建产物
+npm run lint       # ESLint
+npm run format     # Prettier
 ```
 
-建议使用 `pnpm`，若未安装，可使用 `npm install pnpm -g` 来安装。
+构建前会先跑 `npm run fetch-popular`，把文章浏览量抓到 `data/popular.json`，
+首页「按热度排序」依赖这份数据。**该文件是构建产物，已在 .gitignore 中。**
+
+## 目录结构
+
+```
+.vitepress/
+  config.mjs                 # VitePress 站点配置
+  init.mjs                   # 合并 themeConfig（用户配置覆盖默认配置）
+  theme/
+    index.mjs                # 主题入口
+    assets/themeConfig.mjs   # 主题默认配置（不要直接改这个）
+    themeConfig.mjs -> 根目录 # 站点自己的配置
+    components/              # 组件（由 unplugin-vue-components 自动按目录导入）
+    views/                   # 页面级组件（首页/文章/归档…）
+    utils/                   # markdown 插件、构建期工具
+    style/                   # 全局样式（main.scss / post.scss）
+    composables/             # 组合式函数
+    store/                   # Pinia store
+posts/                       # 文章（markdown + frontmatter）
+pages/                       # 独立页面
+page/[num].md                # 分页跳板（→ /?p=N）
+public/                      # 静态资源（covers 为构建期下载的封面）
+scripts/                     # 构建脚本
+tests/                       # 单元测试（node --test）
+```
+
+## 写文章
+
+在 `posts/` 下新建 markdown 文件，frontmatter 示例：
+
+```yaml
+---
+title: 文章标题
+tags: [llm, transformer]
+categories: [llm-principles]
+date: 2026-01-16
+cover: https://image.phimes.top/img/xxx.png
+---
+```
+
+- 图片统一放 `image.phimes.top`（阿里云 OSS 的 CNAME）。该 bucket 配了**防盗链白名单**，
+  白名单里包含 `http://127.0.0.1:*` 和 `http://localhost:*`，所以本地开发也能正常显示。
+- 支持 `[[笔记名]]` 这种 Obsidian 双链语法，会解析成站内链接（见 `utils/markdownWikilink.mjs`）。
+- 数学公式用 `$...$` / `$$...$$`，由 `utils/markdownKatex.mjs` 渲染（katex 0.16）。
+
+## 配置
+
+站点配置在仓库根目录的 `themeConfig.mjs`，它通过 `Object.assign` **浅合并**覆盖
+`.vitepress/theme/assets/themeConfig.mjs` 里的默认值。
+
+> ⚠️ 因为是浅合并，**任何嵌套对象只要在用户配置里写了一半，就会整个替换掉默认值**。
+> 例如你写 `aside: { tags: {...} }`，那么 `aside.toc`、`aside.siteData` 就都没了。
+> 改动 `aside` / `home` 这类嵌套结构时记得把完整的键写全。
+
+## 部署
+
+推送到 `master` 后由 Vercel 自动构建部署。另外有一个 GitHub Actions
+（`.github/workflows/trigger-faq-rebuild.yml`）会在推送后触发 AI FAQ 站点的重建。
+
+## 测试
 
 ```bash
-pnpm install
-pnpm build
+node --test tests/
 ```
 
-通常在未修改配置文件的情况下，打包后的文件会处于根目录下的 `.vitepress\dist` 目录中，您可以将其中的文件上传至任意服务器以访问。
+## License
 
-## 更多
-
-更多信息请参考：[主题文档](https://github.com/phi/phimes-blog)
-
-> Powered by VitePress
+MIT

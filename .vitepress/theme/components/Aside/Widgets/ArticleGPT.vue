@@ -35,10 +35,10 @@ const abstractData = ref(frontmatter.value.articleGPT || "");
 const showType = ref(false);
 
 const fakeGptIntro =
-  "我是無名开发的摘要生成助理 FakeGPT，如你所见，这是一个假的 GPT，所有文本皆源于本地书写的内容。我在这里只负责显示，并仿照 GPT 的形式输出，如果你像我一样囊中羞涩，你也可以像我这样做，当然，你也可以使用 Tianli 开发的 TianliGPT 来更简单地实现真正的 AI 摘要。";
+  "我是 Phimes 写的「假 GPT」——如你所见，这个名字就是字面意思：没有接任何模型，只是把文章摘要套了个对话式的外壳。上面那段摘要是我写文章时手写的，点标题可以在这段说明和摘要之间切换。想用真·AI 摘要的话，可以看看开源的本地摘要方案，或者直接调一家模型 API。";
 
 const syncAbstract = () => {
-  abstractData.value = showType.value ? fakeGptIntro : (frontmatter.value.articleGPT || "");
+  abstractData.value = showType.value ? fakeGptIntro : frontmatter.value.articleGPT || "";
   loading.value = false;
 };
 

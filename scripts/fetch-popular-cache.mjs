@@ -22,9 +22,13 @@ if (!url) {
   process.exit(1);
 }
 
-const timeoutMs = Number(process.env.POPULAR_FETCH_TIMEOUT_MS || 8000);
+// 默认 8 秒实测不够：那个 /all 接口经常要 20~45 秒才返回，超时后脚本会把
+// 空对象写回 data/popular.json，导致首页「按热度排序」静默失效。
+const timeoutMs = Number(process.env.POPULAR_FETCH_TIMEOUT_MS || 45000);
 const controller = new AbortController();
 const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+const absOutput = path.resolve(process.cwd(), outputFile);
 
 let data;
 try {
@@ -35,7 +39,13 @@ try {
   data = await res.json();
 } catch (error) {
   console.warn(`[popular-cache] fetch failed (non-blocking): ${url}`, error.message);
-  // 不退出，继续使用空数据或现有缓存
+  // 关键：拉取失败时不要覆盖已有缓存。
+  // 之前这里写回 {}，把上一次成功抓到的浏览量全部抹掉了。
+  if (await fs.pathExists(absOutput)) {
+    console.warn(`[popular-cache] 保留已有缓存，不做覆盖: ${outputFile}`);
+    process.exit(0);
+  }
+  console.warn(`[popular-cache] 没有已有缓存，写入空对象: ${outputFile}`);
   data = {};
 } finally {
   clearTimeout(timer);
@@ -46,9 +56,7 @@ if (!Array.isArray(data) && !(data && typeof data === "object")) {
   process.exit(1);
 }
 
-const absOutput = path.resolve(process.cwd(), outputFile);
 await fs.ensureDir(path.dirname(absOutput));
 await fs.writeJSON(absOutput, data, { spaces: 2 });
 
 console.log(`[popular-cache] wrote: ${outputFile}`);
-

@@ -24,9 +24,5 @@ export const createBlogIndex = async (config, themeConfig) => {
     url: `${hostLink}${getPostPublicPath(post)}`,
   }));
 
-  writeFileSync(
-    path.join(config.outDir, "index.json"),
-    JSON.stringify(index, null, 2),
-    "utf-8",
-  );
+  writeFileSync(path.join(config.outDir, "index.json"), JSON.stringify(index, null, 2), "utf-8");
 };

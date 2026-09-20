@@ -1,6 +1,10 @@
 node_modules
 dist
 .vitepress/dist
+.vitepress/cache
 .cache
 auto-imports.d.ts
 components.d.ts
+
+# ESLint 默认会忽略点开头的目录，不显式解除的话 .vitepress/ 下的代码一个都检查不到
+!/.vitepress

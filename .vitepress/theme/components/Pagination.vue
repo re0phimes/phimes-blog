@@ -90,7 +90,7 @@ const totalPages = computed(() => Math.ceil(props.total / props.limit));
 
 // 分页指示器数据
 const pageNumber = computed(() => {
-  let pages = [];
+  const pages = [];
   const current = currentPage.value;
   const total = totalPages.value;
   const wingSize = 2; // 当前页前后要显示的页码数

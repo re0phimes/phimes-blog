@@ -46,12 +46,12 @@
     "vitepress-plugin-tabs": "^0.5.0"
   },
   "dependencies": {
+    "@fancyapps/ui": "^5.0.36",
     "@types/node": "^22.7.5",
     "@vite-pwa/vitepress": "^0.4.0",
     "@vueuse/core": "^11.1.0",
     "algoliasearch": "^5.8.0",
     "aplayer": "^1.10.1",
-    "dayjs": "^1.11.13",
     "instantsearch.js": "^4.74.2",
     "katex": "^0.16.38",
     "lodash-es": "^4.17.21",

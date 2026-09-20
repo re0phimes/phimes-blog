@@ -37,8 +37,7 @@ const checkDelimiter = (state, pos) => {
     // 后面紧跟空白，不能作为起始
     canOpen: next !== SPACE && next !== TAB,
     // 前面是空白，或后面紧跟数字，不能作为结束
-    canClose:
-      prev !== SPACE && prev !== TAB && !(next >= 0x30 && next <= 0x39),
+    canClose: prev !== SPACE && prev !== TAB && !(next >= 0x30 && next <= 0x39),
   };
 };
 
@@ -148,10 +147,8 @@ export const markdownKatex = (md) => {
     alt: ["paragraph", "reference", "blockquote", "list"],
   });
 
-  md.renderer.rules.math_inline = (tokens, idx) =>
-    renderMath(tokens[idx].content, false, md);
-  md.renderer.rules.math_block = (tokens, idx) =>
-    `${renderMath(tokens[idx].content, true, md)}\n`;
+  md.renderer.rules.math_inline = (tokens, idx) => renderMath(tokens[idx].content, false, md);
+  md.renderer.rules.math_block = (tokens, idx) => `${renderMath(tokens[idx].content, true, md)}\n`;
 };
 
 export default markdownKatex;

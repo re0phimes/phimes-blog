@@ -66,7 +66,7 @@ const loadPopularData = () => {
 const getPostMDFilePaths = async () => {
   try {
     // 获取所有 md 文件路径
-    let paths = await globby(["**.md"], {
+    const paths = await globby(["**.md"], {
       ignore: ["node_modules", "pages", ".vitepress", "README.md"],
     });
     // 过滤路径，只包括 'posts' 目录下的文件
@@ -106,9 +106,9 @@ export const getAllPosts = async () => {
     const popularData = loadPopularData();
 
     // 获取所有 Markdown 文件的路径
-    let paths = await getPostMDFilePaths();
+    const paths = await getPostMDFilePaths();
     // 读取和处理每个 Markdown 文件的内容
-    let posts = await Promise.all(
+    const posts = await Promise.all(
       paths.map(async (item) => {
         try {
           // 读取文件内容
@@ -119,14 +119,28 @@ export const getAllPosts = async () => {
           const { birthtimeMs, mtimeMs } = stat;
           // 解析 front matter
           const { data, content: markdownContent } = matter(content);
-          const { title, date, categories, description, tags, tag, top, cover, version, lastUpdated, topic } = data;
+          const {
+            title,
+            date,
+            categories,
+            description,
+            tags,
+            tag,
+            top,
+            cover,
+            version,
+            lastUpdated,
+            topic,
+          } = data;
 
           // Most Popular（策展/排序字段，MVP 预留）
           // - popular: boolean
           // - popular_rank / popularRank: number（越大越靠前，具体策略在首页 selector 中定义）
           const rawPopularRank = data?.popular_rank ?? data?.popularRank;
           const popularRankNumber =
-            rawPopularRank === undefined || rawPopularRank === null ? undefined : Number(rawPopularRank);
+            rawPopularRank === undefined || rawPopularRank === null
+              ? undefined
+              : Number(rawPopularRank);
 
           const urlData = buildPostUrlData({
             relativePath: item,
@@ -145,9 +159,13 @@ export const getAllPosts = async () => {
             legacyCleanPath,
           }).reduce((sum, currentPath) => sum + Number(popularData[currentPath] || 0), 0);
           // 优先使用 frontmatter 中的 popularRank，否则使用浏览量
-          const popularRank = Number.isFinite(popularRankNumber) ? popularRankNumber : (viewCount > 0 ? viewCount : undefined);
+          const popularRank = Number.isFinite(popularRankNumber)
+            ? popularRankNumber
+            : viewCount > 0
+              ? viewCount
+              : undefined;
           const popular = Boolean(data?.popular) || popularRank !== undefined;
-          
+
           // 从文章内容中提取第一张图片作为封面
           let articleCover = cover; // 优先使用 front matter 中的 cover
           if (!articleCover && markdownContent) {
@@ -163,30 +181,29 @@ export const getAllPosts = async () => {
           if (articleCover) {
             articleCover = await downloadCover(articleCover);
           }
-          
+
           // 如果没有描述，从文章内容中提取摘要
           let autoDescription = description;
           if (!autoDescription && markdownContent) {
             // 移除markdown语法，提取纯文本
             const plainText = markdownContent
-              .replace(/^#{1,6}\s+/gm, '') // 移除标题
-              .replace(/\*\*(.*?)\*\*/g, '$1') // 移除粗体
-              .replace(/\*(.*?)\*/g, '$1') // 移除斜体
-              .replace(/`(.*?)`/g, '$1') // 移除行内代码
-              .replace(/```[\s\S]*?```/g, '') // 移除代码块
-              .replace(/!\[.*?\]\(.*?\)/g, '') // 移除图片
-              .replace(/\[.*?\]\(.*?\)/g, '') // 移除链接
-              .replace(/\n+/g, ' ') // 替换换行为空格
+              .replace(/^#{1,6}\s+/gm, "") // 移除标题
+              .replace(/\*\*(.*?)\*\*/g, "$1") // 移除粗体
+              .replace(/\*(.*?)\*/g, "$1") // 移除斜体
+              .replace(/`(.*?)`/g, "$1") // 移除行内代码
+              .replace(/```[\s\S]*?```/g, "") // 移除代码块
+              .replace(/!\[.*?\]\(.*?\)/g, "") // 移除图片
+              .replace(/\[.*?\]\(.*?\)/g, "") // 移除链接
+              .replace(/\n+/g, " ") // 替换换行为空格
               .trim();
-            
+
             // 提取前150个字符作为摘要
             if (plainText.length > 0) {
-              autoDescription = plainText.length > 150 
-                ? plainText.substring(0, 150) + '...' 
-                : plainText;
+              autoDescription =
+                plainText.length > 150 ? plainText.substring(0, 150) + "..." : plainText;
             }
           }
-          
+
           // 计算文章的过期天数
           const expired = Math.floor(
             (new Date().getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24),
@@ -327,6 +344,6 @@ export const getAllArchives = (postData) => {
     }
   });
   // 提取年份并按降序排序
-  const sortedYears = Object.keys(archiveData).sort((a, b) => parseInt(b) - parseInt(a));
+  const sortedYears = Object.keys(archiveData).sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
   return { data: archiveData, year: sortedYears };
 };

@@ -151,7 +151,7 @@ export const jumpRedirect = (html, themeConfig, isDom = false) => {
           const attributes = el.attribs;
           // 重构属性字符串，保留原有属性
           let attributesStr = "";
-          for (let attr in attributes) {
+          for (const attr in attributes) {
             if (Object.prototype.hasOwnProperty.call(attributes, attr)) {
               attributesStr += ` ${attr}="${attributes[attr]}"`;
             }

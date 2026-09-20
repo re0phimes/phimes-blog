@@ -168,8 +168,7 @@ import { storeToRefs } from "pinia";
 import { mainStore } from "@/store";
 
 const store = mainStore();
-const { themeType, fontFamily, fontSize, bgAnimationEnabled } =
-  storeToRefs(store);
+const { themeType, fontFamily, fontSize, bgAnimationEnabled } = storeToRefs(store);
 </script>
 
 <style lang="scss" scoped>

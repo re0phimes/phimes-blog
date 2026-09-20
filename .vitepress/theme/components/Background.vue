@@ -55,7 +55,15 @@ const { themeValue, bgAnimationEnabled } = storeToRefs(store);
 }
 
 @keyframes gridMove {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 60px 60px, 60px 60px; }
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      60px 60px,
+      60px 60px;
+  }
 }
 </style>
