@@ -4,9 +4,9 @@
       <div class="nav-all">
         <!-- 导航栏左侧 -->
         <div class="left-nav">
-          <!-- 回首页按钮（原来这里是折叠菜单 + 站点标题，已按要求简化） -->
-          <div class="site-name" title="回到博客首页" @click="goHome">
-            {{ theme.siteMeta.homeLabel || "Home Page" }}
+          <!-- 回首页按钮：房子图标，样式与右侧图标按钮一致 -->
+          <div class="home-btn nav-btn" title="回到博客首页" @click="goHome">
+            <i class="iconfont icon-home" />
           </div>
         </div>
         <!-- 导航栏菜单 -->
@@ -209,50 +209,7 @@ const handleNavClick = (link) => {
       flex-direction: row;
       align-items: center;
       min-width: 200px;
-      .site-name {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        font-weight: bold;
-        height: 34px;
-        padding: 0 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        transition: transform 0.3s;
-        cursor: pointer;
-        // hover 时反色，用箭头而不是图标字体
-        // （原来这里是 iconfont 的 \e032 房子字形，依赖上游主题的图标集）
-        &::after {
-          content: "→";
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          color: var(--main-card-background);
-          background-color: var(--main-color);
-          font-size: 20px;
-          border-radius: 25px;
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        @media (min-width: 768px) {
-          &:hover {
-            &::after {
-              opacity: 1;
-            }
-          }
-          &:active {
-            transform: scale(0.95);
-          }
-        }
-      }
+      // .home-btn 复用 .nav-btn 的圆形图标样式，这里不需要额外定义
     }
     .nav-center {
       display: flex;
