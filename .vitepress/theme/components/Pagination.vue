@@ -184,6 +184,16 @@ onMounted(() => {
   width: 100%;
   height: 40px;
   animation: fade-up 0.6s 0.4s backwards;
+
+  // 与页脚对齐：页脚（.footer-social）相对整个视口居中，而这里原先只相对
+  // 主内容列居中 —— 右侧有侧边栏时主内容列被挤窄，分页就会比页脚偏左
+  // (侧边栏宽 + 间距) / 2 = (300px + 1rem) / 2 = 158px。
+  // 用 padding-left 把居中参考系整体右移一个「侧边栏 + 间距」。
+  // 1200px 以下侧边栏隐藏（见 Home.vue），所以不需要偏移。
+  // 全局是 border-box，所以 width:100% 加 padding 不会溢出。
+  @media (min-width: 1201px) {
+    padding-left: calc(var(--home-aside-width, 300px) + var(--home-content-gap, 1rem));
+  }
   .page-item {
     position: relative;
     display: flex;
