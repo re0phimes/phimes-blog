@@ -28,38 +28,29 @@ export const themeConfig = {
   postSize: 8,
   // 首页（Home）
   home: {
-    // 首页开头 Highlights 模块
-    highlights: {
-      // 总开关
+    // 首屏头条文章
+    hero: {
+      // 关掉后首页直接进列表
       enable: true,
+      // 指定头条：支持 permalink / id / 文件名 / 标题；留空 = 最新一篇
+      post: "",
+      // 头条上方的小标签
+      label: "最新",
+      // 手写摘要（推荐）。留空会退回构建时截取的正文开头，读起来不像摘要。
+      excerpt:
+        "完整对比 MHA、MQA、GQA、MLA 四种 Attention 在 KV Cache 优化上的表现，每一步都用具体数字算清楚：每种方案到底能省多少？代价是什么？瓶颈卡在哪？",
+    },
+    // 头条下方的封面次条
+    featured: {
+      // 关掉后只剩头条 + 列表
+      enable: true,
+      title: "最新文章",
+      // 展示条数
+      limit: 3,
       // 仅首页第一页展示（/，不含 /page/2+；不含分类/标签页）
       onlyFirstPage: true,
-      // Most Popular（MVP：策展式，非真实 PV 排行）
-      mostPopular: {
-        title: "Most Popular",
-        // 展示条数
-        limit: 6,
-        // 策展式列表：按文章 regularPath 指定，顺序固定
-        curated: [],
-        // 可选：构建期读取外部统计缓存（例如从 PV/热度服务导出的 popular.json）
-        // - 启用后会在构建期把 rank/score 合并进 postData.popularRank
-        // - 文件不存在/解析失败时自动降级，不会阻塞 build
-        externalCache: {
-          enable: false,
-          // 相对项目根目录的路径
-          file: "data/popular.json",
-        },
-        // 查看全部
-        moreLink: "/pages/archives",
-      },
-      // Recent Posts
-      recentPosts: {
-        title: "Recent Posts",
-        // 展示条数
-        limit: 6,
-        // 查看全部
-        moreLink: "/pages/archives",
-      },
+      // 查看全部
+      moreLink: "/pages/archives",
     },
   },
   // inject
@@ -157,12 +148,12 @@ export const themeConfig = {
     {
       text: "可视化理解",
       link: "https://demo.phimes.top",
-      icon: "code"
+      icon: "code",
     },
     {
       text: "AI FAQ",
       link: "https://aifaq.phimes.top",
-      icon: "chat"
+      icon: "chat",
     },
     // {
     //   text: "专栏",
@@ -270,16 +261,16 @@ export const themeConfig = {
       // 是否开启封面显示 文章不设置cover封面会显示异常，可以设置下方默认封面
       enable: true,
       // 封面布局方式: left | right | both
-      coverLayout: 'left',
+      coverLayout: "left",
       // 默认封面(随机展示)
       defaultCover: [
-        'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&h=400&fit=crop'
-      ]
-    }
+        "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&h=400&fit=crop",
+      ],
+    },
   },
   // 页脚信息
   footer: {
@@ -399,6 +390,8 @@ export const themeConfig = {
     // 标签
     tags: {
       enable: true,
+      // 侧边栏显示多少个（首页 = 热门 Top N；文章页 = 相关标签 Top N）
+      limit: 10,
     },
     // 倒计时
     countDown: {

@@ -1,275 +1,187 @@
-<!-- 首页 Highlights：Most Popular -->
+<!-- 首页头条下方的封面次条（最新文章） -->
 <template>
-  <div v-if="enabled" class="home-highlights">
-    <!-- Most Popular 横向卡片轮播 -->
-    <section v-if="popularPostsWithCover.length" class="popular-carousel" aria-labelledby="home-highlights-popular">
-      <div class="carousel-header">
-        <span id="home-highlights-popular">Get started with our <strong>best stories</strong></span>
-        <div class="carousel-nav">
-          <button class="nav-btn" @click="scrollCarousel(-1)" aria-label="上一页">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 18l-6-6 6-6"/>
-            </svg>
-          </button>
-          <button class="nav-btn" @click="scrollCarousel(1)" aria-label="下一页">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </button>
+  <section v-if="featuredPosts.length" class="home-featured">
+    <div class="featured-head">
+      <span class="featured-title">{{ title }}</span>
+      <a v-if="moreLink" class="featured-more" :href="moreLink">更多 →</a>
+    </div>
+    <div class="featured-grid">
+      <a
+        v-for="post in featuredPosts"
+        :key="post.id ?? post.permalink ?? post.regularPath"
+        :href="getPostPublicPath(post)"
+        class="featured-card s-card hover"
+      >
+        <div class="card-cover">
+          <img
+            v-if="post.cover"
+            :src="post.cover"
+            :alt="post.title"
+            loading="lazy"
+            @error="(e) => (e.target.style.display = 'none')"
+          />
         </div>
-      </div>
-      <div ref="carouselRef" class="carousel-track">
-        <a
-          v-for="post in popularPostsWithCover"
-          :key="post.id ?? post.permalink ?? post.regularPath"
-          :href="getPostPublicPath(post)"
-          class="carousel-card"
-        >
-          <div class="card-cover">
-            <img
-              :src="post.cover"
-              :alt="post.title"
-              loading="lazy"
-              @error="(e) => e.target.style.display = 'none'"
-            />
-          </div>
-          <div class="card-tags" v-if="post.tags?.length">
+        <div class="card-body">
+          <div v-if="post.tags?.length" class="card-tags">
             <span v-for="tag in post.tags.slice(0, 3)" :key="tag" class="tag">{{ tag }}</span>
           </div>
           <h3 class="card-title">{{ post.title }}</h3>
-          <p class="card-desc" v-if="post.description">{{ post.description }}</p>
-        </a>
-      </div>
-    </section>
-  </div>
+          <span class="card-date">{{ formatTimestamp(post.date) }}</span>
+        </div>
+      </a>
+    </div>
+  </section>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { formatTimestamp } from "@/utils/helper";
+import { selectHomeFeed } from "@/utils/homeSections.mjs";
 import { getPostPublicPath } from "@/utils/postUrl.mjs";
 
 const { theme } = useData();
-
-const enabled = computed(() => Boolean(theme.value?.home?.highlights?.enable));
-
-const getPostKey = (post) =>
-  post?.id ?? post?.permalink ?? post?.regularPath ?? post?.legacyPath ?? post?.title;
-
-const popularPostsWithCover = computed(() => {
-  const posts = Array.isArray(theme.value?.postData) ? theme.value.postData : [];
-  const mostPopularConfig = theme.value?.home?.highlights?.mostPopular ?? {};
-  const rawLimit = Number(mostPopularConfig.limit);
-  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 6;
-  const curatedPaths = Array.isArray(mostPopularConfig.curated) ? mostPopularConfig.curated : [];
-
-  const byPath = new Map();
-  posts.forEach((post) => {
-    if (!post) return;
-    if (typeof post.regularPath === "string") byPath.set(post.regularPath, post);
-    if (typeof post.legacyPath === "string") byPath.set(post.legacyPath, post);
-    if (typeof post.permalink === "string") byPath.set(post.permalink, post);
-  });
-
-  const selected = [];
-  const selectedKeys = new Set();
-  const tryAdd = (post) => {
-    if (!post?.cover) return false;
-    const key = String(getPostKey(post));
-    if (!key || selectedKeys.has(key)) return false;
-    selected.push(post);
-    selectedKeys.add(key);
-    return true;
-  };
-
-  for (const path of curatedPaths) {
-    if (selected.length >= limit) break;
-    if (typeof path !== "string" || !path) continue;
-    tryAdd(byPath.get(path));
-  }
-
-  const rankedPosts = posts
-    .filter((post) => post?.cover && !selectedKeys.has(String(getPostKey(post))))
-    .sort((a, b) => {
-      const aRank = Number(a?.popularRank) || 0;
-      const bRank = Number(b?.popularRank) || 0;
-      if (aRank !== bRank) return bRank - aRank;
-
-      const aDate = Number(a?.date) || 0;
-      const bDate = Number(b?.date) || 0;
-      if (aDate !== bDate) return bDate - aDate;
-
-      return String(getPostKey(a)).localeCompare(String(getPostKey(b)));
-    });
-
-  for (const post of rankedPosts) {
-    if (selected.length >= limit) break;
-    tryAdd(post);
-  }
-
-  return selected;
+const props = defineProps({
+  // 当前页数（只有首页第一页展示）
+  page: {
+    type: Number,
+    default: 1,
+  },
 });
 
-// 轮播滚动
-const carouselRef = ref(null);
-const scrollCarousel = (dir) => {
-  if (!carouselRef.value) return;
-  const el = carouselRef.value;
-  const cardWidth = 296;
+const featuredConfig = computed(() => theme.value?.home?.featured ?? {});
+const title = computed(() => featuredConfig.value.title || "最新文章");
+const moreLink = computed(() => featuredConfig.value.moreLink || "/pages/archives");
 
-  // 检测是否到头
-  const atStart = el.scrollLeft <= 0;
-  const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 5;
-
-  if ((dir < 0 && atStart) || (dir > 0 && atEnd)) {
-    // 震动提示
-    el.classList.add("shake");
-    setTimeout(() => el.classList.remove("shake"), 300);
-    return;
-  }
-
-  el.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
-};
+const featuredPosts = computed(() => {
+  if (featuredConfig.value.enable === false) return [];
+  if (props.page !== 1) return [];
+  return selectHomeFeed(theme.value?.postData, theme.value).featured;
+});
 </script>
 
 <style lang="scss" scoped>
-.home-highlights {
-  margin-bottom: 1rem;
-  animation: fade-up 0.6s 0.2s backwards;
-}
+.home-featured {
+  width: 100%;
+  margin-top: 2.6rem;
 
-.popular-carousel {
-  margin-bottom: 1.5rem;
-}
-
-.carousel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  opacity: 0.9;
-
-  strong {
-    font-weight: 700;
-  }
-}
-
-.carousel-nav {
-  display: flex;
-  gap: 8px;
-
-  .nav-btn {
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--main-card-border);
-    border-radius: 50%;
-    background: var(--main-card-background);
-    cursor: pointer;
+  .featured-head {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    color: inherit;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--main-font-second-color);
 
-    svg {
-      opacity: 0.7;
+    .featured-title {
+      font-weight: 600;
+      color: var(--main-font-color);
     }
 
-    &:hover {
-      border-color: var(--main-color);
-      svg {
-        stroke: var(--main-color);
+    .featured-more {
+      color: var(--main-color);
+      font-weight: 600;
+
+      &:hover {
+        color: var(--main-color-hover);
       }
     }
   }
-}
 
-.carousel-track {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 
-  &.shake {
-    animation: shake 0.3s ease-in-out;
-  }
-}
+  .featured-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  75% { transform: translateX(8px); }
-}
+    .card-cover {
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--main-card-second-background);
+      border-bottom: 1px solid var(--main-card-border);
+      overflow: hidden;
 
-.carousel-card {
-  flex: 0 0 calc((100% - 4rem) / 5);
-  min-width: 240px;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s;
+      img {
+        max-width: 100%;
+        max-height: 150px;
+        display: block;
+        transition: transform 0.4s;
+      }
+    }
 
-  &:hover {
-    transform: translateY(-4px);
+    &:hover {
+      .card-cover img {
+        transform: scale(1.03);
+      }
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 1rem 1.1rem 1.15rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 0.6rem;
+
+      .tag {
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        color: var(--main-font-second-color);
+        background-color: var(--main-card-second-background);
+      }
+    }
+
     .card-title {
-      color: var(--main-color);
+      font-family: var(--main-serif-family);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--main-font-color);
+      margin: 0 0 0.7rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-date {
+      margin-top: auto;
+      font-size: 0.78rem;
+      opacity: 0.6;
+      color: var(--main-font-second-color);
     }
   }
-}
 
-.card-cover {
-  width: 100%;
-  aspect-ratio: 4/3;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 12px;
+  @media (max-width: 900px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    .featured-card {
+      flex-direction: row;
+
+      .card-cover {
+        width: 132px;
+        flex: 0 0 132px;
+        height: auto;
+        min-height: 96px;
+        border-bottom: none;
+        border-right: 1px solid var(--main-card-border);
+      }
+    }
   }
-}
-
-.card-tags {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-
-  .tag {
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    background: var(--main-card-second-background);
-    opacity: 0.8;
-  }
-}
-
-.card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 6px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  transition: color 0.2s;
-}
-
-.card-desc {
-  font-size: 13px;
-  opacity: 0.6;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 </style>

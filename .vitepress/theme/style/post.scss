@@ -16,12 +16,15 @@
     h2 {
       font-size: 1.6rem;
       line-height: 1.6;
+      // 标题需要明显大于段落的上边距，层级才立得住
+      margin: 2.6rem 0 1rem;
       border-bottom: 1px dashed var(--main-color-bg);
       padding-bottom: 0.5rem;
     }
     h3 {
       width: fit-content;
       font-size: 1.2rem;
+      margin: 2rem 0 0.8rem;
       z-index: 0;
       &::after {
         content: "";
@@ -41,6 +44,10 @@
     h4 {
       position: relative;
       cursor: pointer;
+      // Anthropic 的招牌：衬线标题 + 无衬线正文
+      font-family: var(--main-serif-family);
+      font-weight: 600;
+      letter-spacing: -0.01em;
       &:hover {
         .header-anchor {
           opacity: 1;
@@ -69,10 +76,11 @@
   ul,
   li,
   td {
-    margin: 1rem 0;
+    margin: 0.9rem 0;
     text-align: left;
-    letter-spacing: 0.6px;
-    line-height: 2;
+    // 之前是 2 / 0.6px，配合 1000px 的列宽读起来发飘，收紧到编辑级密度
+    letter-spacing: 0.25px;
+    line-height: 1.8;
     // 长 URL / 长英文串不换行会撑破卡片
     overflow-wrap: anywhere;
     // 行内代码
@@ -705,7 +713,7 @@
     border-radius: 8px;
     border: 1px solid var(--main-card-border);
     background-color: var(--main-card-second-background);
-    box-shadow: 0 8px 16px -4px var(--main-border-shadow);
+    box-shadow: 0 1px 3px var(--main-border-shadow);
     p {
       &:first-child {
         margin-top: 0;
