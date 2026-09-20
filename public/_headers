@@ -1,0 +1,26 @@
+# Cloudflare Pages 的响应头配置（对应原来 vercel.json 里的 headers）
+#
+# 说明：
+# - HTML 不在这里配。Cloudflare Pages 会自己在边缘缓存 HTML，并在每次部署时
+#   自动失效，所以既保证部署后立刻生效，又不需要访客跨境回源。
+#   （这是从 Vercel 迁过来的主要收益之一：Vercel 那边 HTML 是 DYNAMIC，
+#     每次访问都要跨太平洋回源美国，还需要额外配 Cache Rule + 忍受 10 分钟陈旧窗口。）
+# - 带内容哈希的构建产物文件名一变就是新 URL，可以放心 immutable。
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/covers/*
+  Cache-Control: public, max-age=604800, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=604800, immutable
+
+/images/*
+  Cache-Control: public, max-age=604800
+
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=604800
