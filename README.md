@@ -89,7 +89,32 @@ cover: https://image.phimes.top/img/xxx.png
 选择 Pages 而不是 Vercel 的原因：Pages 的静态文件**本身就存在 Cloudflare 的边缘**，
 不存在「回源到境外源站」这一跳；而且每次部署会自动失效边缘缓存，改完立刻生效。
 
-- 部署：`.github/workflows/deploy-pages.yml`，推送到 `master` 触发
+### 部署是怎么触发的
+
+**Cloudflare 不参与构建，也不监听这个仓库。** Pages 项目是 Direct Upload 模式
+（API 里 `source` 字段为空），它只知道「有人传了一份文件上来」。
+
+真正的链路是：
+
+```
+git push origin master
+        ↓
+GitHub Actions 检测到 push（.github/workflows/deploy-pages.yml）
+        ↓
+在 GitHub 的 runner 上跑 npm ci → npm run build   ← 构建发生在这里
+        ↓
+wrangler pages deploy 把 .vitepress/dist 上传到 Cloudflare Pages
+        ↓
+Pages 更新边缘缓存并立即生效
+```
+
+也就是说：**构建是 GitHub 做的，Cloudflare 只负责托管产物。**
+
+- 触发条件：推送到 `master`，或在 Actions 页面手动 `workflow_dispatch`
+- 推送其他分支**不会**触发（配置里限定了 `branches: [master]`），
+  也不会有预览部署 —— 那需要 Cloudflare 的 Git 集成模式
+- 构建日志在 GitHub 的 Actions 页面，不在 Cloudflare 面板
+- 响应头里的缓存配置来自 `public/_headers`
 - 需要两个仓库 Secret：`CLOUDFLARE_API_TOKEN`（权限只需 Cloudflare Pages:Edit）
   和 `CLOUDFLARE_ACCOUNT_ID`
 - 手动部署：`npm run deploy`
