@@ -31,7 +31,7 @@ const DEFAULT_RANGE = "7d";
 function unauthorized() {
   return new Response("需要登录", {
     status: 401,
-    headers: { "WWW-Authenticate": "Basic realm=\"analytics\", charset=\"UTF-8\"" },
+    headers: { "WWW-Authenticate": 'Basic realm="analytics", charset="UTF-8"' },
   });
 }
 
@@ -219,6 +219,8 @@ const PAGE = `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="https://blog.phimes.top/images/logo/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://blog.phimes.top/images/logo/favicon-192x192.png">
 <title>站点统计 · Phimes</title>
 <style>
   :root{--bg:#faf9f5;--card:#fff;--line:#e6dfd8;--ink:#141413;--sub:#6b6a64;--coral:#cc785c;--teal:#2f8574;--amber:#b8791f;--blue:#6a9bcc}
@@ -226,9 +228,11 @@ const PAGE = `<!doctype html>
   body{margin:0;padding:20px;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
     font-size:14px;line-height:1.6}
-  .top{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin-bottom:4px}
-  h1{font-size:20px;margin:0}
-  .meta{color:var(--sub);font-size:12px;margin-bottom:14px}
+  .top{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+  .top .brand{width:36px;height:36px;display:block;flex:none}
+  .top .brand-text{min-width:0}
+  h1{font-size:20px;margin:0;line-height:1.3}
+  .meta{color:var(--sub);font-size:12px;margin:1px 0 0}
   .ranges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
   .ranges button{border:1px solid var(--line);background:var(--card);color:var(--ink);
     border-radius:8px;padding:5px 12px;font-size:13px;cursor:pointer;font-family:inherit;transition:all .2s}
@@ -277,8 +281,13 @@ const PAGE = `<!doctype html>
   button.pg.on{background:var(--coral);border-color:var(--coral);color:#fff}
   button.pg:disabled{opacity:.35;cursor:default}
 </style></head><body>
-<div class="top"><h1>站点统计</h1></div>
-<div class="meta" id="meta">加载中…</div>
+<div class="top">
+  <img class="brand" src="https://blog.phimes.top/images/logo/logo.webp" alt="Phimes" width="36" height="36">
+  <div class="brand-text">
+    <h1>站点统计</h1>
+    <div class="meta" id="meta">加载中…</div>
+  </div>
+</div>
 <div class="ranges" id="ranges"></div>
 <div id="app"></div>
 <div id="detail" class="card" style="display:none;margin-top:16px;overflow-x:auto"></div>
