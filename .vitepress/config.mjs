@@ -153,7 +153,9 @@ export default withPwa(
     sitemap: {
       hostname: themeConfig.siteMeta.site,
       transformItems: (items) => {
-        const result = transformSitemapItems(items, postData);
+        const result = transformSitemapItems(items, postData, {
+          site: themeConfig.siteMeta.site,
+        });
         const transformedCount = result.filter(
           (item) => item.url.startsWith("posts/") && item.url.includes("/20"),
         ).length;
