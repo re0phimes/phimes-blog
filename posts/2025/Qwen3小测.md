@@ -1,5 +1,7 @@
 ---
 title: Qwen3-8b的变化和能力初探
+tags:
+  - llm
 categories:
   - model-testing
 date: 2025-04-29

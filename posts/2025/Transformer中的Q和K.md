@@ -1,6 +1,7 @@
 ---
 title: Transformer中的Q和K
 tags:
+  - llm
   - algorithm-principles
 categories:
   - llm-principles

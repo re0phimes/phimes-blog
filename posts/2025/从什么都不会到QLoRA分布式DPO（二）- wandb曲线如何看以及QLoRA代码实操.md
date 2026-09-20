@@ -2,6 +2,7 @@
 title: 从什么都不会到QLoRA分布式DPO（二）
 tags:
   - llm
+  - dpo
   - training
 categories:
   - technical-summary
