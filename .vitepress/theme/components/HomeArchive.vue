@@ -389,6 +389,16 @@ onBeforeUnmount(() => {
     gap: 0.5rem;
     margin-top: 1.6rem;
 
+    // 与页脚对齐。
+    // 页脚（.footer-social）是相对整个视口居中的，而这里原先只相对主内容列
+    // 居中 —— 右侧有侧边栏时主内容列被挤窄，翻页就会比页脚偏左
+    // (侧边栏宽 + 间距) / 2 = (300px + 1rem) / 2 = 158px。
+    // 用 padding-left 把居中参考系整体右移一个「侧边栏 + 间距」，两者就对齐了。
+    // 1200px 以下侧边栏隐藏（见 Home.vue），所以不需要偏移。
+    @media (min-width: 1201px) {
+      padding-left: calc(var(--home-aside-width, 300px) + var(--home-content-gap, 1rem));
+    }
+
     .pager-btn {
       min-width: 32px;
       height: 32px;

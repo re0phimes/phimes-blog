@@ -159,19 +159,25 @@ watch(
 
 <style lang="scss" scoped>
 .home {
+  // 侧边栏宽度与主内容列间距。
+  // 抽成变量是因为 HomeArchive 的翻页分区需要用它来和页脚对齐
+  // （页脚是相对整个视口居中的，而主内容列被侧边栏挤窄了）。
+  --home-aside-width: 300px;
+  --home-content-gap: 1rem;
+
   .home-content {
     width: 100%;
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    gap: var(--home-content-gap);
     .posts-content {
       flex: 1;
       min-width: 0;
       transition: width 0.3s;
     }
     .main-aside {
-      flex: 0 0 300px;
-      width: 300px;
+      flex: 0 0 var(--home-aside-width);
+      width: var(--home-aside-width);
       padding-left: 0;
     }
     @media (max-width: 1200px) {
