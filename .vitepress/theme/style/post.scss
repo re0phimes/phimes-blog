@@ -90,7 +90,7 @@
       padding: 0 6px;
       border-radius: 6px;
       background-color: var(--main-card-border);
-      font-family: "Fira Code", var(--main-font-family), monospace;
+      font-family: var(--main-mono-family);
       font-optical-sizing: auto;
       white-space: nowrap;
       transform: translateY(-2px);
@@ -286,7 +286,7 @@
         user-select: text;
         border-left: 1px solid var(--main-card-border);
         code {
-          font-family: "Fira Code", var(--main-font-family), monospace;
+          font-family: var(--main-mono-family);
           font-optical-sizing: auto;
           .line {
             display: inline-block;

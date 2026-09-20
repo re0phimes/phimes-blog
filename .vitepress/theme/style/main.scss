@@ -40,13 +40,24 @@
   --main-color-white: #ffffff40;
   --main-color-gray: #8e8b82; // muted-soft
   --main-color-red: #c64545;
-  --main-font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen-Sans, Ubuntu,
-    Cantarell, "Helvetica Neue", sans-serif;
-  // 标题衬线字体：Anthropic 的「衬线大标题 + 无衬线正文」
-  // 优先本机自带的宋体（macOS Songti SC / Windows SimSun / Linux Noto Serif CJK），零下载；
-  // 都缺失时才回落到后面的通用衬线。
-  --main-serif-family: "Tiempos Headline", "Source Han Serif SC", "Noto Serif SC",
-    "Noto Serif CJK SC", "Songti SC", "STSong", "SimSun", Georgia, "Times New Roman", serif;
+  // 系统字体栈：中英文由操作系统成对提供（macOS: SF Pro + PingFang SC /
+  // Windows: Segoe UI + 微软雅黑 / Android: Roboto + Noto Sans SC），
+  // 天然同族同重量。零下载、零请求。
+  // 之前默认加载 HarmonyOS Sans，被拆成 46 个子集文件共 723 KB（占全站 55%），
+  // 而且它的拉丁和 CJK 是两套设计，混排时重量对不上。
+  --main-font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", "WenQuanYi Micro Hei", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  // 标题：不再用衬线。
+  // 原来的衬线栈第一顺位 Tiempos Headline 本机/服务器都没有，实际落到 Songti SC，
+  // 其拉丁笔画比中文细一档，正是「中英文不兼容」的来源。直接用系统栈最稳。
+  --main-serif-family: var(--main-font-family);
+  // 代码等宽字体：原来写的是 "Fira Code"，但那个 CDN 早就 404 了，
+  // 于是回落到 var(--main-font-family)——也就是用比例字体渲染代码，非常难看。
+  --main-mono-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Courier New",
+    monospace;
   --vp-c-bg-rgb: 250, 249, 245;
 }
 
@@ -92,13 +103,19 @@ html.dark {
 }
 
 // 字体
+// 默认走 :root 的系统字体栈（html.system 不需要额外规则）。
+// hmos / lxgw 是需要联网下载 webfont 的可选方案，只在用户主动切换时才加载。
 html {
   &.hmos {
-    --main-font-family: "HarmonyOS_Regular", sans-serif;
+    --main-font-family:
+      "HarmonyOS_Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
   }
 
   &.lxgw {
-    --main-font-family: "LXGW WenKai Screen", sans-serif;
+    --main-font-family:
+      "LXGW WenKai Screen", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
   }
 
   .iconfont {
@@ -157,7 +174,6 @@ html {
 
   // 特殊情况
   &.dark {
-
     // 代码高亮
     pre {
       code {
@@ -292,14 +308,24 @@ a {
 // 自定义块样式
 .custom-block {
   .custom-block-content {
-    p, ul, ol, li {
+    p,
+    ul,
+    ol,
+    li {
       color: var(--main-font-color) !important;
     }
   }
 
-  &.info, &.warning, &.danger, &.tip, &.summary {
+  &.info,
+  &.warning,
+  &.danger,
+  &.tip,
+  &.summary {
     .custom-block-content {
-      p, ul, ol, li {
+      p,
+      ul,
+      ol,
+      li {
         color: var(--main-font-color) !important;
       }
     }
