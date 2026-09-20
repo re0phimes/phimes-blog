@@ -97,27 +97,47 @@ const sqlStr = (v) =>
     .replace(/'/g, "''") +
   "'";
 
-async function detail(env, rangeKey, src, dimName, val, limit) {
+async function detail(env, rangeKey, src, dimName, val, page, pageSize) {
   const r = RANGES[rangeKey] || RANGES[DEFAULT_RANGE];
   const dimTable = DETAIL_DIMS[src];
   if (!dimTable) throw new Error("bad src");
   const dim = dimTable[dimName];
   if (!dim) throw new Error("bad dim");
   const dimSql = dim.col || dim.expr;
-  const lim = Math.min(Math.max(Number(limit) || 200, 1), 500);
 
-  if (src === "bot") {
-    return aeQuery(
+  const ps = Math.min(Math.max(Number(pageSize) || 50, 10), 200);
+  const pg = Math.max(Number(page) || 1, 1);
+  const offset = (pg - 1) * ps;
+  const where = `timestamp > NOW() - ${r.interval} AND ${dimSql} = ${sqlStr(val)}`;
+
+  const [countRes, dataRes] = await Promise.all([
+    aeQuery(
       env,
-      `SELECT timestamp, blob1 AS path, blob3 AS ua, blob5 AS country, blob7 AS botType, blob8 AS kind, blob9 AS status, blob10 AS asOrg, blob2 AS oldIp, blob6 AS ipHash FROM bot_visits WHERE timestamp > NOW() - ${r.interval} AND ${dimSql} = ${sqlStr(val)} ORDER BY timestamp DESC LIMIT ${lim}`,
-    );
-  }
-  return aeQuery(
-    env,
-    `SELECT timestamp, blob1 AS path, blob8 AS ua, blob5 AS country, blob6 AS city, blob4 AS referer, blob9 AS clientClass, blob10 AS status, blob11 AS asOrg, blob2 AS ipHash, blob3 AS oldIp FROM site_visits WHERE timestamp > NOW() - ${r.interval} AND ${dimSql} = ${sqlStr(val)} ORDER BY timestamp DESC LIMIT ${lim}`,
-  );
-}
+      `SELECT count() AS total FROM ${src === "bot" ? "bot_visits" : "site_visits"} WHERE ${where}`,
+    ),
+    src === "bot"
+      ? aeQuery(
+          env,
+          `SELECT timestamp, blob1 AS path, blob3 AS ua, blob5 AS country, blob7 AS botType, blob8 AS kind, blob9 AS status, blob10 AS asOrg, blob2 AS oldIp, blob6 AS ipHash FROM bot_visits WHERE ${where} ORDER BY timestamp DESC LIMIT ${ps} OFFSET ${offset}`,
+        )
+      : aeQuery(
+          env,
+          `SELECT timestamp, blob1 AS path, blob8 AS ua, blob5 AS country, blob6 AS city, blob4 AS referer, blob9 AS clientClass, blob10 AS status, blob11 AS asOrg, blob2 AS ipHash, blob3 AS oldIp FROM site_visits WHERE ${where} ORDER BY timestamp DESC LIMIT ${ps} OFFSET ${offset}`,
+        ),
+  ]);
 
+  const total = Number((countRes.data && countRes.data[0] && countRes.data[0].total) || 0);
+  return {
+    src,
+    dim: dimName,
+    val,
+    page: pg,
+    pageSize: ps,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / ps)),
+    data: dataRes.data || [],
+  };
+}
 async function collect(env, rangeKey) {
   const r = RANGES[rangeKey] || RANGES[DEFAULT_RANGE];
   const W = `timestamp > NOW() - ${r.interval}`;
@@ -249,6 +269,13 @@ const PAGE = `<!doctype html>
   tr.rowlink{cursor:pointer}
   tr.rowlink:hover td{background:rgba(204,120,92,.07)}
   tr.rowlink td:first-child::before{content:"› ";color:var(--coral);opacity:.6}
+  .pager{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;margin:10px 0}
+  .pg-group{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+  button.pg{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;
+    padding:3px 9px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .18s}
+  button.pg:hover:not(:disabled){border-color:var(--coral);color:var(--coral)}
+  button.pg.on{background:var(--coral);border-color:var(--coral);color:#fff}
+  button.pg:disabled{opacity:.35;cursor:default}
 </style></head><body>
 <div class="top"><h1>站点统计</h1></div>
 <div class="meta" id="meta">加载中…</div>
@@ -319,34 +346,70 @@ function detailTable(rows, src){
     rows.map(r=>'<tr>'+cols.map(c=>'<td'+(c.n?' class="n"':'')+'>'+c.f(r)+'</td>').join('')+'</tr>').join('') + '</table>';
 }
 
-async function drill(src, dim, val){
-  const box = document.getElementById('detail');
-  box.style.display = 'block';
-  box.innerHTML = '<h2>明细：'+esc(val)+' <span class="muted">加载中…</span></h2>';
-  box.scrollIntoView({behavior:'smooth', block:'start'});
-  try {
-    const q = '/api/detail?range='+encodeURIComponent(CURRENT)+'&src='+esc(src)+'&dim='+esc(dim)+'&val='+encodeURIComponent(val)+'&limit=200';
-    const res = await fetch(q);
-    if(!res.ok) throw new Error('HTTP '+res.status+' '+(await res.text()).slice(0,160));
-    const d = await res.json();
-    const rows = d.data || [];
-    const plain = rows.filter(r=>r.oldIp).length;
-    box.innerHTML =
-      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">' +
-        '<h2 style="margin:0">明细：'+esc(val)+' <span class="muted">共 '+rows.length+' 条（最多显示 200）</span></h2>' +
-        '<button id="detail-close" style="border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 12px;cursor:pointer;font-family:inherit;font-size:13px">收起</button>' +
-      '</div>' +
-      '<div class="muted" style="margin:8px 0 10px">' +
-        (plain ? ('其中 <b>'+plain+'</b> 条是 2026-09-20 之前的旧数据，带<b>明文 IP</b>；其余只有哈希标识。')
-               : '这些记录都只有加盐哈希标识（不能反推 IP）—— 明文 IP 已于 2026-09-20 停止写入。') +
-      '</div>' + detailTable(rows, src);
-    const btn = document.getElementById('detail-close');
-    if(btn) btn.onclick = () => { box.style.display='none'; box.innerHTML=''; };
-  } catch(e) {
-    box.innerHTML = '<h2>明细：'+esc(val)+'</h2><div class="err">加载失败：'+esc(String(e.message||e))+'</div>';
-  }
+// 当前下钻状态（翻页时复用）
+let DRILL = null;
+const PAGE_SIZES = [50, 100, 200];
+
+function pager(state){
+  const { page, totalPages, pageSize, total } = state;
+  // 页码窗口：当前页前后各 2 页
+  const nums = [];
+  const from = Math.max(1, page - 2), to = Math.min(totalPages, page + 2);
+  for (let i = from; i <= to; i++) nums.push(i);
+  const mk = (label, p, dis, on) =>
+    '<button class="pg' + (on ? ' on' : '') + '"' + (dis ? ' disabled' : '') + ' data-p="' + p + '">' + label + '</button>';
+  let h = '<div class="pager">';
+  h += '<span class="muted">共 ' + fmt(total) + ' 条 · 第 ' + page + ' / ' + totalPages + ' 页</span>';
+  h += '<span class="pg-group">';
+  h += mk('‹ 上一页', page - 1, page <= 1, false);
+  if (from > 1) { h += mk('1', 1, false, page === 1); if (from > 2) h += '<span class="muted">…</span>'; }
+  for (const n of nums) h += mk(String(n), n, false, n === page);
+  if (to < totalPages) { if (to < totalPages - 1) h += '<span class="muted">…</span>'; h += mk(String(totalPages), totalPages, false, page === totalPages); }
+  h += mk('下一页 ›', page + 1, page >= totalPages, false);
+  h += '</span>';
+  h += '<span class="pg-group"><span class="muted">每页</span>';
+  for (const ps of PAGE_SIZES) h += '<button class="pg' + (ps === pageSize ? ' on' : '') + '" data-ps="' + ps + '">' + ps + '</button>';
+  h += '</span>';
+  h += '</div>';
+  return h;
 }
 
+async function drill(src, dim, val, page, pageSize){
+  const box = document.getElementById('detail');
+  if(DRILL && (DRILL.src !== src || DRILL.dim !== dim || DRILL.val !== val)){
+    page = 1; // 换分组时回到第一页
+  }
+  const ps = pageSize || (DRILL && DRILL.pageSize) || 50;
+  DRILL = { src, dim, val, page: page || 1, pageSize: ps };
+  box.style.display = 'block';
+  box.innerHTML = '<h2>明细：' + esc(val) + ' <span class="muted">加载中…</span></h2>';
+  if(!page) box.scrollIntoView({behavior:'smooth', block:'start'});
+  try {
+    const q = '/api/detail?range=' + encodeURIComponent(CURRENT) +
+      '&src=' + esc(src) + '&dim=' + esc(dim) +
+      '&val=' + encodeURIComponent(val) +
+      '&page=' + DRILL.page + '&pageSize=' + DRILL.pageSize;
+    const res = await fetch(q);
+    if(!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()).slice(0,160));
+    const d = await res.json();
+    const rows = d.data || [];
+    const plain = rows.filter(r => r.oldIp).length;
+    box.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">' +
+        '<h2 style="margin:0">明细：' + esc(val) + ' <span class="muted">（' + esc(src === 'bot' ? '爬虫' : '真人') + '）</span></h2>' +
+        '<button id="detail-close" class="pg">收起</button>' +
+      '</div>' +
+      '<div class="muted" style="margin:8px 0 4px">' +
+        (plain ? ('本页 <b>' + plain + '</b> 条是 2026-09-20 之前的旧数据，带<b>明文 IP</b>；其余只有哈希标识。')
+               : '本页记录都只有加盐哈希标识（不能反推 IP）—— 明文 IP 已于 2026-09-20 停止写入。') +
+      '</div>' +
+      pager(d) + detailTable(rows, src) + pager(d);
+    const btn = document.getElementById('detail-close');
+    if(btn) btn.onclick = () => { box.style.display='none'; box.innerHTML=''; DRILL = null; };
+  } catch(e) {
+    box.innerHTML = '<h2>明细：' + esc(val) + '</h2><div class="err">加载失败：' + esc(String(e.message||e)) + '</div>';
+  }
+}
 function chart(human, bot){
   const keys = [...new Set([...human.map(x=>x.t), ...bot.map(x=>x.t)])].sort();
   const hm = new Map(human.map(x=>[x.t, Number(x.n)]));
@@ -468,10 +531,16 @@ async function load(){
 
 document.getElementById('app').addEventListener('click', ev => {
   const tr = ev.target.closest('tr.rowlink');
-  if(!tr) return;
-  drill(tr.dataset.src, tr.dataset.dim, tr.dataset.val);
+  if(tr) return drill(tr.dataset.src, tr.dataset.dim, tr.dataset.val);
 });
 
+// 下钻面板里的翻页按钮
+document.getElementById('detail').addEventListener('click', ev => {
+  const b = ev.target.closest('button.pg');
+  if(!b || !DRILL) return;
+  if(b.dataset.p) return drill(DRILL.src, DRILL.dim, DRILL.val, Number(b.dataset.p), DRILL.pageSize);
+  if(b.dataset.ps) return drill(DRILL.src, DRILL.dim, DRILL.val, 1, Number(b.dataset.ps));
+});
 renderRanges();
 load();
 </script>
@@ -491,7 +560,8 @@ export default {
           url.searchParams.get("src") || "bot",
           url.searchParams.get("dim") || "",
           url.searchParams.get("val") || "",
-          url.searchParams.get("limit"),
+          url.searchParams.get("page"),
+          url.searchParams.get("pageSize"),
         );
         return Response.json(data, {
           headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex" },

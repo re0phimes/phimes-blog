@@ -115,9 +115,14 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/
 看板里所有表格的行都**可点击**（行首有个 `›`），点进去看该分组的原始记录：
 时间 / 路径 / 国家 / 城市 / **IP 或哈希** / AS 组织 / Referer / 状态码 / 完整 UA。
 
-后端是 `/api/detail?range=&src=bot|human&dim=&val=&limit=`，
+**明细支持分页**：每页可选 50 / 100 / 200 条，页码窗口是当前页 ±2，
+翻页会回到顶部并保持当前分组。
+
+后端是 `/api/detail?range=&src=bot|human&dim=&val=&page=&pageSize=`，
 `dim` 走白名单（见 `DETAIL_DIMS`），值经 `sqlStr()` 转义后拼进 SQL ——
 Analytics Engine 的 SQL API 不支持参数化查询，所以这是必须的。
+分页用 `LIMIT n OFFSET m`（实测 offset 20000 也正常），同时跑一条 `count()`
+拿总数，两个查询并发。
 
 **能看到的 IP 分两种：**
 
@@ -127,6 +132,17 @@ Analytics Engine 的 SQL API 不支持参数化查询，所以这是必须的。
 | 2026-09-20 之后 | 加盐哈希（16 位十六进制） | 不能反推 IP                   |
 
 明细页会明确标出「其中 N 条是旧数据，带明文 IP」。
+
+### 改这个文件时的注意事项
+
+看板的 HTML 和 JS 是嵌在 Worker 源码的**模板字符串**里的，
+所以用脚本改它很容易踩坑 —— 我这次就踩了：
+
+- 用「按标记切片再拼接」的方式改，**切掉的区间里可能还藏着别的函数**。
+  我切 `drill()` 那次把紧随其后的 `chart()` 一起删了，
+  结果页面只剩一句「加载失败：chart is not defined」。
+- 改完**一定要做一次全量自检**：列出页面脚本里调用的所有函数名，
+  逐个确认有定义。只检查「没报语法错」是不够的。
 
 ### 两个 Analytics Engine SQL 的坑
 
