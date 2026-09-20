@@ -58,6 +58,11 @@ export const themeConfig = {
     // 头部
     // https://vitepress.dev/zh/reference/site-config#head
     header: [
+      // 图片不带 Referer 发出。
+      // 阿里云 OSS（phimesimage.oss-*.aliyuncs.com）配了防盗链白名单，只放行
+      // blog.phimes.top；本地 dev（127.0.0.1:9877）和 Vercel 预览域名不在白名单里，
+      // 会整片 403。不带 Referer 时 OSS 返回 200，所以这里统一去掉。
+      ["meta", { name: "referrer", content: "no-referrer" }],
       // favicon
       ["link", { rel: "icon", href: "/favicon.ico" }],
       // RSS
