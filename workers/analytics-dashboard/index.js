@@ -31,7 +31,7 @@ const DEFAULT_RANGE = "7d";
 function unauthorized() {
   return new Response("需要登录", {
     status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="analytics", charset="UTF-8"' },
+    headers: { "WWW-Authenticate": "Basic realm=\"analytics\", charset=\"UTF-8\"" },
   });
 }
 
@@ -202,9 +202,12 @@ const PAGE = `<!doctype html>
   <b>口径说明</b><br>
   · <b>真人</b> = 返回 200 的页面浏览（静态资源不计）。RSS 阅读器单独记为「订阅者」。<br>
   · <b>爬虫/扫描</b> = 爬虫 UA、扫描器、空 UA、以及所有 404 探测。<br>
-  · 分类字段（<code>blob8</code> kind / <code>blob9</code> clientClass）2026-09-20 才加。<br>
-  &nbsp;&nbsp;之前的旧数据没有分类，历史「真人」里仍含扫描器噪音（表现为 <code>/.env</code>、<code>/wp-login.php</code> 这类路径）。<br>
-  · 新数据已不再写入明文 IP，只保留加盐哈希用于 UV 去重。
+  · 判定用<strong>正向白名单</strong>：路径必须属于 <code>/</code>、<code>/posts/</code>、<code>/pages/</code>、<code>/page</code>
+  &nbsp;以及 <code>/rss.xml</code>、<code>/sitemap.xml</code>、<code>/robots.txt</code> 这些端点，其余一律归 notfound（与状态码无关）。<br>
+  · 爬虫细分为：<code>search_bot</code>（搜索引擎）、<code>ai_bot</code>（GPTBot / ClaudeBot / Perplexity 等）、
+  <code>scanner</code>（扫描器）、<code>datacenter</code>（机房 AS 的伪装浏览器流量）、
+  <code>notfound</code>、<code>empty_ua</code>、<code>http_*</code>、<code>bot</code>。<br>
+  · 分类字段 2026-09-20 才加。之前的旧数据没有分类，历史「真人」里仍含扫描器噪音。
 </div>
 <script>
 const RANGES=[["1h","1 小时"],["6h","6 小时"],["24h","24 小时"],["7d","7 天"],["30d","30 天"],["90d","90 天"]];

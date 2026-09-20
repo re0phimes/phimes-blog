@@ -65,6 +65,51 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/
 真人/爬虫趋势对比、爬虫分类、访问最多页面、来源国家、设备系统、Referer、
 以及「内容优化建议」（对比每篇文章的真人阅读量 vs 爬虫抓取次数）。
 
+### 判定逻辑（v3，2026-09-20）
+
+顺序很重要，第一个命中决定归类：
+
+| #   | 条件                                                                        | 结果                    |
+| --- | --------------------------------------------------------------------------- | ----------------------- |
+| ①   | 路径不在正向白名单（`/`、`/posts/`、`/pages/`、`/page`、feed/crawler 端点） | `notfound`              |
+| ②   | 状态码不是 200 / 304                                                        | `http_<status>`         |
+| ③   | UA 命中扫描器特征                                                           | `scanner`               |
+| ④   | 路径命中探针特征（`/.env`、`/wp-*`…）                                       | `scanner`               |
+| ⑤   | UA 为空或过短                                                               | `empty_ua`              |
+| ⑥   | UA 命中 RSS 阅读器白名单                                                    | `feed`（**真人**）      |
+| ⑦   | UA 命中搜索引擎特征                                                         | `search_bot`            |
+| ⑧   | UA 命中 AI 爬虫特征                                                         | `ai_bot`                |
+| ⑨   | UA 命中其他爬虫/命令行工具                                                  | `bot`                   |
+| ⑩   | IP 命中已知爬虫网段                                                         | `bot`                   |
+| ⑪   | **AS 组织名是机房**（DigitalOcean / AWS / OVH…）                            | `datacenter`            |
+| ⑫   | `cf.botManagement.score < 30`                                               | `bot`（免费套餐不触发） |
+| ⑬   | 以上都不匹配                                                                | `browser`（**真人**）   |
+
+**为什么 ① 用正向白名单而不是状态码**：原来只排除 404，但浏览器缓存过
+一个 404 页面后再访问，Cloudflare 会回 `304 Not Modified`，于是绕过了判定
+被算成真人（实测 `/NCWHtoBSD.html`、`/embedding_visulization.html` 就是这样
+混进来的）。改成正向白名单后与状态码无关。
+
+**为什么 ⑥ 的白名单要收窄**：原来有 `/rss/i` 和 `/feed/i` 这种宽泛匹配，
+`python-feedparser`（抓取库）名字里带 feed，会被误判成真实订阅者。
+
+**⑪ 为什么不用 `botManagement`**：那个字段需要付费套餐才会注入，免费版是
+`undefined`，等于死代码。`asOrganization` 免费版就能读到。
+
+### 一个诚实的说明：IP 哈希的强度
+
+`ipHash = SHA-256(IP + salt)` 取前 8 字节，用于 UV 去重。
+
+盐通过 Worker secret `IP_HASH_SALT` 注入，源码里不再出现。**但这个值
+在仓库的 git 历史里出现过**，所以：
+
+- 想让它真正不可反推（IPv4 只有 2³² 个地址，暴力反查是可行的），需要
+  **换一个新盐**；
+- 代价是**新旧哈希不一致，UV 会有一段重叠期**（同一人被算两次），
+  直到 3 个月保留期把旧数据滚掉。
+
+现在用的是旧值（保证 UV 连续），换不换由你决定。
+
 ### 两个 Analytics Engine SQL 的坑
 
 AE 的 SQL 是 ClickHouse 的**受限子集**，实测：
