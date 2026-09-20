@@ -13,6 +13,29 @@
 
 路由按**具体程度**匹配，所以 `views` 和 `stats` 会覆盖 `*.phimes.top/*` 那条兜底。
 
+三个 Worker 的源码都在本目录下：
+`workers/site-analytics/`、`workers/analytics-dashboard/`、`workers/blog-page-views/`。
+
+> ⚠️ **Worker 不会自动部署**。`.github/workflows/deploy-pages.yml` 只部署 Pages 静态站，
+> 不碰任何 Worker。改完 Worker 代码要手动部署一次（见下），否则线上还是旧的。
+
+## blog-page-views
+
+文章阅读量计数，`views.phimes.top`，用 Workers KV 存储（绑定名 `PAGE_VIEWS`）。
+
+```
+GET  /all?          → { "<path>": count, ... }   构建期 fetch-popular 用
+GET  /?path=<路径>  → { path, count }
+POST /?path=<路径>  → { path, count }            加一并返回最新值
+```
+
+⚠️ **不要用 `*.workers.dev`**：那个域名在国内被 DNS 污染（四个解析器返回四个不同的
+随机社交网站 IP），浏览器请求根本到不了 Worker，表现就是文章页的火焰数字恒为 0。
+必须绑自有域名，这也是 `views.phimes.top` 存在的原因。
+
+⚠️ **POST 是无条件加一**，没有去重 —— 所以这是 PV 不是 UV。同一个人刷新一次就加一次。
+真人/爬虫的区分在 `site-analytics` 那边做。
+
 ## site-analytics
 
 把访问分流写进两个 Analytics Engine 数据集：
