@@ -1,0 +1,42 @@
+name: Deploy to Cloudflare Pages
+
+# 从 Vercel 迁到 Cloudflare Pages 后，部署由这里完成。
+# 需要先在本仓库设置两个 Secrets（Settings → Secrets and variables → Actions）：
+#   CLOUDFLARE_API_TOKEN   一个只带「Cloudflare Pages:Edit」权限的 API Token
+#   CLOUDFLARE_ACCOUNT_ID  2cb7ae35f9305d1bfc18cf40172f6bdb
+# 没有配置这两个 Secret 时，这个 job 会失败（不会影响现有站点，只是不更新）。
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建
+        run: npm run build
+        env:
+          # 浏览量接口实测要 20~45 秒，默认 8 秒会超时并把缓存写空
+          POPULAR_FETCH_TIMEOUT_MS: "45000"
+
+      - name: 部署到 Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .vitepress/dist --project-name=phimes-blog --branch=master
