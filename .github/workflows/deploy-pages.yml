@@ -34,7 +34,18 @@ jobs:
           # 浏览量接口实测要 20~45 秒，默认 8 秒会超时并把缓存写空
           POPULAR_FETCH_TIMEOUT_MS: "45000"
 
+      # 还没配置 Secret 时跳过部署而不是报错 —— 否则每次推送都会多一个红叉。
+      # 配置好 CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID 后这步会自动开始工作。
+      - name: 提醒配置部署凭证
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN == '' }}
+        run: |
+          echo "::warning::还没配置 CLOUDFLARE_API_TOKEN，本次跳过部署。"
+          echo "到仓库 Settings → Secrets and variables → Actions 添加："
+          echo "  CLOUDFLARE_API_TOKEN  （权限只需 Cloudflare Pages:Edit）"
+          echo "  CLOUDFLARE_ACCOUNT_ID （2cb7ae35f9305d1bfc18cf40172f6bdb）"
+
       - name: 部署到 Cloudflare Pages
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
