@@ -4,28 +4,9 @@
       <div class="nav-all">
         <!-- 导航栏左侧 -->
         <div class="left-nav">
-          <div class="more-menu nav-btn" title="更多内容">
-            <i class="iconfont icon-menu" />
-            <div class="more-card s-card">
-              <div v-for="(item, index) in theme.navMore" :key="index" class="more-item">
-                <span class="more-name">{{ item.name }}</span>
-                <div class="more-list">
-                  <a
-                    v-for="(link, i) in item.list"
-                    :key="i"
-                    :href="link.url"
-                    class="more-link"
-                    target="_blank"
-                  >
-                    <img class="link-icon" :src="link.icon" :alt="link.name" />
-                    <span class="link-name">{{ link.name }}</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="site-name" @click="goHome">
-            {{ site.title }}
+          <!-- 回首页按钮（原来这里是折叠菜单 + 站点标题，已按要求简化） -->
+          <div class="site-name" title="回到博客首页" @click="goHome">
+            {{ theme.siteMeta.homeLabel || "Home Page" }}
           </div>
         </div>
         <!-- 导航栏菜单 -->
@@ -228,75 +209,6 @@ const handleNavClick = (link) => {
       flex-direction: row;
       align-items: center;
       min-width: 200px;
-      .more-menu {
-        position: relative;
-        margin-right: 4px;
-        @media (max-width: 512px) {
-          display: none;
-        }
-        .more-card {
-          position: absolute;
-          left: 0;
-          top: 46px;
-          opacity: 0;
-          visibility: hidden;
-          transform-origin: left top;
-          transform: scale(0.8) translateY(-5px);
-          .more-item {
-            margin-top: 0.8rem;
-            &:first-child {
-              margin-top: 0;
-            }
-            .more-name {
-              font-size: 14px;
-              display: inline-block;
-              color: var(--main-font-second-color);
-              margin-bottom: 0.6rem;
-            }
-            .more-list {
-              display: grid;
-              gap: 0.8rem;
-              grid-template-columns: 1fr 1fr;
-              .more-link {
-                display: flex;
-                align-items: center;
-                width: 150px;
-                padding: 6px 8px;
-                border-radius: 8px;
-                .link-icon {
-                  width: 24px;
-                  height: 24px;
-                  border-radius: 50%;
-                  margin-right: 8px;
-                }
-                &:hover {
-                  color: var(--main-card-background);
-                  background-color: var(--main-color);
-                }
-              }
-            }
-          }
-          &::after {
-            content: "";
-            position: absolute;
-            top: -20px;
-            left: 0;
-            width: 100%;
-            height: 30px;
-            z-index: 1;
-          }
-          &:hover {
-            border-color: var(--main-color);
-          }
-        }
-        &:hover {
-          .more-card {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            visibility: visible;
-          }
-        }
-      }
       .site-name {
         position: relative;
         display: flex;
@@ -305,15 +217,16 @@ const handleNavClick = (link) => {
         font-size: 18px;
         font-weight: bold;
         height: 34px;
-        padding: 0 6px;
+        padding: 0 14px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         transition: transform 0.3s;
         cursor: pointer;
+        // hover 时反色，用箭头而不是图标字体
+        // （原来这里是 iconfont 的 \e032 房子字形，依赖上游主题的图标集）
         &::after {
-          content: "\e032";
-          font-family: "iconfont";
+          content: "→";
           display: flex;
           align-items: center;
           justify-content: center;
@@ -324,7 +237,7 @@ const handleNavClick = (link) => {
           height: 100%;
           color: var(--main-card-background);
           background-color: var(--main-color);
-          font-size: 22px;
+          font-size: 20px;
           border-radius: 25px;
           opacity: 0;
           transition: opacity 0.3s;
@@ -359,8 +272,10 @@ const handleNavClick = (link) => {
         justify-content: center;
         align-items: center;
         z-index: 10;
-        opacity: 0;
-        transform: translateY(-50px);
+        // 导航模块常驻在 banner 上方：默认就可见
+        // （原来默认 opacity: 0 + translateY(-50px) 藏起来，要滚过 banner 才滑出）
+        opacity: 1;
+        transform: translateY(0);
         transition:
           transform 0.3s,
           opacity 0.3s;
@@ -638,6 +553,12 @@ const handleNavClick = (link) => {
         background-color: var(--main-card-background);
         border-bottom: 1px solid var(--main-card-border);
         z-index: 100;
+        // 移动端顶部空间不够，不常驻四个模块
+        // （这里的 .site-title 本来就是下滑后才出现的滚动标题，
+        //   常驻形态在移动端会占满整行、盖住 Home Page 按钮）
+        .site-menu {
+          display: none;
+        }
         .site-title {
           font-size: 15px;
           height: auto;
