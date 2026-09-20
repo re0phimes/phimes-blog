@@ -1,6 +1,7 @@
 import { defineConfig } from "vitepress";
 import { createRssFile } from "./theme/utils/generateRSS.mjs";
 import { createBlogIndex } from "./theme/utils/generateBlogIndex.mjs";
+import { createLlmsTxt } from "./theme/utils/generateLlmsTxt.mjs";
 import { withPwa } from "@vite-pwa/vitepress";
 import {
   getAllPosts,
@@ -216,6 +217,62 @@ export default withPwa(
 
       pageData.frontmatter.head ??= [];
       pageData.frontmatter.head.push(["link", { rel: "canonical", href: canonicalUrl }]);
+
+      // JSON-LD 结构化数据。
+      // 搜索引擎靠它出富摘要，AI 爬虫（GPTBot / ClaudeBot / PerplexityBot 等）
+      // 也用它来判断「这是什么页面、作者是谁、什么时候写的」，
+      // 比从 HTML 里猜要准得多。
+      const fm = pageData.frontmatter || {};
+      const isPost = pageData.relativePath.startsWith("posts/");
+      const site = themeConfig.siteMeta.site.replace(/\/$/, "");
+
+      const publisher = {
+        "@type": "Person",
+        name: themeConfig.siteMeta.author?.name || themeConfig.siteMeta.title,
+        url: site,
+        ...(themeConfig.siteMeta.author?.link
+          ? { sameAs: [themeConfig.siteMeta.author.link] }
+          : {}),
+      };
+
+      const graph = [
+        {
+          "@type": "WebSite",
+          "@id": `${site}/#website`,
+          url: `${site}/`,
+          name: themeConfig.siteMeta.title,
+          description: themeConfig.siteMeta.description,
+          inLanguage: "zh-CN",
+          publisher,
+        },
+      ];
+
+      if (isPost) {
+        graph.push({
+          "@type": "BlogPosting",
+          "@id": `${canonicalUrl}#article`,
+          mainEntityOfPage: canonicalUrl,
+          headline: fm.title || pageData.title,
+          description: fm.description || pageData.description || "",
+          inLanguage: "zh-CN",
+          ...(fm.date ? { datePublished: new Date(fm.date).toISOString() } : {}),
+          ...(fm.lastUpdated ? { dateModified: new Date(fm.lastUpdated).toISOString() } : {}),
+          ...(Array.isArray(fm.tags) && fm.tags.length ? { keywords: fm.tags.join(", ") } : {}),
+          ...(Array.isArray(fm.categories) && fm.categories.length
+            ? { articleSection: fm.categories }
+            : {}),
+          ...(fm.cover ? { image: fm.cover } : {}),
+          author: publisher,
+          publisher,
+          isPartOf: { "@id": `${site}/#website` },
+        });
+      }
+
+      pageData.frontmatter.head.push([
+        "script",
+        { type: "application/ld+json" },
+        JSON.stringify({ "@context": "https://schema.org", "@graph": graph }),
+      ]);
     },
     // transformHtml
     transformHtml: (html) => {
@@ -225,6 +282,7 @@ export default withPwa(
     buildEnd: async (config) => {
       await createRssFile(config, themeConfig);
       await createBlogIndex(config, themeConfig);
+      await createLlmsTxt(config, themeConfig);
 
       console.log("[URL Optimization] Generating legacy redirect pages...");
       let redirectCount = 0;

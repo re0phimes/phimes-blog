@@ -1,6 +1,115 @@
+# robots.txt —— Phimes 的博客
+#
+# 策略：内容全部开放抓取，包括 AI 爬虫。
+# 这个站点是公开的技术博客，被更多搜索引擎和 AI 引用 = 更多流量，
+# 所以不做选择性屏蔽，只挡掉那些纯扫描器的探针路径。
+#
+# 注意（历史遗留）：这里原来写的 Sitemap 指向 https://blog.imsyy.top/sitemap.xml，
+# 那是上游主题作者的域名 —— 等于把所有爬虫指向了别人的站，已修正。
+
+# ---------- 通用 ----------
 User-agent: *
 Allow: /
-Allow: /pages/
-Allow: /posts/
 
-Sitemap: https://blog.imsyy.top/sitemap.xml
+# 这些路径本站不存在（不是 WordPress、没有 .env / .git），
+# 扫描器每天都在打，直接声明不允许，减少无意义的采集噪音。
+Disallow: /.env
+Disallow: /.git/
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+Disallow: /wp-content/
+Disallow: /vendor/
+Disallow: /*.php$
+
+# ---------- 搜索引擎 ----------
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Sogou web spider
+Allow: /
+
+User-agent: 360Spider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+# ---------- AI / Agent 爬虫 ----------
+# 明确 Allow 是因为部分平台的抓取策略会读这里的声明。
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: DeepSeekBot
+Allow: /
+
+User-agent: GrokBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# ---------- 订阅 / 归档 ----------
+User-agent: ScourRSSBot
+Allow: /
+
+User-agent: Feedly
+Allow: /
+
+User-agent: ia_archiver
+Allow: /
+
+Sitemap: https://blog.phimes.top/sitemap.xml
