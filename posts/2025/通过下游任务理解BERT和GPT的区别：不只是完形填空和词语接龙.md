@@ -166,14 +166,14 @@ Mask的位置： 随机选择15%的词进行遮盖。这个任务强迫模型学
 所以我们综合来看，BERT和GPT的想要解决的问题不同，所以选择了**不同的注意力形态**。前者可以关注所有的内容，后者则只能看到当前词之前的内容。
 
 
-![](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20251117120238.png)
+![](https://image.phimes.top/img/20251117120238.png)
 
 于是现在，我们终于可以回过头来看一下最初说的“BERT用的Encoder，GPT用的Decoder”。看看架构上的区别。
 
 ## 6 架构区别
 
 
-![模型和架构选择](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251115181934089.png)
+![模型和架构选择](https://image.phimes.top/img/20251115181934089.png)
 
 
 不论是GPT还是BERT，对原始方案都是有一点点改动的。我们先看一下原始的架构，左边是encoder，右边是decoder。decoder需要注意的是，它是先接入一个masked multi-head attention（这里的mask是我们后面GPT用的因果注意力，通过mask遮盖当前token之后的所有token），后面还有个multi-head attention是编码器-解码器交叉注意力（cross-attention），它的Q来自decoder，K和V来自encoder的输出。
@@ -182,7 +182,7 @@ Mask的位置： 随机选择15%的词进行遮盖。这个任务强迫模型学
 
 知道了原生结构，现在开始我们的GPT和BERT的结构对比。
 
-![image.png](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251219233011391.png)
+![image.png](https://image.phimes.top/img/20251219233011391.png)
 
 ### 6.1 GPT
 
@@ -202,13 +202,13 @@ GPT的最主要修改是**移除了编码器解码器注意力部分**。上文�
 - 前瞻掩码自注意力机制
 - 全连接前馈神经网络
 
-![GPT的decoder only](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251219232913711.png)
+![GPT的decoder only](https://image.phimes.top/img/20251219232913711.png)
 
 
 **当然这里GPT对decoder部分的改造并不是本次的重点。**
 ### 6.2 BERT
 
-![BERT架构](https://phimesimage.oss-accelerate.aliyuncs.com/img/20251219232824382.png)
+![BERT架构](https://image.phimes.top/img/20251219232824382.png)
 
 
 

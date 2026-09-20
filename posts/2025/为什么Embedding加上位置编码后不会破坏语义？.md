@@ -202,7 +202,7 @@ $$
 
 也就是说：**高维空间提供了信息分离的基础**
 
-![向量的信息可分离](https://phimesimage.oss-cn-hongkong.aliyuncs.com/img/20250926160420.png)
+![向量的信息可分离](https://image.phimes.top/img/20250926160420.png)
 
 
 这可以说的通了。但是这里有两个前提。
