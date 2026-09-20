@@ -97,7 +97,7 @@
         <!-- 评论 -->
         <Comments ref="commentRef" />
       </article>
-      <Aside showToc />
+      <Aside showToc context="post" />
     </div>
   </div>
 </template>
@@ -131,14 +131,21 @@ onMounted(() => {
 <style lang="scss" scoped>
 @use "../style/post";
 
+// 正文卡片宽度：内容区约 860px（≈ 48 个汉字/行），比原来的 1004px 更好读
+$reading-width: 930px;
+$aside-width: 300px;
+
 .post {
   width: 100%;
   display: flex;
   flex-direction: column;
   animation: fade-up 0.6s 0.1s backwards;
   .post-meta {
-    padding: 2rem 0 3rem 18px;
     width: 100%;
+    // 与正文卡片同宽同起点，标题才能和正文左对齐
+    max-width: $reading-width + $aside-width;
+    margin: 0 auto;
+    padding: 2rem 2.2rem 3rem 2.2rem;
     .meta {
       display: flex;
       flex-direction: row;
@@ -196,8 +203,12 @@ onMounted(() => {
       }
     }
     .title {
+      // 与正文标题同一套衬线字体
+      font-family: var(--main-serif-family);
+      font-weight: 600;
+      letter-spacing: -0.015em;
       font-size: 2.2rem;
-      line-height: 1.2;
+      line-height: 1.25;
       color: var(--main-font-color);
       margin: 1.4rem 0;
     }
@@ -251,11 +262,15 @@ onMounted(() => {
   }
   .post-content {
     width: 100%;
+    max-width: $reading-width + $aside-width;
+    margin: 0 auto;
     display: flex;
     flex-direction: row;
+    justify-content: center;
     animation: fade-up 0.6s 0.3s backwards;
     .post-article {
-      width: calc(100% - 300px);
+      width: calc(100% - #{$aside-width});
+      max-width: $reading-width;
       // flex 子项默认 min-width: auto，宽公式会把卡片顶宽、溢出到侧边栏
       min-width: 0;
       padding: 1rem 2.2rem 2.2rem 2.2rem;
@@ -332,7 +347,7 @@ onMounted(() => {
       }
     }
     .main-aside {
-      width: 300px;
+      width: $aside-width;
       padding-left: 1rem;
     }
     @media (max-width: 1200px) {
@@ -342,6 +357,13 @@ onMounted(() => {
       .main-aside {
         display: none;
       }
+    }
+  }
+  // 目录收起后，标题与正文都按正文宽度居中
+  @media (max-width: 1200px) {
+    .post-meta,
+    .post-content {
+      max-width: $reading-width;
     }
   }
   @media (max-width: 768px) {

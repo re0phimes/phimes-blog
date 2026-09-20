@@ -12,9 +12,13 @@
       <i v-if="height === 'full'" class="iconfont icon-up" @click="scrollToHome" />
     </Transition>
   </div>
-  <div v-else-if="type === 'page'" :class="['banner-page', 's-card', { image }]" :style="{
-    backgroundImage: image ? `url(${image})` : null,
-  }">
+  <div
+    v-else-if="type === 'page'"
+    :class="['banner-page', 's-card', { image }]"
+    :style="{
+      backgroundImage: image ? `url(${image})` : null,
+    }"
+  >
     <div class="top">
       <div class="title">
         <span class="title-small">{{ title }}</span>
@@ -127,7 +131,8 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .banner {
-  height: 180px;
+  // 首页顶部只保留一条问候条，把第一屏让给头条文章
+  height: 110px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,7 +155,7 @@ onBeforeUnmount(() => {
   .title {
     font-family: "Site Title";
     font-weight: bold;
-    font-size: 2.75rem;
+    font-size: 2rem;
   }
 
   .subtitle {
@@ -181,10 +186,10 @@ onBeforeUnmount(() => {
 
   @media (max-width: 768px) {
     align-items: flex-start;
-    height: 140px;
+    height: 92px;
 
     .title {
-      font-size: 2.25rem;
+      font-size: 1.6rem;
     }
 
     .subtitle {

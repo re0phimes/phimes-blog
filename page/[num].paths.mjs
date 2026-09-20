@@ -1,4 +1,5 @@
 import { getAllPosts } from "../.vitepress/theme/utils/getPostData.mjs";
+import { selectHomeFeed } from "../.vitepress/theme/utils/homeSections.mjs";
 import { getThemeConfig } from "../.vitepress/init.mjs";
 
 const postData = await getAllPosts();
@@ -7,8 +8,12 @@ const themeConfig = await getThemeConfig();
 // 每页文章数
 const postsPerPage = themeConfig.postSize;
 
+// 首页首屏（头条 + 封面次条）会从列表里去掉，分页总数必须用同一份数据算，
+// 否则页数会和实际列表对不上。
+const { feed } = selectHomeFeed(postData, themeConfig);
+
 // 计算总页数
-const totalPages = Math.ceil(postData.length / postsPerPage);
+const totalPages = Math.ceil(feed.length / postsPerPage);
 
 // 文章分页动态路由
 export default {

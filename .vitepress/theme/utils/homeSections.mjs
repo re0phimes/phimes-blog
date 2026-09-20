@@ -139,8 +139,18 @@ export const selectRecentPosts = (postData, recentConfig = {}, options = {}) => 
     const bModified = Number(b.lastModified) || 0;
     if (aModified !== bModified) return bModified - aModified;
 
-    const aPath = typeof a.permalink === "string" ? a.permalink : (typeof a.regularPath === "string" ? a.regularPath : "");
-    const bPath = typeof b.permalink === "string" ? b.permalink : (typeof b.regularPath === "string" ? b.regularPath : "");
+    const aPath =
+      typeof a.permalink === "string"
+        ? a.permalink
+        : typeof a.regularPath === "string"
+          ? a.regularPath
+          : "";
+    const bPath =
+      typeof b.permalink === "string"
+        ? b.permalink
+        : typeof b.regularPath === "string"
+          ? b.regularPath
+          : "";
     return aPath.localeCompare(bPath);
   });
 
@@ -176,4 +186,83 @@ export const selectHomeHighlights = (postData, themeConfig = {}) => {
   });
 
   return { mostPopularPosts, recentPosts };
+};
+
+const byDateDesc = (a, b) => {
+  const aDate = Number(a.date) || 0;
+  const bDate = Number(b.date) || 0;
+  if (aDate !== bDate) return bDate - aDate;
+  const aModified = Number(a.lastModified) || 0;
+  const bModified = Number(b.lastModified) || 0;
+  if (aModified !== bModified) return bModified - aModified;
+  const aPath = typeof a.permalink === "string" ? a.permalink : "";
+  const bPath = typeof b.permalink === "string" ? b.permalink : "";
+  return aPath.localeCompare(bPath);
+};
+
+/**
+ * Select the homepage hero / 头条文章.
+ *
+ * `heroConfig.post` 支持 permalink、id、文件名或标题；留空则取最新一篇。
+ *
+ * @param {Array<object>} postData - theme.postData
+ * @param {object} heroConfig - themeConfig.home.hero
+ * @returns {object|null}
+ */
+export const selectHomeHero = (postData, heroConfig = {}) => {
+  if (!Array.isArray(postData) || postData.length === 0) return null;
+  if (heroConfig?.enable === false) return null;
+
+  const candidates = postData.filter((post) => post && post.id !== undefined && post.id !== null);
+  if (candidates.length === 0) return null;
+
+  const wanted = String(heroConfig?.post ?? "").trim();
+  if (wanted) {
+    const matched = candidates.find((post) =>
+      [post.permalink, post.id, post.regularPath, post.legacyPath, post.title]
+        .filter((value) => typeof value === "string" && value)
+        .some((value) => value === wanted || value.endsWith(wanted)),
+    );
+    if (matched) return matched;
+    console.warn(`[home] hero.post 没有匹配到文章，回退到最新一篇：${wanted}`);
+  }
+
+  return [...candidates].sort(byDateDesc)[0] ?? null;
+};
+
+/**
+ * 首页首屏数据：头条 + 封面次条 + 其余文章流（三者互不重复）。
+ *
+ * 这里的 feed 同时被 Home.vue 的列表和 page/[num].paths.mjs 的分页总数使用，
+ * 必须保持同一个来源，否则分页页数会和实际列表对不上。
+ *
+ * @param {Array<object>} postData - theme.postData
+ * @param {object} themeConfig
+ * @returns {{ hero: object|null, featured: Array<object>, feed: Array<object> }}
+ */
+export const selectHomeFeed = (postData, themeConfig = {}) => {
+  const posts = Array.isArray(postData) ? postData : [];
+  if (posts.length === 0) return { hero: null, featured: [], feed: [] };
+
+  const hero = selectHomeHero(posts, themeConfig?.home?.hero);
+
+  const featuredConfig = themeConfig?.home?.featured ?? {};
+  const rawLimit = Number(featuredConfig.limit);
+  const featuredLimit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 3;
+
+  const featured =
+    featuredConfig.enable === false
+      ? []
+      : selectRecentPosts(posts, { limit: featuredLimit }, { excludeIds: hero ? [hero.id] : [] });
+
+  const excludeIds = new Set([hero, ...featured].filter(Boolean).map((post) => String(post.id)));
+
+  const feed = posts
+    .filter(
+      (post) =>
+        post && post.id !== undefined && post.id !== null && !excludeIds.has(String(post.id)),
+    )
+    .sort(byDateDesc);
+
+  return { hero, featured, feed };
 };

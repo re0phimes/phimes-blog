@@ -4,26 +4,31 @@
     <Banner v-if="showHeader" :height="store.bannerType" />
     <div class="home-content">
       <div class="posts-content">
-        <!-- 首页 Highlights：Most Popular / Recent Posts -->
-        <HomeHighlights v-if="shouldShowHighlights" />
-        <!-- 分类总览 -->
-        <TypeBar :type="showTags ? 'tags' : 'categories'" />
-        <!-- 文章列表 -->
-        <PostList :listData="postData" />
-        <!-- 分页 -->
-        <Pagination
-          :total="allListTotal"
-          :page="Number(page)"
-          :limit="postSize"
-          :useParams="showCategories || showTags ? true : false"
-          :routePath="
-            showCategories
-              ? `/pages/categories/${showCategories}`
-              : showTags
-                ? `/pages/tags/${showTags}`
-                : ''
-          "
-        />
+        <!-- 头条文章 -->
+        <HomeHero v-if="shouldShowHero" />
+        <!-- 头条下方的封面次条 -->
+        <HomeHighlights v-if="shouldShowHero" :page="Number(page)" />
+        <!-- 分类 / 标签页：沿用服务端筛选 -->
+        <template v-if="isTaxonomyPage">
+          <TypeBar :type="showTags ? 'tags' : 'categories'" />
+          <PostList :listData="postData" />
+          <Pagination
+            :total="allListTotal"
+            :page="Number(page)"
+            :limit="postSize"
+            :useParams="true"
+            :routePath="
+              showCategories
+                ? `/pages/categories/${showCategories}`
+                : showTags
+                  ? `/pages/tags/${showTags}`
+                  : ''
+            "
+          />
+        </template>
+
+        <!-- 首页：历史文章（客户端排序 / 筛选 / 分页） -->
+        <HomeArchive v-else />
       </div>
       <!-- 侧边栏 -->
       <Aside />
@@ -33,7 +38,7 @@
 
 <script setup>
 import { mainStore } from "@/store";
-import { selectHomeHighlights } from "@/utils/homeSections.mjs";
+import { selectHomeFeed } from "@/utils/homeSections.mjs";
 
 const { theme } = useData();
 const store = mainStore();
@@ -63,45 +68,26 @@ const props = defineProps({
 // 每页文章数
 const postSize = theme.value.postSize;
 
-// 首页 Highlights 数据（用于：去重/分页/展示条件）
-const homeHighlightsData = computed(() => selectHomeHighlights(theme.value?.postData, theme.value));
-const homeHighlightsExcludedIds = computed(() => {
-  const idSet = new Set();
-  const { mostPopularPosts = [], recentPosts = [] } = homeHighlightsData.value ?? {};
-  [...mostPopularPosts, ...recentPosts].forEach((post) => {
-    if (!post || post.id === undefined || post.id === null) return;
-    idSet.add(String(post.id));
-  });
-  return idSet;
-});
+// 首页首屏数据（头条 + 封面次条 + 其余文章流，三者互不重复）
+const homeFeedData = computed(() => selectHomeFeed(theme.value?.postData, theme.value));
 
 // 首页文章流（按日期降序排序）
 const homeFeedPostData = computed(() => {
-  const data = theme.value?.postData;
-  if (!Array.isArray(data)) return [];
-
-  const filtered = data.filter(post => post && post.id !== undefined && post.id !== null);
-
-  // 按日期降序排序（最新优先）
-  return [...filtered].sort((a, b) => {
-    const aDate = Number(a?.date) || 0;
-    const bDate = Number(b?.date) || 0;
-    return bDate - aDate;
-  });
+  const { feed } = homeFeedData.value;
+  if (!Array.isArray(feed)) return [];
+  return feed.filter((post) => post && post.id !== undefined && post.id !== null);
 });
 
-// 首页 Highlights 显示条件（仅首页第一页，且不在分类/标签页）
-const shouldShowHighlights = computed(() => {
-  const highlightsConfig = theme.value?.home?.highlights;
-  if (!highlightsConfig?.enable) return false;
+// 首屏（头条 + 封面次条）显示条件：仅首页第一页，且不在分类/标签页
+const shouldShowHero = computed(() => {
   if (props.showCategories || props.showTags) return false;
-
   // 默认仅首页第一页展示
-  if (highlightsConfig.onlyFirstPage !== false) {
-    return getCurrentPage() === 0;
-  }
-  return true;
+  if (theme.value?.home?.featured?.onlyFirstPage === false) return true;
+  return getCurrentPage() === 0;
 });
+
+// 分类 / 标签页沿用服务端筛选，首页走客户端的历史文章列表
+const isTaxonomyPage = computed(() => Boolean(props.showCategories || props.showTags));
 
 // 列表总数量
 const allListTotal = computed(() => {

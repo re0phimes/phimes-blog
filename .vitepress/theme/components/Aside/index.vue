@@ -4,7 +4,7 @@
     <div class="sticky">
       <Toc v-if="theme.aside.toc.enable && showToc" class="weidgets" />
       <Countdown class="weidgets" />
-      <Tags v-if="theme.aside.tags.enable" class="weidgets" />
+      <Tags v-if="theme.aside.tags.enable" class="weidgets" :context="context" />
       <SiteData v-if="theme.aside.siteData.enable" class="weidgets" />
     </div>
   </aside>
@@ -17,6 +17,11 @@ const props = defineProps({
   showToc: {
     type: Boolean,
     default: false,
+  },
+  // 标签组件上下文：home = 全局热门；post = 与当前文章相关
+  context: {
+    type: String,
+    default: "home",
   },
 });
 </script>
