@@ -6,7 +6,8 @@
         <a :href="theme.siteMeta.author.link" class="author link" target="_blank">
           {{ theme.siteMeta.author.name }}
         </a>
-        <a class="icp link" href="https://beian.miit.gov.cn/" target="_blank">
+        <!-- 备案号：留空时整块不显示（本站没有真实 ICP 备案） -->
+        <a v-if="theme.icp" class="icp link" href="https://beian.miit.gov.cn/" target="_blank">
           <i class="iconfont icon-safe" />
           {{ theme.icp }}
         </a>
@@ -16,8 +17,8 @@
           <span class="by">Powered by</span>
           <span class="name">VitePress</span>
         </a>
-        <a class="theme link" href="https://github.com/phi/phimes-blog" target="_blank">
-          <span class="name">Theme by phi</span>
+        <a class="theme link" href="https://github.com/re0phimes/phimes-blog" target="_blank">
+          <span class="name">Theme by Phimes</span>
         </a>
         <a
           class="cc link"
