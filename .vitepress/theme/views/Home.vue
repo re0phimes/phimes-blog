@@ -170,6 +170,15 @@ watch(
     display: flex;
     flex-direction: row;
     gap: var(--home-content-gap);
+
+    // 侧栏没有渲染时（三个 widget 全关 / 或本就不该显示）不留宽度和间距。
+    // 否则主内容列会被挤窄，右边空出一大片，看起来像「页面没自适应」。
+    // 用 :has() 而不是 JS 判断，这样以后在 themeConfig 里开关 widget，
+    // 这里的宽度会自动跟着变，不会漏改。
+    &:not(:has(.main-aside)) {
+      --home-aside-width: 0px;
+      --home-content-gap: 0px;
+    }
     .posts-content {
       flex: 1;
       min-width: 0;
@@ -187,6 +196,12 @@ watch(
       .main-aside {
         display: none;
       }
+    }
+
+    // 窄屏和「无侧栏」两种情况都不需要翻页控件的补偿内边距
+    @media (max-width: 1200px) {
+      --home-aside-width: 0px;
+      --home-content-gap: 0px;
     }
   }
 }
