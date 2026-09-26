@@ -50,7 +50,10 @@ const { frontmatter } = useData();
       padding: 1rem 2rem;
     }
   }
-  &.has-aside {
+  // :has(.main-aside) 是必须的 —— 侧栏在三个 widget 全关时整个不渲染
+  // （见 components/Aside/index.vue），此时如果再让出 300px，
+  // 右边就会空出一整列。pages/archives.md 就是 aside:true 但没 widget 的情况。
+  &.has-aside:has(.main-aside) {
     animation: fade-up 0.6s 0.3s backwards;
     .page-content {
       width: calc(100% - 300px);

@@ -31,7 +31,7 @@ const DEFAULT_RANGE = "7d";
 function unauthorized() {
   return new Response("需要登录", {
     status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="analytics", charset="UTF-8"' },
+    headers: { "WWW-Authenticate": "Basic realm=\"analytics\", charset=\"UTF-8\"" },
   });
 }
 
