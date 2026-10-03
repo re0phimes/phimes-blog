@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 import { createRssFile } from "./theme/utils/generateRSS.mjs";
 import { createBlogIndex } from "./theme/utils/generateBlogIndex.mjs";
 import { createLlmsTxt } from "./theme/utils/generateLlmsTxt.mjs";
+import { createMarkdownMirrors } from "./theme/utils/generateMarkdownMirrors.mjs";
 import { withPwa } from "@vite-pwa/vitepress";
 import {
   getAllPosts,
@@ -161,6 +162,10 @@ export default withPwa(
       //
       // 全站 PV/UV 目前仍由侧边栏的 busuanzi 提供（见 Aside/Widgets/SiteData.vue），
       // 文章阅读量由自建 Worker 提供（见 composables/usePageViews.js）。
+
+      // llms.txt 的显式声明。文件一直有构建，但 HTML 和 robots.txt 里都没提过，
+      // AI 只能靠猜根路径。补一个 rel="alternate"，能读 head 的抓取器就能直接找到。
+      ["link", { rel: "alternate", type: "text/plain", href: "/llms.txt", title: "llms.txt" }],
     ],
 
     // sitemap
@@ -234,6 +239,15 @@ export default withPwa(
       pageData.frontmatter.head ??= [];
       pageData.frontmatter.head.push(["link", { rel: "canonical", href: canonicalUrl }]);
 
+      // 声明这篇文章的 Markdown 纯文本版本（构建期由 generateMarkdownMirrors 生成）。
+      // 一处声明，AI 爬虫和聚合器就能跳过 HTML 直接取正文。
+      if (customUrl) {
+        pageData.frontmatter.head.push([
+          "link",
+          { rel: "alternate", type: "text/markdown", href: `${customUrl}.md` },
+        ]);
+      }
+
       // JSON-LD 结构化数据。
       // 搜索引擎靠它出富摘要，AI 爬虫（GPTBot / ClaudeBot / PerplexityBot 等）
       // 也用它来判断「这是什么页面、作者是谁、什么时候写的」，
@@ -298,6 +312,8 @@ export default withPwa(
     buildEnd: async (config) => {
       await createRssFile(config, themeConfig);
       await createBlogIndex(config, themeConfig);
+      // 必须在 createLlmsTxt 之前：llms.txt 里的文章链接指向这些 .md
+      await createMarkdownMirrors(config, themeConfig);
       await createLlmsTxt(config, themeConfig);
 
       console.log("[URL Optimization] Generating legacy redirect pages...");

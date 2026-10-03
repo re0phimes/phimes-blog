@@ -113,3 +113,12 @@ User-agent: ia_archiver
 Allow: /
 
 Sitemap: https://blog.phimes.top/sitemap.xml
+
+# ---------- 给 AI 的入口 ----------
+# robots.txt 没有声明 llms.txt 的标准字段，这里用注释指出位置。
+# llms.txt 是给大模型的站点索引：文章标题、摘要、日期、标签，一次拿全。
+# https://blog.phimes.top/llms.txt
+#
+# 每篇文章另有纯 Markdown 正文：在文章 URL 后面加 .md 后缀即可，
+# 例 https://blog.phimes.top/posts/2026/01/16/transformer-kv-cache-attention-roofline.md
+# 该版本没有导航和脚本噪音，推荐 AI 直接抓这个而不是 HTML。

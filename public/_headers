@@ -24,3 +24,12 @@
 
 /manifest.webmanifest
   Cache-Control: public, max-age=604800
+
+# AI 入口。显式指定类型，免得某些边缘节点把 .md 当成二进制附件下发。
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
+
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+  Cache-Control: public, max-age=3600

@@ -80,7 +80,14 @@ export const transformSitemapItems = (items, postData, options = {}) => {
   const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
   const site = String(options.site || "").replace(/\/$/, "");
 
-  const withLastmod = (item, date) => (date ? { ...item, lastmod: date.toISOString() } : item);
+  // 没有可信的修改时间就干脆不写 lastmod。
+  // VitePress 默认给每个页面填文件 mtime，而 CI 的 actions/checkout 不保留 mtime，
+  // 等于构建时间 —— 每次部署全站 lastmod 都刷新，爬虫会以为所有页面都改过。
+  const withLastmod = (item, date) => {
+    if (date) return { ...item, lastmod: date.toISOString() };
+    const { lastmod: _drop, ...rest } = item;
+    return rest;
+  };
 
   return (
     items
@@ -172,8 +179,9 @@ export const transformSitemapItems = (items, postData, options = {}) => {
         }
 
         // 其余独立页面（about / link / project / privacy / cc …）
+        // 这些页面没有文章级的日期，宁可不写 lastmod 也不填构建时间
         return {
-          ...withLastmod(rawItem, toDate(options.siteLastmod) || now),
+          ...withLastmod(rawItem, toDate(options.siteLastmod)),
           url: normalizedUrl,
           priority: 0.5,
           changefreq: "monthly",

@@ -156,8 +156,8 @@ export const getAllPosts = async () => {
           const content = await fs.readFile(item, "utf-8");
           // 文件的元数据
           const stat = await fs.stat(item);
-          // 获取文件创建时间和最后修改时间
-          const { birthtimeMs, mtimeMs } = stat;
+          // 获取文件创建时间（lastModified 不再用 mtime，见下）
+          const { birthtimeMs } = stat;
           // 解析 front matter
           const { data, content: markdownContent } = matter(content);
           const {
@@ -253,12 +253,20 @@ export const getAllPosts = async () => {
           // 兼容 tag（单数）和 tags（复数）
           const resolvedTags = tags || tag || undefined;
 
+          const resolvedDate = date ? new Date(date).getTime() : birthtimeMs;
+
           return {
             id: urlData?.id || generateId(item),
             title: title || "未命名文章",
-            date: date ? new Date(date).getTime() : birthtimeMs,
-            lastModified: mtimeMs,
+            date: resolvedDate,
+            // 不用文件 mtime：CI 的 actions/checkout 不保留 mtime，
+            // 每次部署它都等于构建时间，会让 sitemap 的 lastmod 全站漂移，
+            // 爬虫于是每次都以为所有文章都改过。改用 frontmatter 的
+            // lastUpdated，没有就退回发布日期。
+            lastModified: lastUpdated ? new Date(lastUpdated).getTime() : resolvedDate,
             lastUpdated: lastUpdated ? new Date(lastUpdated).getTime() : undefined,
+            // 源文件相对路径，generateMarkdownMirrors 用它读原始 Markdown
+            sourcePath: item,
             version: version || undefined,
             expired,
             tags: resolvedTags,
