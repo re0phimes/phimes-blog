@@ -283,7 +283,9 @@ const HOSTING_ASN = new RegExp(
   "i",
 );
 
-const IP_HASH_SALT_FALLBACK = "REMOVED-OLD-SALT";
+// 这里刻意不留硬编码兜底盐。旧值曾随本文件进入公开仓库，已经是公开值；
+// 留着它等于让哈希恒定可反推。secret 缺失时宁可不写哈希，也不能用一个
+// 全世界都知道的盐继续算。
 
 function matchMap(map, ua) {
   for (const [re, name] of map) if (re.test(ua)) return name;
@@ -433,9 +435,10 @@ async function record(request, env, response, url) {
   const city = request.cf?.city || "";
   const asOrg = request.cf?.asOrganization || "";
   const status = String(response.status);
-  // 盐从 secret 读，仓库源码里不再出现（旧的硬编码值只作兜底）
-  const salt = env.IP_HASH_SALT || IP_HASH_SALT_FALLBACK;
-  const ipHash = await hashIP(ip, salt);
+  // 盐只从 secret 读。没配就写空串：UV 去重会失真，但绝不会拿一个
+  // 已经公开的盐去算「看起来匿名」的哈希。
+  const salt = env.IP_HASH_SALT || "";
+  const ipHash = salt ? await hashIP(ip, salt) : "";
   const index = [hostname];
 
   const verdict = classify(request, response, pathname);

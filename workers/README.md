@@ -123,15 +123,21 @@ curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/
 
 `ipHash = SHA-256(IP + salt)` 取前 8 字节，用于 UV 去重。
 
-盐通过 Worker secret `IP_HASH_SALT` 注入，源码里不再出现。**但这个值
-在仓库的 git 历史里出现过**，所以：
+盐只从 Worker secret `IP_HASH_SALT` 读，源码里没有任何兜底值。旧盐曾随
+本文件进入公开仓库，等于已公开，因此**必须换成一个新值**（IPv4 只有 2³²
+个地址，盐一旦已知就能暴力反查出原始 IP）。旧盐的字面量已从源码、文档和
+git 历史中一并清除，不再留存。
 
-- 想让它真正不可反推（IPv4 只有 2³² 个地址，暴力反查是可行的），需要
-  **换一个新盐**；
-- 代价是**新旧哈希不一致，UV 会有一段重叠期**（同一人被算两次），
-  直到 3 个月保留期把旧数据滚掉。
+代价是**新旧哈希不一致，UV 会有一段重叠期**（同一人被算两次），
+直到 3 个月保留期把旧数据滚掉。旧数据里已经写进去的哈希无法删除，
+这段重叠期是换盐的必然成本。
 
-现在用的是旧值（保证 UV 连续），换不换由你决定。
+**secret 缺失时**（而不是用兜底值）行为是：`ipHash` 写空串。UV 去重
+会失真，看板里「真人 UV」会掉，但不会暴露任何可反推的哈希。
+这是刻意的取舍，别为了「让数字好看」把兜底盐加回来。
+
+> 部署 Worker 后务必确认 secret 在位：
+> `curl -s "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/site-analytics/settings" -H "Authorization: Bearer $CF_TOKEN" | grep -c IP_HASH_SALT`
 
 ### 下钻（明细）
 
